@@ -26,9 +26,9 @@ Route::post('/preferences/{token}', [PublicSubscriptionController::class, 'updat
 Route::get('/t/open/{token}', [TrackingController::class, 'trackOpen'])->name('tracking.open');
 Route::get('/t/click/{token}', [TrackingController::class, 'trackClick'])->name('tracking.click');
 
-// Root Route - Redirects to Dashboard or Public Form based on auth
+// Root Route - Redirects to Dashboard or Login based on auth
 Route::get('/', function () {
-    return auth()->check() ? redirect()->route('dashboard') : redirect()->route('public.signup');
+    return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
 });
 
 // Authenticated Admin Dashboard & Management Routes
