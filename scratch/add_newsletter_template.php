@@ -65,28 +65,6 @@ $htmlContent = <<<'HTML'
                         </td>
                     </tr>
 
-                    <!-- Content Section 1 -->
-                    <tr>
-                        <td style="padding: 0 32px 24px 32px;">
-                            <h3 style="color: #1e293b; font-size: 18px; font-weight: 700; margin: 0 0 10px 0;">[Content Section Title]</h3>
-                            <p style="color: #475569; font-size: 14px; margin: 0 0 14px 0;">
-                                [Add your newsletter content here. You can use paragraphs, bullet points, links, and formatting.]
-                            </p>
-                            <ul style="color: #475569; font-size: 14px; margin: 0 0 16px 0; padding-left: 20px; line-height: 1.8;">
-                                <li>Key takeaway or highlight item number one</li>
-                                <li>Important announcement or feature update</li>
-                                <li>Actionable tip for your workflow</li>
-                            </ul>
-                        </td>
-                    </tr>
-
-                    <!-- Middle Image -->
-                    <tr>
-                        <td style="padding: 0 32px 24px 32px;">
-                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1000&h=450&fit=crop&q=80" alt="Section Visual" width="686" style="width: 100%; max-width: 686px; height: auto; display: block; border-radius: 12px; border: 0;" />
-                            <p style="color: #94a3b8; font-size: 11px; text-align: center; margin: 6px 0 0 0;">Image can be inserted between content sections.</p>
-                        </td>
-                    </tr>
 
                     <!-- Featured Content Highlight Box -->
                     <tr>

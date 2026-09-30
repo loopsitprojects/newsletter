@@ -4,7 +4,6 @@ import {
     Sparkles,
     Image as ImageIcon,
     Type,
-    ListPlus,
     Link2,
     Eye,
     Code,
@@ -37,15 +36,6 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
         headerImage: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&h=500&fit=crop&q=80',
         mainHeading: 'Welcome to Our Latest Edition',
         introText: 'Thank you for subscribing to our newsletter! Here is our latest roundup of news, feature updates, and exclusive tutorials.',
-        section1Title: 'Key Announcements & Updates',
-        section1Text: 'We are excited to share some major milestones and helpful guides designed to accelerate your workflow.',
-        bulletPoints: [
-            'Automated multi-agent campaign scheduling',
-            'Enhanced SMTP delivery tracking & analytics',
-            'Customizable subscriber preference centers',
-        ],
-        section1Image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1000&h=450&fit=crop&q=80',
-        section1ImageUrl: '',
         showFeatured: true,
         featuredImage: '',
         featuredTitle: 'Special Announcement',
@@ -96,17 +86,16 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             const introElem = doc.querySelector('h2 + p');
             const introText = introElem ? introElem.textContent.trim() : '';
 
-            const h3s = Array.from(doc.querySelectorAll('h3'));
-            const section1Title = h3s[0] ? h3s[0].textContent.trim() : '';
-            const section1TextElem = h3s[0] ? h3s[0].nextElementSibling : null;
-            const section1Text = (section1TextElem && section1TextElem.tagName === 'P') ? section1TextElem.textContent.trim() : '';
+            const bodyH3s = Array.from(doc.querySelectorAll('table table td:not([style*="0f172a"]) h3, table table tr:not(:last-child) h3'));
+            const sec2H3 = bodyH3s.length > 0 ? bodyH3s[bodyH3s.length - 1] : null;
+            const section2Title = sec2H3 ? sec2H3.textContent.trim() : '';
+            const section2TextElem = sec2H3 ? sec2H3.nextElementSibling : null;
+            const section2Text = (section2TextElem && section2TextElem.tagName === 'P') ? section2TextElem.textContent.trim() : '';
 
-            const lis = Array.from(doc.querySelectorAll('ul li')).map((li) => li.textContent.trim());
-
-            const sec1Img = doc.querySelector('img[alt="Section Image"]');
-            const section1Image = cleanExtract(sec1Img ? sec1Img.getAttribute('src') || '' : '');
-            const section1ImageUrl = (sec1Img && sec1Img.parentElement && sec1Img.parentElement.tagName === 'A')
-                ? sec1Img.parentElement.getAttribute('href') || ''
+            const sec2Img = doc.querySelector('img[alt="Secondary Image"]') || doc.querySelector('img[alt="Second Section Banner"]') || doc.querySelector('img[alt="Section Visual"]');
+            const section2Image = cleanExtract(sec2Img ? sec2Img.getAttribute('src') || '' : '');
+            const section2ImageUrl = (sec2Img && sec2Img.parentElement && sec2Img.parentElement.tagName === 'A')
+                ? sec2Img.parentElement.getAttribute('href') || ''
                 : '';
 
             const featuredImg = doc.querySelector('img[alt="Featured Image"]');
@@ -122,16 +111,6 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             const ctaUrl = ctaBtn ? ctaBtn.getAttribute('href') || '' : '';
 
             const showFeatured = !!(featuredTitle || featuredText || ctaText || featuredImage);
-
-            const section2Title = h3s[1] ? h3s[1].textContent.trim() : '';
-            const section2TextElem = h3s[1] ? h3s[1].nextElementSibling : null;
-            const section2Text = (section2TextElem && section2TextElem.tagName === 'P') ? section2TextElem.textContent.trim() : '';
-
-            const sec2Img = doc.querySelector('img[alt="Secondary Image"]');
-            const section2Image = cleanExtract(sec2Img ? sec2Img.getAttribute('src') || '' : '');
-            const section2ImageUrl = (sec2Img && sec2Img.parentElement && sec2Img.parentElement.tagName === 'A')
-                ? sec2Img.parentElement.getAttribute('href') || ''
-                : '';
 
             const companyHeading = doc.querySelector('footer h3') || doc.querySelector('td[style*="0f172a"] h3');
             const companyName = companyHeading ? companyHeading.textContent.trim() : '';
@@ -154,15 +133,6 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                 headerImage: headerImage || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&h=500&fit=crop&q=80',
                 mainHeading: mainHeading || 'Welcome to Our Latest Edition',
                 introText: introText || 'Thank you for subscribing to our newsletter!',
-                section1Title: section1Title || 'Key Announcements & Updates',
-                section1Text: section1Text || 'Here are the latest updates.',
-                bulletPoints: lis.length > 0 ? lis : [
-                    'Automated multi-agent campaign scheduling',
-                    'Enhanced SMTP delivery tracking & analytics',
-                    'Customizable subscriber preference centers',
-                ],
-                section1Image: section1Image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1000&h=450&fit=crop&q=80',
-                section1ImageUrl: section1ImageUrl,
                 showFeatured: showFeatured,
                 featuredImage: featuredImage,
                 featuredTitle: featuredTitle || 'Special Announcement',
@@ -193,10 +163,6 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
         const maxWidth = parseInt(f.templateWidth) || 750;
         const innerImageWidth = maxWidth - 64;
         const cleanUrl = (url) => url ? String(url).replace(/^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?\//i, '/') : '';
-
-        const bulletsHtml = f.bulletPoints && f.bulletPoints.length > 0
-            ? f.bulletPoints.map(b => `<li style="margin-bottom: 6px;">${escapeHtml(b)}</li>`).join('')
-            : '';
 
         return `<!DOCTYPE html>
 <html lang="en">
@@ -250,26 +216,6 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                             <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 10px 0 20px 0;" />
                         </td>
                     </tr>
-
-                    <!-- Section 1 -->
-                    ${(f.section1Title || f.section1Text || bulletsHtml) ? `
-                    <tr>
-                        <td style="padding: 0 32px 24px 32px;">
-                            ${f.section1Title ? `<h3 style="color: #1e293b; font-size: 18px; font-weight: 700; margin: 0 0 10px 0;">${escapeHtml(f.section1Title)}</h3>` : ''}
-                            ${f.section1Text ? `<p style="color: #475569; font-size: 14px; margin: 0 0 14px 0;">${escapeHtml(f.section1Text)}</p>` : ''}
-                            ${bulletsHtml ? `<ul style="color: #475569; font-size: 14px; margin: 0 0 16px 0; padding-left: 20px; line-height: 1.8;">${bulletsHtml}</ul>` : ''}
-                        </td>
-                    </tr>` : ''}
-
-                    <!-- Section 1 Image -->
-                    ${f.section1Image ? `
-                    <tr>
-                        <td style="padding: 0 32px 24px 32px;">
-                            ${f.section1ImageUrl ? `<a href="${escapeHtml(f.section1ImageUrl)}" target="_blank" style="text-decoration: none; display: block;">` : ''}
-                                <img src="${escapeHtml(cleanUrl(f.section1Image))}" alt="Section Image" width="${innerImageWidth}" style="width: 100%; max-width: ${innerImageWidth}px; height: auto; display: block; border-radius: 12px; border: 0;" />
-                            ${f.section1ImageUrl ? `</a>` : ''}
-                        </td>
-                    </tr>` : ''}
 
                     <!-- Featured Highlight Box -->
                     ${(f.showFeatured !== false && (f.featuredTitle || f.featuredText || f.ctaText || f.featuredImage || (f.extraCards && f.extraCards.length > 0))) ? `
@@ -386,22 +332,6 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             lastCompiledRef.current = compiled;
             onChange(compiled);
         }
-    };
-
-    const addBulletPoint = () => {
-        const next = [...fields.bulletPoints, 'New bullet point item'];
-        updateField('bulletPoints', next);
-    };
-
-    const updateBulletPoint = (idx, val) => {
-        const copy = [...fields.bulletPoints];
-        copy[idx] = val;
-        updateField('bulletPoints', copy);
-    };
-
-    const removeBulletPoint = (idx) => {
-        const next = fields.bulletPoints.filter((_, i) => i !== idx);
-        updateField('bulletPoints', next);
     };
 
     // Sync external value changes (e.g. when template is selected in parent component)
@@ -640,85 +570,6 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                             onChange={(e) => updateField('introText', e.target.value)}
                                             className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-indigo-500 leading-relaxed"
                                         />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Section 1 Content & Bullets */}
-                            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
-                                <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center">
-                                    <ListPlus className="h-3.5 w-3.5 mr-1.5 text-amber-400" /> Primary Content & Bullet Points
-                                </h4>
-                                <div className="space-y-2">
-                                    <div>
-                                        <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Section Title</label>
-                                        <input
-                                            type="text"
-                                            value={fields.section1Title}
-                                            onChange={(e) => updateField('section1Title', e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Paragraph Content</label>
-                                        <textarea
-                                            rows="3"
-                                            value={fields.section1Text}
-                                            onChange={(e) => updateField('section1Text', e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-indigo-500"
-                                        />
-                                    </div>
-
-                                    {/* Bullet points editor */}
-                                    <div className="space-y-1.5 pt-1">
-                                        <div className="flex items-center justify-between">
-                                            <label className="text-[11px] text-slate-300 font-semibold">Bullet Points</label>
-                                            <button
-                                                type="button"
-                                                onClick={addBulletPoint}
-                                                className="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 flex items-center"
-                                            >
-                                                <Plus className="h-3 w-3 mr-1" /> Add Bullet
-                                            </button>
-                                        </div>
-                                        {fields.bulletPoints.map((bp, idx) => (
-                                            <div key={idx} className="flex items-center space-x-2">
-                                                <input
-                                                    type="text"
-                                                    value={bp}
-                                                    onChange={(e) => updateBulletPoint(idx, e.target.value)}
-                                                    className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeBulletPoint(idx)}
-                                                    className="p-1.5 text-rose-400 hover:text-rose-300"
-                                                >
-                                                    <Trash2 className="h-3.5 w-3.5" />
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Section 1 Image Uploader */}
-                                    <div className="pt-2 space-y-2">
-                                        <ImageUploaderField
-                                            label="Section 1 Image"
-                                            value={fields.section1Image}
-                                            onChange={(url) => updateField('section1Image', url)}
-                                        />
-                                        {fields.section1Image && (
-                                            <div>
-                                                <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">Section 1 Image Link URL (Optional click destination)</label>
-                                                <input
-                                                    type="text"
-                                                    value={fields.section1ImageUrl || ''}
-                                                    onChange={(e) => updateField('section1ImageUrl', e.target.value)}
-                                                    placeholder="https://example.com/learn-more"
-                                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-indigo-300 font-mono focus:outline-none"
-                                                />
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </div>
