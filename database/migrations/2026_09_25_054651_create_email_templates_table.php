@@ -1,0 +1,29 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('email_templates', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('subject_template')->nullable();
+            $table->longText('content_html');
+            $table->json('content_json')->nullable();
+            $table->string('category')->default('newsletter');
+            $table->text('header_content')->nullable();
+            $table->text('footer_content')->nullable();
+            $table->boolean('is_default')->default(false);
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('email_templates');
+    }
+};
