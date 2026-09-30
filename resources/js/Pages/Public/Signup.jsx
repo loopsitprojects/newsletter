@@ -35,8 +35,8 @@ export default function PublicSignup({ groups }) {
             <div className="max-w-xl w-full">
                 {/* Brand Logo */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex h-14 w-14 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 items-center justify-center shadow-xl shadow-indigo-500/25 mb-4 transform hover:scale-105 transition">
-                        <Mail className="h-7 w-7 text-white" />
+                    <div className="inline-flex h-16 w-16 rounded-2xl bg-white/5 border border-white/10 items-center justify-center shadow-xl shadow-blue-500/20 mb-4 p-2 transform hover:scale-105 transition">
+                        <img src="/favicon.png" alt="SL Logo" className="h-full w-full object-contain" />
                     </div>
                     <h1 className="text-3xl font-extrabold text-white tracking-tight">Stay Ahead of the Curve</h1>
                     <p className="text-slate-400 text-sm mt-2 max-w-md mx-auto">
