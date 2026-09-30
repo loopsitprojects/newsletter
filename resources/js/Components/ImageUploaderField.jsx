@@ -33,7 +33,9 @@ export default function ImageUploaderField({ label, value, onChange, placeholder
             const result = await response.json();
 
             if (response.ok && result.success) {
-                onChange(result.url);
+                // Normalize localhost/127.0.0.1 port to root-relative so it loads directly from active origin
+                const normalized = (result.url || '').replace(/^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?\//i, '/');
+                onChange(normalized);
             } else {
                 setUploadError(result.message || 'Failed to upload image. Please try again.');
             }
@@ -113,7 +115,19 @@ export default function ImageUploaderField({ label, value, onChange, placeholder
                     {value && (
                         <div className="flex items-center justify-between bg-slate-800/80 border border-slate-700/70 p-2 rounded-xl">
                             <div className="flex items-center space-x-2.5 overflow-hidden">
-                                <img src={value} alt="Preview" className="h-9 w-14 object-cover rounded-lg border border-slate-700" />
+                                <img
+                                    src={(value || '').replace(/^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?\//i, '/')}
+                                    alt="Preview"
+                                    className="h-9 w-14 object-cover rounded-lg border border-slate-700 bg-slate-900"
+                                    onError={(e) => {
+                                        if (e.target.src && e.target.src.includes('/storage/')) {
+                                            const rel = '/storage/' + e.target.src.split('/storage/')[1];
+                                            if (e.target.src !== window.location.origin + rel) {
+                                                e.target.src = rel;
+                                            }
+                                        }
+                                    }}
+                                />
                                 <span className="text-[11px] text-emerald-400 font-bold flex items-center">
                                     <Check className="h-3.5 w-3.5 mr-1" /> Image Ready
                                 </span>

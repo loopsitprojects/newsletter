@@ -76,8 +76,10 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             const preheaderDiv = doc.querySelector('div[style*="display: none"]');
             const preheader = preheaderDiv ? preheaderDiv.textContent.replace(/&zwnj;|\s+/g, ' ').trim() : '';
 
+            const cleanExtract = (url) => url ? String(url).replace(/^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?\//i, '/') : '';
+
             const logoImg = doc.querySelector('img[alt="Logo"]') || doc.querySelector('td[style*="background-color: #0f172a"] img:not([alt="Banner"])');
-            const logoUrl = logoImg ? logoImg.getAttribute('src') || '' : '/images/loops-logo-white.png';
+            const logoUrl = cleanExtract(logoImg ? logoImg.getAttribute('src') || '' : '/images/loops-logo-white.png');
 
             const h1 = doc.querySelector('h1');
             const headerTitle = h1 ? h1.textContent.trim() : '';
@@ -86,7 +88,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             const headerSubtitle = headerSubtitleElem ? headerSubtitleElem.textContent.trim() : '';
 
             const bannerImg = doc.querySelector('img[alt="Banner"]') || doc.querySelector('table tr:nth-child(2) img') || doc.querySelector('img');
-            const headerImage = bannerImg ? bannerImg.getAttribute('src') || '' : '';
+            const headerImage = cleanExtract(bannerImg ? bannerImg.getAttribute('src') || '' : '');
 
             const h2 = doc.querySelector('h2');
             const mainHeading = h2 ? h2.textContent.trim() : '';
@@ -102,13 +104,13 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             const lis = Array.from(doc.querySelectorAll('ul li')).map((li) => li.textContent.trim());
 
             const sec1Img = doc.querySelector('img[alt="Section Image"]');
-            const section1Image = sec1Img ? sec1Img.getAttribute('src') || '' : '';
+            const section1Image = cleanExtract(sec1Img ? sec1Img.getAttribute('src') || '' : '');
             const section1ImageUrl = (sec1Img && sec1Img.parentElement && sec1Img.parentElement.tagName === 'A')
                 ? sec1Img.parentElement.getAttribute('href') || ''
                 : '';
 
             const featuredImg = doc.querySelector('img[alt="Featured Image"]');
-            const featuredImage = featuredImg ? featuredImg.getAttribute('src') || '' : '';
+            const featuredImage = cleanExtract(featuredImg ? featuredImg.getAttribute('src') || '' : '');
 
             const h4 = doc.querySelector('h4');
             const featuredTitle = h4 ? h4.textContent.trim() : '';
@@ -126,7 +128,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             const section2Text = (section2TextElem && section2TextElem.tagName === 'P') ? section2TextElem.textContent.trim() : '';
 
             const sec2Img = doc.querySelector('img[alt="Secondary Image"]');
-            const section2Image = sec2Img ? sec2Img.getAttribute('src') || '' : '';
+            const section2Image = cleanExtract(sec2Img ? sec2Img.getAttribute('src') || '' : '');
             const section2ImageUrl = (sec2Img && sec2Img.parentElement && sec2Img.parentElement.tagName === 'A')
                 ? sec2Img.parentElement.getAttribute('href') || ''
                 : '';
@@ -190,6 +192,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
     const compileHtml = (f) => {
         const maxWidth = parseInt(f.templateWidth) || 750;
         const innerImageWidth = maxWidth - 64;
+        const cleanUrl = (url) => url ? String(url).replace(/^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?\//i, '/') : '';
 
         const bulletsHtml = f.bulletPoints && f.bulletPoints.length > 0
             ? f.bulletPoints.map(b => `<li style="margin-bottom: 6px;">${escapeHtml(b)}</li>`).join('')
@@ -218,7 +221,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                         <td align="center" style="background-color: #0f172a; padding: 28px 30px 24px 30px; text-align: center;">
                             ${f.logoUrl ? `
                             <div style="margin-bottom: 14px;">
-                                <img src="${escapeHtml(f.logoUrl)}" alt="Logo" width="190" style="width: 190px; max-width: 100%; height: auto; object-fit: contain; display: inline-block; border: 0; vertical-align: middle;" />
+                                <img src="${escapeHtml(cleanUrl(f.logoUrl))}" alt="Logo" width="190" style="width: 190px; max-width: 100%; height: auto; object-fit: contain; display: inline-block; border: 0; vertical-align: middle;" />
                             </div>` : ''}
                             <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">${escapeHtml(f.headerTitle)}</h1>
                             ${f.headerSubtitle ? `<p style="color: #94a3b8; font-size: 12px; margin: 6px 0 0 0; text-transform: uppercase; letter-spacing: 1px;">${escapeHtml(f.headerSubtitle)}</p>` : ''}
@@ -229,7 +232,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                     ${f.headerImage ? `
                     <tr>
                         <td style="padding: 0;">
-                            <img src="${escapeHtml(f.headerImage)}" alt="Banner" width="${maxWidth}" style="width: 100%; max-width: ${maxWidth}px; height: auto; display: block; border: 0;" />
+                            <img src="${escapeHtml(cleanUrl(f.headerImage))}" alt="Banner" width="${maxWidth}" style="width: 100%; max-width: ${maxWidth}px; height: auto; display: block; border: 0;" />
                         </td>
                     </tr>` : ''}
 
@@ -263,7 +266,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                     <tr>
                         <td style="padding: 0 32px 24px 32px;">
                             ${f.section1ImageUrl ? `<a href="${escapeHtml(f.section1ImageUrl)}" target="_blank" style="text-decoration: none; display: block;">` : ''}
-                                <img src="${escapeHtml(f.section1Image)}" alt="Section Image" width="${innerImageWidth}" style="width: 100%; max-width: ${innerImageWidth}px; height: auto; display: block; border-radius: 12px; border: 0;" />
+                                <img src="${escapeHtml(cleanUrl(f.section1Image))}" alt="Section Image" width="${innerImageWidth}" style="width: 100%; max-width: ${innerImageWidth}px; height: auto; display: block; border-radius: 12px; border: 0;" />
                             ${f.section1ImageUrl ? `</a>` : ''}
                         </td>
                     </tr>` : ''}
@@ -277,7 +280,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                 ${f.featuredImage ? `
                                 <div style="margin-bottom: 14px;">
                                     ${f.ctaUrl ? `<a href="${escapeHtml(f.ctaUrl)}" target="_blank" style="text-decoration: none; display: block;">` : ''}
-                                        <img src="${escapeHtml(f.featuredImage)}" alt="Featured Image" width="${innerImageWidth - 40}" style="width: 100%; max-width: ${innerImageWidth - 40}px; height: auto; display: block; border-radius: 8px; border: 0;" />
+                                        <img src="${escapeHtml(cleanUrl(f.featuredImage))}" alt="Featured Image" width="${innerImageWidth - 40}" style="width: 100%; max-width: ${innerImageWidth - 40}px; height: auto; display: block; border-radius: 8px; border: 0;" />
                                     ${f.ctaUrl ? `</a>` : ''}
                                 </div>` : ''}
                                 ${f.featuredTitle ? `<h4 style="color: #1e3a8a; font-size: 16px; font-weight: 700; margin: 0 0 8px 0;">${escapeHtml(f.featuredTitle)}</h4>` : ''}
@@ -297,7 +300,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                 ${card.image ? `
                                 <div style="margin-bottom: 14px;">
                                     ${card.ctaUrl ? `<a href="${escapeHtml(card.ctaUrl)}" target="_blank" style="text-decoration: none; display: block;">` : ''}
-                                        <img src="${escapeHtml(card.image)}" alt="Featured Card Image" width="${innerImageWidth - 40}" style="width: 100%; max-width: ${innerImageWidth - 40}px; height: auto; display: block; border-radius: 8px; border: 0;" />
+                                        <img src="${escapeHtml(cleanUrl(card.image))}" alt="Featured Card Image" width="${innerImageWidth - 40}" style="width: 100%; max-width: ${innerImageWidth - 40}px; height: auto; display: block; border-radius: 8px; border: 0;" />
                                     ${card.ctaUrl ? `</a>` : ''}
                                 </div>` : ''}
                                 ${card.title ? `<h4 style="color: #312e81; font-size: 16px; font-weight: 700; margin: 0 0 8px 0;">${escapeHtml(card.title)}</h4>` : ''}
@@ -323,7 +326,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                             ${f.section2Text ? `<p style="color: #475569; font-size: 14px; margin: 0 0 14px 0;">${escapeHtml(f.section2Text)}</p>` : ''}
                             ${f.section2Image ? `
                             ${f.section2ImageUrl ? `<a href="${escapeHtml(f.section2ImageUrl)}" target="_blank" style="text-decoration: none; display: block;">` : ''}
-                                <img src="${escapeHtml(f.section2Image)}" alt="Secondary Image" width="${innerImageWidth}" style="width: 100%; max-width: ${innerImageWidth}px; height: auto; display: block; border-radius: 12px; margin-bottom: 12px; border: 0;" />
+                                <img src="${escapeHtml(cleanUrl(f.section2Image))}" alt="Secondary Image" width="${innerImageWidth}" style="width: 100%; max-width: ${innerImageWidth}px; height: auto; display: block; border-radius: 12px; margin-bottom: 12px; border: 0;" />
                             ${f.section2ImageUrl ? `</a>` : ''}
                             ` : ''}
                         </td>
@@ -372,7 +375,11 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
 
     // When fields change in visual mode, update parent HTML value
     const updateField = (key, val) => {
-        const next = { ...fields, [key]: val };
+        let cleanVal = val;
+        if (typeof val === 'string' && (val.includes('/storage/') || val.includes('/images/'))) {
+            cleanVal = val.replace(/^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?\//i, '/');
+        }
+        const next = { ...fields, [key]: cleanVal };
         setFields(next);
         if (editorMode === 'visual') {
             const compiled = compileHtml(next);
@@ -803,8 +810,9 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                                         label="Card Image"
                                                         value={card.image || ''}
                                                         onChange={(url) => {
+                                                            const cleanUrlVal = typeof url === 'string' ? url.replace(/^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?\//i, '/') : url;
                                                             const nextCards = [...fields.extraCards];
-                                                            nextCards[idx] = { ...nextCards[idx], image: url };
+                                                            nextCards[idx] = { ...nextCards[idx], image: cleanUrlVal };
                                                             updateField('extraCards', nextCards);
                                                         }}
                                                     />

@@ -22,9 +22,8 @@ class MediaUploadController extends Controller
             // Store in public disk under newsletter_images
             $path = $file->storeAs('newsletter_images', $filename, 'public');
 
-            // Generate full public URL using configured APP_URL
-            $baseUrl = rtrim(config('app.url', url('/')), '/');
-            $url = $baseUrl.'/storage/'.$path;
+            // Generate root-relative URL so it always resolves from current origin in browser
+            $url = '/storage/'.$path;
 
             return response()->json([
                 'success' => true,
