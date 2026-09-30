@@ -13,9 +13,20 @@ use App\Http\Controllers\SubscriberGroupController;
 use App\Http\Controllers\TrackingController;
 use Illuminate\Support\Facades\Route;
 
-// Public Subscription & Preference Routes
-Route::get('/subscribe', [PublicSubscriptionController::class, 'showSignupForm'])->name('public.signup');
-Route::post('/subscribe', [PublicSubscriptionController::class, 'subscribe'])->name('public.subscribe');
+// Root Route - Serve the signup frontend directly on root URL
+Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+
+    return app(PublicSubscriptionController::class)->showSignupForm();
+})->name('home');
+
+Route::post('/', [PublicSubscriptionController::class, 'subscribe'])->name('public.subscribe');
+
+// Redirect /subscribe to root URL
+Route::get('/subscribe', fn () => redirect('/'))->name('public.signup');
+// Public Verification, Preferences, and Unsubscribe
 Route::get('/verify/{token}', [PublicSubscriptionController::class, 'confirmVerification'])->name('public.verify');
 Route::get('/unsubscribe/{token}', [PublicSubscriptionController::class, 'showUnsubscribe'])->name('public.unsubscribe');
 Route::post('/unsubscribe/{token}', [PublicSubscriptionController::class, 'processUnsubscribe'])->name('public.unsubscribe.process');
@@ -25,11 +36,6 @@ Route::post('/preferences/{token}', [PublicSubscriptionController::class, 'updat
 // Tracking Endpoints
 Route::get('/t/open/{token}', [TrackingController::class, 'trackOpen'])->name('tracking.open');
 Route::get('/t/click/{token}', [TrackingController::class, 'trackClick'])->name('tracking.click');
-
-// Root Route - Redirects to Dashboard or Login based on auth
-Route::get('/', function () {
-    return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
-});
 
 // Authenticated Admin Dashboard & Management Routes
 Route::middleware(['auth'])->group(function () {

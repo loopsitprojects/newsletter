@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Mail, Check, Sparkles, Send, ShieldCheck, Heart } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -29,8 +29,18 @@ export default function PublicSignup({ groups }) {
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex items-center justify-center p-4 selection:bg-indigo-500 selection:text-white">
-            <Head title="Subscribe to Newsletter" />
+        <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex items-center justify-center p-4 selection:bg-indigo-500 selection:text-white relative">
+            <Head title="Newsletter" />
+
+            {/* Admin Login Link */}
+            <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+                <Link
+                    href={route('login')}
+                    className="text-xs font-semibold text-slate-400 hover:text-white bg-slate-900/60 hover:bg-slate-800 border border-slate-800/80 px-3.5 py-1.5 rounded-full transition shadow-sm backdrop-blur"
+                >
+                    Admin Login &rarr;
+                </Link>
+            </div>
 
             <div className="max-w-xl w-full">
                 {/* Brand Logo */}
