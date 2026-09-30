@@ -45,13 +45,18 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             'Customizable subscriber preference centers',
         ],
         section1Image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1000&h=450&fit=crop&q=80',
+        section1ImageUrl: '',
+        showFeatured: true,
+        featuredImage: '',
         featuredTitle: 'Special Announcement',
         featuredText: 'Get early access to our upcoming release with exclusive pro features.',
         ctaText: 'READ MORE NOW',
         ctaUrl: 'https://example.com',
+        extraCards: [],
         section2Title: 'Community & Highlights',
         section2Text: 'Discover stories from our active community members and top contributors around the globe.',
         section2Image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1000&h=400&fit=crop&q=80',
+        section2ImageUrl: '',
         websiteUrl: 'https://example.com',
         facebookUrl: 'https://facebook.com',
         instagramUrl: 'https://instagram.com',
@@ -98,6 +103,12 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
 
             const sec1Img = doc.querySelector('img[alt="Section Image"]');
             const section1Image = sec1Img ? sec1Img.getAttribute('src') || '' : '';
+            const section1ImageUrl = (sec1Img && sec1Img.parentElement && sec1Img.parentElement.tagName === 'A')
+                ? sec1Img.parentElement.getAttribute('href') || ''
+                : '';
+
+            const featuredImg = doc.querySelector('img[alt="Featured Image"]');
+            const featuredImage = featuredImg ? featuredImg.getAttribute('src') || '' : '';
 
             const h4 = doc.querySelector('h4');
             const featuredTitle = h4 ? h4.textContent.trim() : '';
@@ -108,12 +119,17 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             const ctaText = ctaBtn ? ctaBtn.textContent.trim() : '';
             const ctaUrl = ctaBtn ? ctaBtn.getAttribute('href') || '' : '';
 
+            const showFeatured = !!(featuredTitle || featuredText || ctaText || featuredImage);
+
             const section2Title = h3s[1] ? h3s[1].textContent.trim() : '';
             const section2TextElem = h3s[1] ? h3s[1].nextElementSibling : null;
             const section2Text = (section2TextElem && section2TextElem.tagName === 'P') ? section2TextElem.textContent.trim() : '';
 
             const sec2Img = doc.querySelector('img[alt="Secondary Image"]');
             const section2Image = sec2Img ? sec2Img.getAttribute('src') || '' : '';
+            const section2ImageUrl = (sec2Img && sec2Img.parentElement && sec2Img.parentElement.tagName === 'A')
+                ? sec2Img.parentElement.getAttribute('href') || ''
+                : '';
 
             const companyHeading = doc.querySelector('footer h3') || doc.querySelector('td[style*="0f172a"] h3');
             const companyName = companyHeading ? companyHeading.textContent.trim() : '';
@@ -144,13 +160,18 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                     'Customizable subscriber preference centers',
                 ],
                 section1Image: section1Image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1000&h=450&fit=crop&q=80',
+                section1ImageUrl: section1ImageUrl,
+                showFeatured: showFeatured,
+                featuredImage: featuredImage,
                 featuredTitle: featuredTitle || 'Special Announcement',
                 featuredText: featuredText || 'Get early access to our upcoming release.',
                 ctaText: ctaText || 'READ MORE NOW',
                 ctaUrl: ctaUrl || 'https://example.com',
+                extraCards: [],
                 section2Title: section2Title || 'Community & Highlights',
                 section2Text: section2Text || 'Discover stories from our active community.',
                 section2Image: section2Image || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1000&h=400&fit=crop&q=80',
+                section2ImageUrl: section2ImageUrl,
                 websiteUrl: 'https://example.com',
                 facebookUrl: 'https://facebook.com',
                 instagramUrl: 'https://instagram.com',
@@ -241,17 +262,26 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                     ${f.section1Image ? `
                     <tr>
                         <td style="padding: 0 32px 24px 32px;">
-                            <img src="${escapeHtml(f.section1Image)}" alt="Section Image" width="${innerImageWidth}" style="width: 100%; max-width: ${innerImageWidth}px; height: auto; display: block; border-radius: 12px; border: 0;" />
+                            ${f.section1ImageUrl ? `<a href="${escapeHtml(f.section1ImageUrl)}" target="_blank" style="text-decoration: none; display: block;">` : ''}
+                                <img src="${escapeHtml(f.section1Image)}" alt="Section Image" width="${innerImageWidth}" style="width: 100%; max-width: ${innerImageWidth}px; height: auto; display: block; border-radius: 12px; border: 0;" />
+                            ${f.section1ImageUrl ? `</a>` : ''}
                         </td>
                     </tr>` : ''}
 
                     <!-- Featured Highlight Box -->
-                    ${(f.featuredTitle || f.featuredText || f.ctaText) ? `
+                    ${(f.showFeatured !== false && (f.featuredTitle || f.featuredText || f.ctaText || f.featuredImage || (f.extraCards && f.extraCards.length > 0))) ? `
                     <tr>
                         <td style="padding: 0 32px 28px 32px;">
-                            <div style="background-color: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 20px;">
+                            ${(f.featuredTitle || f.featuredText || f.ctaText || f.featuredImage) ? `
+                            <div style="background-color: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 20px; margin-bottom: ${(f.extraCards && f.extraCards.length > 0) ? '16px' : '0'};">
+                                ${f.featuredImage ? `
+                                <div style="margin-bottom: 14px;">
+                                    ${f.ctaUrl ? `<a href="${escapeHtml(f.ctaUrl)}" target="_blank" style="text-decoration: none; display: block;">` : ''}
+                                        <img src="${escapeHtml(f.featuredImage)}" alt="Featured Image" width="${innerImageWidth - 40}" style="width: 100%; max-width: ${innerImageWidth - 40}px; height: auto; display: block; border-radius: 8px; border: 0;" />
+                                    ${f.ctaUrl ? `</a>` : ''}
+                                </div>` : ''}
                                 ${f.featuredTitle ? `<h4 style="color: #1e3a8a; font-size: 16px; font-weight: 700; margin: 0 0 8px 0;">${escapeHtml(f.featuredTitle)}</h4>` : ''}
-                                ${f.featuredText ? `<p style="color: #334155; font-size: 14px; margin: 0 0 16px 0;">${escapeHtml(f.featuredText)}</p>` : ''}
+                                ${f.featuredText ? `<p style="color: #334155; font-size: 14px; margin: 0 0 16px 0; line-height: 1.6;">${escapeHtml(f.featuredText)}</p>` : ''}
                                 ${f.ctaText ? `
                                 <table role="presentation" border="0" cellspacing="0" cellpadding="0">
                                     <tr>
@@ -260,7 +290,28 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                         </td>
                                     </tr>
                                 </table>` : ''}
+                            </div>` : ''}
+
+                            ${(f.extraCards && f.extraCards.length > 0) ? f.extraCards.map((card) => `
+                            <div style="background-color: #f8fafc; border-left: 4px solid #6366f1; border-radius: 8px; padding: 20px; margin-top: 16px;">
+                                ${card.image ? `
+                                <div style="margin-bottom: 14px;">
+                                    ${card.ctaUrl ? `<a href="${escapeHtml(card.ctaUrl)}" target="_blank" style="text-decoration: none; display: block;">` : ''}
+                                        <img src="${escapeHtml(card.image)}" alt="Featured Card Image" width="${innerImageWidth - 40}" style="width: 100%; max-width: ${innerImageWidth - 40}px; height: auto; display: block; border-radius: 8px; border: 0;" />
+                                    ${card.ctaUrl ? `</a>` : ''}
+                                </div>` : ''}
+                                ${card.title ? `<h4 style="color: #312e81; font-size: 16px; font-weight: 700; margin: 0 0 8px 0;">${escapeHtml(card.title)}</h4>` : ''}
+                                ${card.text ? `<p style="color: #334155; font-size: 14px; margin: 0 0 16px 0; line-height: 1.6;">${escapeHtml(card.text)}</p>` : ''}
+                                ${card.ctaText ? `
+                                <table role="presentation" border="0" cellspacing="0" cellpadding="0">
+                                    <tr>
+                                        <td align="center" style="border-radius: 8px; background-color: #4f46e5;">
+                                            <a href="${escapeHtml(card.ctaUrl || '#')}" target="_blank" style="font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; border: 1px solid #4f46e5; display: inline-block;">${escapeHtml(card.ctaText)}</a>
+                                        </td>
+                                    </tr>
+                                </table>` : ''}
                             </div>
+                            `).join('') : ''}
                         </td>
                     </tr>` : ''}
 
@@ -270,7 +321,11 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                         <td style="padding: 0 32px 24px 32px;">
                             ${f.section2Title ? `<h3 style="color: #1e293b; font-size: 18px; font-weight: 700; margin: 0 0 10px 0;">${escapeHtml(f.section2Title)}</h3>` : ''}
                             ${f.section2Text ? `<p style="color: #475569; font-size: 14px; margin: 0 0 14px 0;">${escapeHtml(f.section2Text)}</p>` : ''}
-                            ${f.section2Image ? `<img src="${escapeHtml(f.section2Image)}" alt="Secondary Image" width="${innerImageWidth}" style="width: 100%; max-width: ${innerImageWidth}px; height: auto; display: block; border-radius: 12px; margin-bottom: 12px; border: 0;" />` : ''}
+                            ${f.section2Image ? `
+                            ${f.section2ImageUrl ? `<a href="${escapeHtml(f.section2ImageUrl)}" target="_blank" style="text-decoration: none; display: block;">` : ''}
+                                <img src="${escapeHtml(f.section2Image)}" alt="Secondary Image" width="${innerImageWidth}" style="width: 100%; max-width: ${innerImageWidth}px; height: auto; display: block; border-radius: 12px; margin-bottom: 12px; border: 0;" />
+                            ${f.section2ImageUrl ? `</a>` : ''}
+                            ` : ''}
                         </td>
                     </tr>` : ''}
 
@@ -639,60 +694,225 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                     </div>
 
                                     {/* Section 1 Image Uploader */}
-                                    <div className="pt-2">
+                                    <div className="pt-2 space-y-2">
                                         <ImageUploaderField
                                             label="Section 1 Image"
                                             value={fields.section1Image}
                                             onChange={(url) => updateField('section1Image', url)}
                                         />
+                                        {fields.section1Image && (
+                                            <div>
+                                                <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">Section 1 Image Link URL (Optional click destination)</label>
+                                                <input
+                                                    type="text"
+                                                    value={fields.section1ImageUrl || ''}
+                                                    onChange={(e) => updateField('section1ImageUrl', e.target.value)}
+                                                    placeholder="https://example.com/learn-more"
+                                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-indigo-300 font-mono focus:outline-none"
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
 
                             {/* Featured Announcement Box & CTA */}
-                            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
-                                <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center">
-                                    <Megaphone className="h-3.5 w-3.5 mr-1.5 text-rose-400" /> Featured Highlight & Call-To-Action Button
-                                </h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {fields.showFeatured !== false ? (
+                                <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+                                    <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                                        <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center">
+                                            <Megaphone className="h-3.5 w-3.5 mr-1.5 text-rose-400" /> Featured Highlight & Call-To-Action
+                                        </h4>
+                                        <button
+                                            type="button"
+                                            onClick={() => updateField('showFeatured', false)}
+                                            className="text-[10px] text-rose-400 hover:text-rose-300 font-semibold flex items-center transition"
+                                            title="Exclude this section from newsletter"
+                                        >
+                                            <Trash2 className="h-3 w-3 mr-1" /> Remove Section
+                                        </button>
+                                    </div>
+
+                                    <ImageUploaderField
+                                        label="Featured Highlight Image / Banner (Optional)"
+                                        value={fields.featuredImage}
+                                        onChange={(url) => updateField('featuredImage', url)}
+                                        placeholder="https://... or upload banner"
+                                    />
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Box Title</label>
+                                            <input
+                                                type="text"
+                                                value={fields.featuredTitle}
+                                                onChange={(e) => updateField('featuredTitle', e.target.value)}
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Button Label</label>
+                                            <input
+                                                type="text"
+                                                value={fields.ctaText}
+                                                onChange={(e) => updateField('ctaText', e.target.value)}
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none font-bold"
+                                            />
+                                        </div>
+                                    </div>
                                     <div>
-                                        <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Box Title</label>
-                                        <input
-                                            type="text"
-                                            value={fields.featuredTitle}
-                                            onChange={(e) => updateField('featuredTitle', e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+                                        <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Box Highlight Description</label>
+                                        <textarea
+                                            rows="2"
+                                            value={fields.featuredText}
+                                            onChange={(e) => updateField('featuredText', e.target.value)}
+                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Button Label</label>
+                                        <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Button & Image Target Link URL</label>
                                         <input
                                             type="text"
-                                            value={fields.ctaText}
-                                            onChange={(e) => updateField('ctaText', e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none font-bold"
+                                            value={fields.ctaUrl}
+                                            onChange={(e) => updateField('ctaUrl', e.target.value)}
+                                            placeholder="https://example.com"
+                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-indigo-300 font-mono focus:outline-none"
                                         />
                                     </div>
+
+                                    {/* Additional Custom Highlight Cards */}
+                                    {fields.extraCards && fields.extraCards.length > 0 && (
+                                        <div className="space-y-3 pt-2 border-t border-slate-800">
+                                            <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block">Additional Highlight Cards:</span>
+                                            {fields.extraCards.map((card, idx) => (
+                                                <div key={card.id || idx} className="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 relative">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-[10px] font-bold text-indigo-400">Card #{idx + 2}</span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const nextCards = fields.extraCards.filter((_, i) => i !== idx);
+                                                                updateField('extraCards', nextCards);
+                                                            }}
+                                                            className="text-rose-400 hover:text-rose-300 text-[10px] font-semibold flex items-center"
+                                                        >
+                                                            <Trash2 className="h-3 w-3 mr-0.5" /> Delete
+                                                        </button>
+                                                    </div>
+                                                    <ImageUploaderField
+                                                        label="Card Image"
+                                                        value={card.image || ''}
+                                                        onChange={(url) => {
+                                                            const nextCards = [...fields.extraCards];
+                                                            nextCards[idx] = { ...nextCards[idx], image: url };
+                                                            updateField('extraCards', nextCards);
+                                                        }}
+                                                    />
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        <div>
+                                                            <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">Card Title</label>
+                                                            <input
+                                                                type="text"
+                                                                value={card.title || ''}
+                                                                onChange={(e) => {
+                                                                    const nextCards = [...fields.extraCards];
+                                                                    nextCards[idx] = { ...nextCards[idx], title: e.target.value };
+                                                                    updateField('extraCards', nextCards);
+                                                                }}
+                                                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">Button Text</label>
+                                                            <input
+                                                                type="text"
+                                                                value={card.ctaText || ''}
+                                                                onChange={(e) => {
+                                                                    const nextCards = [...fields.extraCards];
+                                                                    nextCards[idx] = { ...nextCards[idx], ctaText: e.target.value };
+                                                                    updateField('extraCards', nextCards);
+                                                                }}
+                                                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">Description</label>
+                                                        <textarea
+                                                            rows="2"
+                                                            value={card.text || ''}
+                                                            onChange={(e) => {
+                                                                const nextCards = [...fields.extraCards];
+                                                                nextCards[idx] = { ...nextCards[idx], text: e.target.value };
+                                                                updateField('extraCards', nextCards);
+                                                            }}
+                                                            className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-xs text-white"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">Target Link URL</label>
+                                                        <input
+                                                            type="text"
+                                                            value={card.ctaUrl || ''}
+                                                            onChange={(e) => {
+                                                                const nextCards = [...fields.extraCards];
+                                                                nextCards[idx] = { ...nextCards[idx], ctaUrl: e.target.value };
+                                                                updateField('extraCards', nextCards);
+                                                            }}
+                                                            placeholder="https://..."
+                                                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-indigo-300 font-mono"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <div className="pt-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const nextCards = [...(fields.extraCards || []), {
+                                                    id: Date.now(),
+                                                    image: '',
+                                                    title: 'Featured Promotion',
+                                                    text: 'Discover our newest offering and take advantage of special pricing.',
+                                                    ctaText: 'CHECK IT OUT',
+                                                    ctaUrl: 'https://example.com',
+                                                }];
+                                                updateField('extraCards', nextCards);
+                                            }}
+                                            className="w-full py-2 border border-dashed border-indigo-500/40 rounded-xl text-xs font-bold text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 flex items-center justify-center transition"
+                                        >
+                                            <Plus className="h-3.5 w-3.5 mr-1" /> Add Another Highlight Card
+                                        </button>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Box Highlight Description</label>
-                                    <textarea
-                                        rows="2"
-                                        value={fields.featuredText}
-                                        onChange={(e) => updateField('featuredText', e.target.value)}
-                                        className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none"
-                                    />
+                            ) : (
+                                <div className="bg-slate-900/60 border border-dashed border-slate-800 hover:border-slate-700 rounded-2xl p-4 flex items-center justify-between transition">
+                                    <div className="flex items-center space-x-3">
+                                        <div className="p-2.5 rounded-xl bg-slate-800/80 text-slate-400">
+                                            <Megaphone className="h-4 w-4" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-xs font-bold text-slate-300">Featured Highlight & CTA Box</h4>
+                                            <p className="text-[10px] text-slate-500">Currently excluded from this newsletter.</p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            updateField('showFeatured', true);
+                                            if (!fields.featuredTitle) updateField('featuredTitle', 'Special Announcement');
+                                            if (!fields.ctaText) updateField('ctaText', 'READ MORE NOW');
+                                            if (!fields.ctaUrl) updateField('ctaUrl', 'https://example.com');
+                                        }}
+                                        className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center shadow-lg shadow-indigo-600/20 transition"
+                                    >
+                                        <Plus className="h-3.5 w-3.5 mr-1" /> Add This Section
+                                    </button>
                                 </div>
-                                <div>
-                                    <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Button Target Link URL</label>
-                                    <input
-                                        type="text"
-                                        value={fields.ctaUrl}
-                                        onChange={(e) => updateField('ctaUrl', e.target.value)}
-                                        className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-indigo-300 font-mono focus:outline-none"
-                                    />
-                                </div>
-                            </div>
+                            )}
 
                             {/* Secondary Section */}
                             <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
@@ -723,6 +943,18 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                         value={fields.section2Image}
                                         onChange={(url) => updateField('section2Image', url)}
                                     />
+                                    {fields.section2Image && (
+                                        <div>
+                                            <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">Section 2 Image Link URL (Optional click destination)</label>
+                                            <input
+                                                type="text"
+                                                value={fields.section2ImageUrl || ''}
+                                                onChange={(e) => updateField('section2ImageUrl', e.target.value)}
+                                                placeholder="https://example.com/event"
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-indigo-300 font-mono focus:outline-none"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
