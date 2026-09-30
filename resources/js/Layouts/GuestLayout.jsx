@@ -44,11 +44,6 @@ export default function GuestLayout({ children, title, subtitle }) {
                     <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
                     {children}
                 </div>
-
-                {/* Footer security tag */}
-                <div className="mt-6 text-center text-xs text-slate-500 flex items-center justify-center gap-1.5">
-                    <span>Protected by SL MarTech &bull; 256-bit SSL Encrypted</span>
-                </div>
             </div>
         </div>
     );
