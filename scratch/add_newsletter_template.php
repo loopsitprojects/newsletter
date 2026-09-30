@@ -69,6 +69,10 @@ $htmlContent = <<<'HTML'
                     <!-- Featured Content Highlight Box -->
                     <tr>
                         <td style="padding: 0 32px 28px 32px;">
+                            <div style="margin-bottom: 16px;">
+                                <h3 data-section="featured-title" style="color: #0f172a; font-size: 19px; font-weight: 700; margin: 0 0 4px 0; letter-spacing: -0.3px;">Featured Highlights</h3>
+                                <p data-section="featured-subtitle" style="color: #64748b; font-size: 13px; margin: 0; line-height: 1.5;">Latest announcements, special promotions and key updates</p>
+                            </div>
                             <div style="background-color: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 20px;">
                                 <h4 style="color: #1e3a8a; font-size: 16px; font-weight: 700; margin: 0 0 8px 0;">[Featured Content]</h4>
                                 <p style="color: #334155; font-size: 14px; margin: 0 0 16px 0;">

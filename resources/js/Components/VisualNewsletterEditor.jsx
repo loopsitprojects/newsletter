@@ -37,6 +37,8 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
         mainHeading: 'Welcome to Our Latest Edition',
         introText: 'Thank you for subscribing to our newsletter! Here is our latest roundup of news, feature updates, and exclusive tutorials.',
         showFeatured: true,
+        featuredSectionTitle: 'Featured Highlights',
+        featuredSectionSubtitle: '',
         featuredImage: '',
         featuredTitle: 'Special Announcement',
         featuredText: 'Get early access to our upcoming release with exclusive pro features.',
@@ -98,6 +100,20 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                 ? sec2Img.parentElement.getAttribute('href') || ''
                 : '';
 
+            const featH3 = doc.querySelector('[data-section="featured-title"]');
+            const featSub = doc.querySelector('[data-section="featured-subtitle"]');
+            let featuredSectionTitle = featH3 ? featH3.textContent.trim() : '';
+            let featuredSectionSubtitle = featSub ? featSub.textContent.trim() : '';
+
+            // Fallback for featured section title if data attribute not found
+            const highlightBox = doc.querySelector('div[style*="border-left"]');
+            if (!featuredSectionTitle && highlightBox && highlightBox.parentElement) {
+                const prevH3 = highlightBox.parentElement.querySelector('div:first-child h3, h3');
+                if (prevH3 && prevH3 !== highlightBox.querySelector('h3') && (prevH3.compareDocumentPosition(highlightBox) & Node.DOCUMENT_POSITION_FOLLOWING)) {
+                    featuredSectionTitle = prevH3.textContent.trim();
+                }
+            }
+
             const featuredImg = doc.querySelector('img[alt="Featured Image"]');
             const featuredImage = cleanExtract(featuredImg ? featuredImg.getAttribute('src') || '' : '');
 
@@ -110,7 +126,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             const ctaText = ctaBtn ? ctaBtn.textContent.trim() : '';
             const ctaUrl = ctaBtn ? ctaBtn.getAttribute('href') || '' : '';
 
-            const showFeatured = !!(featuredTitle || featuredText || ctaText || featuredImage);
+            const showFeatured = !!(featuredSectionTitle || featuredTitle || featuredText || ctaText || featuredImage);
 
             const companyHeading = doc.querySelector('footer h3') || doc.querySelector('td[style*="0f172a"] h3');
             const companyName = companyHeading ? companyHeading.textContent.trim() : '';
@@ -134,6 +150,8 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                 mainHeading: mainHeading || 'Welcome to Our Latest Edition',
                 introText: introText || 'Thank you for subscribing to our newsletter!',
                 showFeatured: showFeatured,
+                featuredSectionTitle: featuredSectionTitle || 'Featured Highlights',
+                featuredSectionSubtitle: featuredSectionSubtitle || '',
                 featuredImage: featuredImage,
                 featuredTitle: featuredTitle || 'Special Announcement',
                 featuredText: featuredText || 'Get early access to our upcoming release.',
@@ -218,9 +236,15 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                     </tr>
 
                     <!-- Featured Highlight Box -->
-                    ${(f.showFeatured !== false && (f.featuredTitle || f.featuredText || f.ctaText || f.featuredImage || (f.extraCards && f.extraCards.length > 0))) ? `
+                    ${(f.showFeatured !== false && (f.featuredSectionTitle || f.featuredSectionSubtitle || f.featuredTitle || f.featuredText || f.ctaText || f.featuredImage || (f.extraCards && f.extraCards.length > 0))) ? `
                     <tr>
                         <td style="padding: 0 32px 28px 32px;">
+                            ${(f.featuredSectionTitle || f.featuredSectionSubtitle) ? `
+                            <div style="margin-bottom: 16px;">
+                                ${f.featuredSectionTitle ? `<h3 data-section="featured-title" style="color: #0f172a; font-size: 19px; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.3px;">${escapeHtml(f.featuredSectionTitle)}</h3>` : ''}
+                                ${f.featuredSectionSubtitle ? `<p data-section="featured-subtitle" style="color: #64748b; font-size: 13px; margin: 0; line-height: 1.5;">${escapeHtml(f.featuredSectionSubtitle)}</p>` : ''}
+                            </div>` : ''}
+
                             ${(f.featuredTitle || f.featuredText || f.ctaText || f.featuredImage) ? `
                             <div style="background-color: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 20px; margin-bottom: ${(f.extraCards && f.extraCards.length > 0) ? '16px' : '0'};">
                                 ${f.featuredImage ? `
@@ -589,6 +613,34 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                         >
                                             <Trash2 className="h-3 w-3 mr-1" /> Remove Section
                                         </button>
+                                    </div>
+
+                                    {/* Section Heading & Subtitle above the boxes */}
+                                    <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 space-y-2.5">
+                                        <div>
+                                            <label className="block text-[11px] text-indigo-300 mb-1 font-bold uppercase tracking-wider flex items-center">
+                                                <Type className="h-3 w-3 mr-1 text-indigo-400" /> Section Heading (Above this section)
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={fields.featuredSectionTitle || ''}
+                                                onChange={(e) => updateField('featuredSectionTitle', e.target.value)}
+                                                placeholder="e.g. Featured Highlights / Key Announcements"
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-bold"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">
+                                                Section Sub-heading (Optional small text under heading)
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={fields.featuredSectionSubtitle || ''}
+                                                onChange={(e) => updateField('featuredSectionSubtitle', e.target.value)}
+                                                placeholder="e.g. Explore our latest product features and updates"
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
+                                            />
+                                        </div>
                                     </div>
 
                                     <ImageUploaderField
