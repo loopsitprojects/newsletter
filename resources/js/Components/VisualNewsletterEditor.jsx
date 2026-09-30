@@ -31,7 +31,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
     const [fields, setFields] = useState({
         templateWidth: '750',
         preheader: "Short preview text shown in the recipient's inbox",
-        logoUrl: '/favicon.png',
+        logoUrl: '/images/loops-logo-white.png',
         headerTitle: 'Weekly Tech & Product Digest',
         headerSubtitle: 'Weekly Updates & Insights',
         headerImage: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&h=500&fit=crop&q=80',
@@ -72,7 +72,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             const preheader = preheaderDiv ? preheaderDiv.textContent.replace(/&zwnj;|\s+/g, ' ').trim() : '';
 
             const logoImg = doc.querySelector('img[alt="Logo"]') || doc.querySelector('td[style*="background-color: #0f172a"] img:not([alt="Banner"])');
-            const logoUrl = logoImg ? logoImg.getAttribute('src') || '' : '/favicon.png';
+            const logoUrl = logoImg ? logoImg.getAttribute('src') || '' : '/images/loops-logo-white.png';
 
             const h1 = doc.querySelector('h1');
             const headerTitle = h1 ? h1.textContent.trim() : '';
@@ -197,7 +197,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                         <td align="center" style="background-color: #0f172a; padding: 28px 30px 24px 30px; text-align: center;">
                             ${f.logoUrl ? `
                             <div style="margin-bottom: 14px;">
-                                <img src="${escapeHtml(f.logoUrl)}" alt="Logo" width="56" height="56" style="width: 56px; height: 56px; object-fit: contain; border-radius: 12px; display: inline-block; border: 0; vertical-align: middle; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);" />
+                                <img src="${escapeHtml(f.logoUrl)}" alt="Logo" width="190" style="width: 190px; max-width: 100%; height: auto; object-fit: contain; display: inline-block; border: 0; vertical-align: middle;" />
                             </div>` : ''}
                             <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">${escapeHtml(f.headerTitle)}</h1>
                             ${f.headerSubtitle ? `<p style="color: #94a3b8; font-size: 12px; margin: 6px 0 0 0; text-transform: uppercase; letter-spacing: 1px;">${escapeHtml(f.headerSubtitle)}</p>` : ''}
@@ -485,22 +485,49 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                     <ImageIcon className="h-3.5 w-3.5 mr-1.5 text-sky-400" /> Newsletter Banner & Title
                                 </h4>
                                 <div className="space-y-3">
-                                    <div className="space-y-1">
+                                    <div className="space-y-2">
                                         <ImageUploaderField
                                             label="Site / Brand Logo"
                                             value={fields.logoUrl}
                                             onChange={(url) => updateField('logoUrl', url)}
-                                            placeholder="/favicon.png or https://..."
+                                            placeholder="/images/loops-logo-white.png or https://..."
                                         />
-                                        {fields.logoUrl !== '/favicon.png' && (
+                                        <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Brand Logos:</span>
                                             <button
                                                 type="button"
-                                                onClick={() => updateField('logoUrl', '/favicon.png')}
-                                                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold"
+                                                onClick={() => updateField('logoUrl', '/images/loops-logo-white.png')}
+                                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center transition border ${
+                                                    fields.logoUrl === '/images/loops-logo-white.png'
+                                                        ? 'bg-indigo-600/30 text-indigo-300 border-indigo-500 shadow-sm'
+                                                        : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                                                }`}
                                             >
-                                                ↺ Reset to default site logo
+                                                <span className="w-2.5 h-2.5 rounded-full bg-white mr-1.5 inline-block shadow-sm" />
+                                                White Logo (for Dark BG)
                                             </button>
-                                        )}
+                                            <button
+                                                type="button"
+                                                onClick={() => updateField('logoUrl', '/images/loops-logo-dark.png')}
+                                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center transition border ${
+                                                    fields.logoUrl === '/images/loops-logo-dark.png'
+                                                        ? 'bg-indigo-600/30 text-indigo-300 border-indigo-500 shadow-sm'
+                                                        : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                                                }`}
+                                            >
+                                                <span className="w-2.5 h-2.5 rounded-full bg-slate-900 border border-slate-400 mr-1.5 inline-block shadow-sm" />
+                                                Dark Logo (for Light BG)
+                                            </button>
+                                            {fields.logoUrl && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateField('logoUrl', '')}
+                                                    className="text-[10px] text-rose-400 hover:text-rose-300 font-semibold ml-auto"
+                                                >
+                                                    Remove Logo
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                     <div>
                                         <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Newsletter Title</label>

@@ -20,12 +20,20 @@ class NormalizeMediaUrlsCommand extends Command
     {
         $this->info('Normalizing media URLs in campaigns and templates...');
 
-        $logoSnippet = '<div style="margin-bottom: 14px;"><img src="/favicon.png" alt="Logo" width="56" height="56" style="width: 56px; height: 56px; object-fit: contain; border-radius: 12px; display: inline-block; border: 0; vertical-align: middle; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);" /></div>';
+        $logoSnippet = '<div style="margin-bottom: 14px;"><img src="/images/loops-logo-white.png" alt="Logo" width="190" style="width: 190px; max-width: 100%; height: auto; object-fit: contain; display: inline-block; border: 0; vertical-align: middle;" /></div>';
 
         $campaignsUpdated = 0;
         foreach (Campaign::all() as $campaign) {
             $normalized = CampaignController::normalizeMediaUrls($campaign->content_html);
-            if (str_contains($normalized, 'background-color: #0f172a') && ! str_contains($normalized, 'alt="Logo"')) {
+
+            // Replace old /favicon.png logo snippet with brand logo if present
+            if (str_contains($normalized, '/favicon.png" alt="Logo"')) {
+                $normalized = preg_replace(
+                    '#<div[^>]*margin-bottom:\s*14px[^>]*>\s*<img[^>]*src="[^"]*favicon\.png"[^>]*>\s*</div>#i',
+                    $logoSnippet,
+                    $normalized
+                );
+            } elseif (str_contains($normalized, 'background-color: #0f172a') && ! str_contains($normalized, 'alt="Logo"')) {
                 $normalized = preg_replace(
                     '/(<td[^>]*background-color:\s*#0f172a[^>]*>)\s*(<h1)/i',
                     '$1'."\n                            ".$logoSnippet."\n                            ".'$2',
@@ -51,7 +59,15 @@ class NormalizeMediaUrlsCommand extends Command
         $templatesUpdated = 0;
         foreach (EmailTemplate::all() as $template) {
             $normalized = CampaignController::normalizeMediaUrls($template->content_html);
-            if (str_contains($normalized, 'background-color: #0f172a') && ! str_contains($normalized, 'alt="Logo"')) {
+
+            // Replace old /favicon.png logo snippet with brand logo if present
+            if (str_contains($normalized, '/favicon.png" alt="Logo"')) {
+                $normalized = preg_replace(
+                    '#<div[^>]*margin-bottom:\s*14px[^>]*>\s*<img[^>]*src="[^"]*favicon\.png"[^>]*>\s*</div>#i',
+                    $logoSnippet,
+                    $normalized
+                );
+            } elseif (str_contains($normalized, 'background-color: #0f172a') && ! str_contains($normalized, 'alt="Logo"')) {
                 $normalized = preg_replace(
                     '/(<td[^>]*background-color:\s*#0f172a[^>]*>)\s*(<h1)/i',
                     '$1'."\n                            ".$logoSnippet."\n                            ".'$2',

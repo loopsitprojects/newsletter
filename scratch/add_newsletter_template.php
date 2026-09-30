@@ -1,12 +1,13 @@
 <?php
 
 require __DIR__.'/../vendor/autoload.php';
-$app = require_once __DIR__.'/../bootstrap/app.php';
-$kernel = $app->make(Kernel::class);
-$kernel->bootstrap();
 
 use App\Models\EmailTemplate;
 use Illuminate\Contracts\Console\Kernel;
+
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
+$kernel->bootstrap();
 
 $htmlContent = <<<'HTML'
 <!DOCTYPE html>
@@ -33,7 +34,7 @@ $htmlContent = <<<'HTML'
                     <tr>
                         <td align="center" style="background-color: #0f172a; padding: 28px 30px 24px 30px; text-align: center;">
                             <div style="margin-bottom: 14px;">
-                                <img src="/favicon.png" alt="Logo" width="56" height="56" style="width: 56px; height: 56px; object-fit: contain; border-radius: 12px; display: inline-block; border: 0; vertical-align: middle; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);" />
+                                <img src="/images/loops-logo-white.png" alt="Logo" width="190" style="width: 190px; max-width: 100%; height: auto; object-fit: contain; display: inline-block; border: 0; vertical-align: middle;" />
                             </div>
                             <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">[Newsletter Title]</h1>
                             <p style="color: #94a3b8; font-size: 12px; margin: 6px 0 0 0; text-transform: uppercase; letter-spacing: 1px;">Weekly Updates & Insights</p>

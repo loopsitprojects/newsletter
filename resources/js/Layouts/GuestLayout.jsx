@@ -23,7 +23,7 @@ export default function GuestLayout({ children, title, subtitle }) {
                 {/* Header with Logo */}
                 <div className="text-center mb-6">
                     <Link href="/" className="inline-block transform hover:scale-105 transition-transform duration-200">
-                        <div className="inline-flex h-20 w-20 rounded-3xl bg-slate-900/90 border border-slate-700/60 items-center justify-center p-3 shadow-2xl shadow-blue-500/25 backdrop-blur-xl">
+                        <div className="inline-flex h-16 w-52 rounded-2xl bg-slate-900/90 border border-slate-700/60 items-center justify-center p-3 shadow-2xl shadow-blue-500/25 backdrop-blur-xl">
                             <ApplicationLogo className="h-full w-full object-contain" />
                         </div>
                     </Link>

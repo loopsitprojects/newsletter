@@ -39,7 +39,7 @@ class NewsletterMailable extends Mailable
         );
         $html = preg_replace('#src=[\'"]/storage/#i', 'src="'.$storageBaseUrl, $html);
         $appBaseUrl = rtrim(config('app.url', url('/')), '/');
-        $html = preg_replace('#src=[\'"]/favicon\.png[\'"]#i', 'src="'.$appBaseUrl.'/favicon.png"', $html);
+        $html = preg_replace('#src=[\'"]/(favicon\.png|(?:images/)?loops-logo-(?:white|dark)\.png)[\'"]#i', 'src="'.$appBaseUrl.'/$1"', $html);
 
         // Perform variable replacement
         $firstName = $subscriber->first_name ?: 'Subscriber';
