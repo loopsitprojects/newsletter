@@ -93,18 +93,20 @@ $htmlContent = <<<'HTML'
 
                     <!-- Second Section -->
                     <tr>
-                        <td style="padding: 0 32px 24px 32px;">
-                            <h3 style="color: #1e293b; font-size: 18px; font-weight: 700; margin: 0 0 10px 0;">[Second Section]</h3>
-                            <p style="color: #475569; font-size: 14px; margin: 0 0 14px 0;">
+                        <td style="padding: 0 32px 28px 32px;">
+                            <h3 data-section="section2-title" style="color: #1e293b; font-size: 18px; font-weight: 700; margin: 0 0 10px 0;">[Second Section]</h3>
+                            <p style="color: #475569; font-size: 14px; margin: 0 0 18px 0; line-height: 1.6;">
                                 [Add another content section if required. Expand on secondary news or upcoming events.]
                             </p>
                             
-                            <!-- Additional Image in Section 2 -->
-                            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1000&h=400&fit=crop&q=80" alt="Second Section Banner" width="686" style="width: 100%; max-width: 686px; height: auto; display: block; border-radius: 12px; margin-bottom: 12px; border: 0;" />
-                            
-                            <p style="color: #475569; font-size: 14px; margin: 0;">
-                                [Additional text/content. Summarize concluding thoughts or contact links here.]
-                            </p>
+                            <!-- Call to Action Button for Section 2 -->
+                            <table role="presentation" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center" style="border-radius: 8px; background-color: #0f172a;">
+                                        <a href="https://example.com" target="_blank" data-section="section2-cta" style="font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; border: 1px solid #0f172a; display: inline-block;">LEARN MORE</a>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
 

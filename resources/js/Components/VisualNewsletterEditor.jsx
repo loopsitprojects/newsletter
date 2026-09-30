@@ -47,8 +47,8 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
         extraCards: [],
         section2Title: 'Community & Highlights',
         section2Text: 'Discover stories from our active community members and top contributors around the globe.',
-        section2Image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1000&h=400&fit=crop&q=80',
-        section2ImageUrl: '',
+        section2CtaText: 'LEARN MORE',
+        section2CtaUrl: 'https://example.com',
         websiteUrl: 'https://example.com',
         facebookUrl: 'https://facebook.com',
         instagramUrl: 'https://instagram.com',
@@ -94,11 +94,9 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             const section2TextElem = sec2H3 ? sec2H3.nextElementSibling : null;
             const section2Text = (section2TextElem && section2TextElem.tagName === 'P') ? section2TextElem.textContent.trim() : '';
 
-            const sec2Img = doc.querySelector('img[alt="Secondary Image"]') || doc.querySelector('img[alt="Second Section Banner"]') || doc.querySelector('img[alt="Section Visual"]');
-            const section2Image = cleanExtract(sec2Img ? sec2Img.getAttribute('src') || '' : '');
-            const section2ImageUrl = (sec2Img && sec2Img.parentElement && sec2Img.parentElement.tagName === 'A')
-                ? sec2Img.parentElement.getAttribute('href') || ''
-                : '';
+            const sec2CtaBtn = doc.querySelector('[data-section="section2-cta"]');
+            const section2CtaText = sec2CtaBtn ? sec2CtaBtn.textContent.trim() : '';
+            const section2CtaUrl = sec2CtaBtn ? sec2CtaBtn.getAttribute('href') || '' : '';
 
             const featH3 = doc.querySelector('[data-section="featured-title"]');
             const featSub = doc.querySelector('[data-section="featured-subtitle"]');
@@ -160,8 +158,8 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                 extraCards: [],
                 section2Title: section2Title || 'Community & Highlights',
                 section2Text: section2Text || 'Discover stories from our active community.',
-                section2Image: section2Image || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1000&h=400&fit=crop&q=80',
-                section2ImageUrl: section2ImageUrl,
+                section2CtaText: section2CtaText || '',
+                section2CtaUrl: section2CtaUrl || 'https://example.com',
                 websiteUrl: 'https://example.com',
                 facebookUrl: 'https://facebook.com',
                 instagramUrl: 'https://instagram.com',
@@ -289,16 +287,19 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                     </tr>` : ''}
 
                     <!-- Section 2 -->
-                    ${(f.section2Title || f.section2Text || f.section2Image) ? `
+                    ${(f.section2Title || f.section2Text || f.section2CtaText) ? `
                     <tr>
-                        <td style="padding: 0 32px 24px 32px;">
-                            ${f.section2Title ? `<h3 style="color: #1e293b; font-size: 18px; font-weight: 700; margin: 0 0 10px 0;">${escapeHtml(f.section2Title)}</h3>` : ''}
-                            ${f.section2Text ? `<p style="color: #475569; font-size: 14px; margin: 0 0 14px 0;">${escapeHtml(f.section2Text)}</p>` : ''}
-                            ${f.section2Image ? `
-                            ${f.section2ImageUrl ? `<a href="${escapeHtml(f.section2ImageUrl)}" target="_blank" style="text-decoration: none; display: block;">` : ''}
-                                <img src="${escapeHtml(cleanUrl(f.section2Image))}" alt="Secondary Image" width="${innerImageWidth}" style="width: 100%; max-width: ${innerImageWidth}px; height: auto; display: block; border-radius: 12px; margin-bottom: 12px; border: 0;" />
-                            ${f.section2ImageUrl ? `</a>` : ''}
-                            ` : ''}
+                        <td style="padding: 0 32px 28px 32px;">
+                            ${f.section2Title ? `<h3 data-section="section2-title" style="color: #1e293b; font-size: 18px; font-weight: 700; margin: 0 0 10px 0;">${escapeHtml(f.section2Title)}</h3>` : ''}
+                            ${f.section2Text ? `<p style="color: #475569; font-size: 14px; margin: 0 0 ${(f.section2CtaText) ? '18px' : '0'}; line-height: 1.6;">${escapeHtml(f.section2Text)}</p>` : ''}
+                            ${f.section2CtaText ? `
+                            <table role="presentation" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center" style="border-radius: 8px; background-color: #0f172a;">
+                                        <a href="${escapeHtml(f.section2CtaUrl || '#')}" target="_blank" data-section="section2-cta" style="font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; border: 1px solid #0f172a; display: inline-block;">${escapeHtml(f.section2CtaText)}</a>
+                                    </td>
+                                </tr>
+                            </table>` : ''}
                         </td>
                     </tr>` : ''}
 
@@ -849,23 +850,28 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                             className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none"
                                         />
                                     </div>
-                                    <ImageUploaderField
-                                        label="Section 2 Image"
-                                        value={fields.section2Image}
-                                        onChange={(url) => updateField('section2Image', url)}
-                                    />
-                                    {fields.section2Image && (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
                                         <div>
-                                            <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">Section 2 Image Link URL (Optional click destination)</label>
+                                            <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Button Label (Optional)</label>
                                             <input
                                                 type="text"
-                                                value={fields.section2ImageUrl || ''}
-                                                onChange={(e) => updateField('section2ImageUrl', e.target.value)}
-                                                placeholder="https://example.com/event"
-                                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-indigo-300 font-mono focus:outline-none"
+                                                value={fields.section2CtaText || ''}
+                                                onChange={(e) => updateField('section2CtaText', e.target.value)}
+                                                placeholder="e.g. LEARN MORE / EXPLORE"
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none font-bold"
                                             />
                                         </div>
-                                    )}
+                                        <div>
+                                            <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Button Link URL</label>
+                                            <input
+                                                type="text"
+                                                value={fields.section2CtaUrl || ''}
+                                                onChange={(e) => updateField('section2CtaUrl', e.target.value)}
+                                                placeholder="https://example.com"
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-indigo-300 font-mono focus:outline-none"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
