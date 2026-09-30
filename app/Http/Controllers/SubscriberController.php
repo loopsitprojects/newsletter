@@ -20,8 +20,8 @@ class SubscriberController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('email', 'like', "%{$search}%")
-                  ->orWhere('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name', 'like', "%{$search}%");
+                    ->orWhere('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%");
             });
         }
 
@@ -67,7 +67,7 @@ class SubscriberController extends Controller
             'consent_timestamp' => now(),
         ]);
 
-        if (!empty($validated['group_ids'])) {
+        if (! empty($validated['group_ids'])) {
             $subscriber->groups()->sync($validated['group_ids']);
         }
 
@@ -85,7 +85,7 @@ class SubscriberController extends Controller
     public function update(Request $request, Subscriber $subscriber): RedirectResponse
     {
         $validated = $request->validate([
-            'email' => 'required|email|unique:subscribers,email,' . $subscriber->id,
+            'email' => 'required|email|unique:subscribers,email,'.$subscriber->id,
             'first_name' => 'nullable|string|max:100',
             'last_name' => 'nullable|string|max:100',
             'status' => 'required|in:active,pending,unsubscribed,bounced',
@@ -139,42 +139,84 @@ class SubscriberController extends Controller
     public function import(Request $request): RedirectResponse
     {
         $request->validate([
-            'csv_file' => 'nullable|file|mimes:csv,txt|max:2048',
+            'csv_file' => 'nullable|file|mimes:csv,txt|max:5120',
             'csv_text' => 'nullable|string',
             'group_id' => 'nullable|exists:subscriber_groups,id',
         ]);
 
-        $rows = [];
+        $rawLines = [];
 
         if ($request->hasFile('csv_file')) {
-            $file = $request->file('csv_file');
-            $handle = fopen($file->getRealPath(), 'r');
-            $header = fgetcsv($handle);
-            while (($data = fgetcsv($handle)) !== false) {
-                if (count($data) >= 1) {
-                    $rows[] = $data;
-                }
-            }
-            fclose($handle);
+            $content = file_get_contents($request->file('csv_file')->getRealPath());
+            $rawLines = preg_split('/\r\n|\r|\n/', (string) $content);
         } elseif ($request->filled('csv_text')) {
-            $lines = explode("\n", trim($request->csv_text));
-            foreach ($lines as $line) {
-                $cols = str_getcsv($line);
-                if (count($cols) >= 1 && !empty(trim($cols[0]))) {
-                    $rows[] = $cols;
-                }
-            }
+            $rawLines = preg_split('/\r\n|\r|\n/', (string) $request->csv_text);
         }
 
         $importedCount = 0;
-        foreach ($rows as $row) {
-            $email = trim($row[0] ?? '');
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
+        foreach ($rawLines as $line) {
+            $line = trim((string) $line);
+            if (empty($line)) {
                 continue;
             }
 
-            $firstName = trim($row[1] ?? '');
-            $lastName = trim($row[2] ?? '');
+            // Fix unbalanced quotes per line so one stray quote never breaks subsequent rows
+            if (substr_count($line, '"') % 2 !== 0) {
+                $line = str_replace('"', '', $line);
+            }
+
+            // Detect delimiter (tab, semicolon, or comma)
+            $delimiter = str_contains($line, "\t") ? "\t" : (str_contains($line, ';') ? ';' : ',');
+            $cols = str_getcsv($line, $delimiter);
+
+            if (empty($cols)) {
+                continue;
+            }
+
+            // Dynamically detect which column contains the valid email address
+            $email = null;
+            $emailIdx = -1;
+            foreach ($cols as $idx => $val) {
+                $cleanVal = trim((string) $val, " \t\n\r\0\x0B\"'");
+                if (filter_var($cleanVal, FILTER_VALIDATE_EMAIL)) {
+                    $email = strtolower($cleanVal);
+                    $emailIdx = $idx;
+                    break;
+                }
+            }
+
+            if (! $email) {
+                // Header row or line without a valid email address
+                continue;
+            }
+
+            // Extract remaining columns for names
+            $otherCols = [];
+            foreach ($cols as $idx => $val) {
+                if ($idx !== $emailIdx) {
+                    $cleaned = trim((string) $val, " \t\n\r\0\x0B\"'");
+                    if ($cleaned !== '') {
+                        $otherCols[] = $cleaned;
+                    }
+                }
+            }
+
+            $firstName = null;
+            $lastName = null;
+
+            if (count($otherCols) >= 2) {
+                $firstName = $otherCols[0];
+                $lastName = $otherCols[1];
+            } elseif (count($otherCols) === 1) {
+                $parts = preg_split('/\s+/', $otherCols[0], 2);
+                $firstName = $parts[0] ?? null;
+                $lastName = $parts[1] ?? null;
+            }
+
+            // Truncate cleanly to ensure it never exceeds database column limits
+            $firstName = $firstName !== null ? mb_substr(strip_tags((string) $firstName), 0, 100) : null;
+            $lastName = $lastName !== null ? mb_substr(strip_tags((string) $lastName), 0, 100) : null;
 
             $subscriber = Subscriber::firstOrCreate(
                 ['email' => $email],
@@ -188,6 +230,13 @@ class SubscriberController extends Controller
                     'consent_timestamp' => now(),
                 ]
             );
+
+            if ($firstName && ! $subscriber->first_name) {
+                $subscriber->update(['first_name' => $firstName]);
+            }
+            if ($lastName && ! $subscriber->last_name) {
+                $subscriber->update(['last_name' => $lastName]);
+            }
 
             if ($request->filled('group_id')) {
                 $subscriber->groups()->syncWithoutDetaching([$request->group_id]);
@@ -213,7 +262,7 @@ class SubscriberController extends Controller
 
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="subscribers_' . date('Y-m-d') . '.csv"',
+            'Content-Disposition' => 'attachment; filename="subscribers_'.date('Y-m-d').'.csv"',
         ];
 
         $callback = function () use ($subscribers) {
