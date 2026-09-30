@@ -27,7 +27,7 @@ $htmlContent = <<<'HTML'
     <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 30px 10px;">
         <tr>
             <td align="center">
-                <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 650px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
+                <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 750px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
                     
                     <!-- Header Bar / Newsletter Title -->
                     <tr>
@@ -43,7 +43,7 @@ $htmlContent = <<<'HTML'
                     <!-- Header Image (Recommended size: 1200 x 500 px) -->
                     <tr>
                         <td style="padding: 0;">
-                            <img src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&h=500&fit=crop&q=80" alt="Header Banner" width="650" style="width: 100%; max-width: 650px; height: auto; display: block; border: 0;" />
+                            <img src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&h=500&fit=crop&q=80" alt="Header Banner" width="750" style="width: 100%; max-width: 750px; height: auto; display: block; border: 0;" />
                         </td>
                     </tr>
 
@@ -82,7 +82,7 @@ $htmlContent = <<<'HTML'
                     <!-- Middle Image -->
                     <tr>
                         <td style="padding: 0 32px 24px 32px;">
-                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1000&h=450&fit=crop&q=80" alt="Section Visual" width="586" style="width: 100%; max-width: 586px; height: auto; display: block; border-radius: 12px; border: 0;" />
+                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1000&h=450&fit=crop&q=80" alt="Section Visual" width="686" style="width: 100%; max-width: 686px; height: auto; display: block; border-radius: 12px; border: 0;" />
                             <p style="color: #94a3b8; font-size: 11px; text-align: center; margin: 6px 0 0 0;">Image can be inserted between content sections.</p>
                         </td>
                     </tr>
@@ -117,7 +117,7 @@ $htmlContent = <<<'HTML'
                             </p>
                             
                             <!-- Additional Image in Section 2 -->
-                            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1000&h=400&fit=crop&q=80" alt="Second Section Banner" width="586" style="width: 100%; max-width: 586px; height: auto; display: block; border-radius: 12px; margin-bottom: 12px; border: 0;" />
+                            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1000&h=400&fit=crop&q=80" alt="Second Section Banner" width="686" style="width: 100%; max-width: 686px; height: auto; display: block; border-radius: 12px; margin-bottom: 12px; border: 0;" />
                             
                             <p style="color: #475569; font-size: 14px; margin: 0;">
                                 [Additional text/content. Summarize concluding thoughts or contact links here.]

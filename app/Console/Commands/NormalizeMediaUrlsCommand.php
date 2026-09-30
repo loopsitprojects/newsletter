@@ -33,6 +33,15 @@ class NormalizeMediaUrlsCommand extends Command
                 );
             }
 
+            // Upgrade older 650px newsletter layouts to 750px wide layout
+            if (str_contains($normalized, 'max-width: 650px')) {
+                $normalized = str_replace(
+                    ['max-width: 650px', 'width="650"', 'width="586"', 'max-width: 586px'],
+                    ['max-width: 750px', 'width="750"', 'width="686"', 'max-width: 686px'],
+                    $normalized
+                );
+            }
+
             if ($normalized !== $campaign->content_html) {
                 $campaign->update(['content_html' => $normalized]);
                 $campaignsUpdated++;
@@ -46,6 +55,15 @@ class NormalizeMediaUrlsCommand extends Command
                 $normalized = preg_replace(
                     '/(<td[^>]*background-color:\s*#0f172a[^>]*>)\s*(<h1)/i',
                     '$1'."\n                            ".$logoSnippet."\n                            ".'$2',
+                    $normalized
+                );
+            }
+
+            // Upgrade older 650px newsletter layouts to 750px wide layout
+            if (str_contains($normalized, 'max-width: 650px')) {
+                $normalized = str_replace(
+                    ['max-width: 650px', 'width="650"', 'width="586"', 'max-width: 586px'],
+                    ['max-width: 750px', 'width="750"', 'width="686"', 'max-width: 686px'],
                     $normalized
                 );
             }

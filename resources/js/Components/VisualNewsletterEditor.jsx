@@ -29,6 +29,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
 
     // Visual Form State for Non-Tech Users
     const [fields, setFields] = useState({
+        templateWidth: '750',
         preheader: "Short preview text shown in the recipient's inbox",
         logoUrl: '/favicon.png',
         headerTitle: 'Weekly Tech & Product Digest',
@@ -117,7 +118,17 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             const companyHeading = doc.querySelector('footer h3') || doc.querySelector('td[style*="0f172a"] h3');
             const companyName = companyHeading ? companyHeading.textContent.trim() : '';
 
+            let templateWidth = '750';
+            const mainTable = doc.querySelector('table[style*="max-width"]');
+            if (mainTable) {
+                const match = mainTable.getAttribute('style').match(/max-width:\s*(\d+)px/i);
+                if (match && match[1]) {
+                    templateWidth = match[1];
+                }
+            }
+
             return {
+                templateWidth: templateWidth,
                 preheader: preheader || "Short preview text shown in recipient's inbox",
                 logoUrl: logoUrl,
                 headerTitle: headerTitle || 'Newsletter Title',
@@ -156,6 +167,9 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
 
     // Generate clean responsive HTML from form fields
     const compileHtml = (f) => {
+        const maxWidth = parseInt(f.templateWidth) || 750;
+        const innerImageWidth = maxWidth - 64;
+
         const bulletsHtml = f.bulletPoints && f.bulletPoints.length > 0
             ? f.bulletPoints.map(b => `<li style="margin-bottom: 6px;">${escapeHtml(b)}</li>`).join('')
             : '';
@@ -176,7 +190,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
     <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 24px 10px;">
         <tr>
             <td align="center">
-                <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 650px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
+                <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: ${maxWidth}px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
                     
                     <!-- Header Bar -->
                     <tr>
@@ -194,7 +208,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                     ${f.headerImage ? `
                     <tr>
                         <td style="padding: 0;">
-                            <img src="${escapeHtml(f.headerImage)}" alt="Banner" width="650" style="width: 100%; max-width: 650px; height: auto; display: block; border: 0;" />
+                            <img src="${escapeHtml(f.headerImage)}" alt="Banner" width="${maxWidth}" style="width: 100%; max-width: ${maxWidth}px; height: auto; display: block; border: 0;" />
                         </td>
                     </tr>` : ''}
 
@@ -227,7 +241,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                     ${f.section1Image ? `
                     <tr>
                         <td style="padding: 0 32px 24px 32px;">
-                            <img src="${escapeHtml(f.section1Image)}" alt="Section Image" width="586" style="width: 100%; max-width: 586px; height: auto; display: block; border-radius: 12px; border: 0;" />
+                            <img src="${escapeHtml(f.section1Image)}" alt="Section Image" width="${innerImageWidth}" style="width: 100%; max-width: ${innerImageWidth}px; height: auto; display: block; border-radius: 12px; border: 0;" />
                         </td>
                     </tr>` : ''}
 
@@ -256,7 +270,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                         <td style="padding: 0 32px 24px 32px;">
                             ${f.section2Title ? `<h3 style="color: #1e293b; font-size: 18px; font-weight: 700; margin: 0 0 10px 0;">${escapeHtml(f.section2Title)}</h3>` : ''}
                             ${f.section2Text ? `<p style="color: #475569; font-size: 14px; margin: 0 0 14px 0;">${escapeHtml(f.section2Text)}</p>` : ''}
-                            ${f.section2Image ? `<img src="${escapeHtml(f.section2Image)}" alt="Secondary Image" width="586" style="width: 100%; max-width: 586px; height: auto; display: block; border-radius: 12px; margin-bottom: 12px; border: 0;" />` : ''}
+                            ${f.section2Image ? `<img src="${escapeHtml(f.section2Image)}" alt="Secondary Image" width="${innerImageWidth}" style="width: 100%; max-width: ${innerImageWidth}px; height: auto; display: block; border-radius: 12px; margin-bottom: 12px; border: 0;" />` : ''}
                         </td>
                     </tr>` : ''}
 
@@ -395,28 +409,52 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                     )}
                 </div>
 
-                <div className="flex items-center space-x-2">
-                    <span className="text-[11px] text-slate-400 font-semibold mr-1">Live Preview Device:</span>
-                    <button
-                        type="button"
-                        onClick={() => setPreviewDevice('desktop')}
-                        className={`p-1.5 rounded-lg transition ${
-                            previewDevice === 'desktop' ? 'bg-indigo-600/30 text-indigo-400 border border-indigo-500/40' : 'text-slate-500 hover:text-white'
-                        }`}
-                        title="Desktop Preview"
-                    >
-                        <Monitor className="h-4 w-4" />
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setPreviewDevice('mobile')}
-                        className={`p-1.5 rounded-lg transition ${
-                            previewDevice === 'mobile' ? 'bg-indigo-600/30 text-indigo-400 border border-indigo-500/40' : 'text-slate-500 hover:text-white'
-                        }`}
-                        title="Mobile Preview"
-                    >
-                        <Smartphone className="h-4 w-4" />
-                    </button>
+                <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center space-x-1 bg-slate-900 border border-slate-800 p-1 rounded-xl">
+                        <span className="text-[10px] text-slate-400 font-bold px-1.5 uppercase tracking-wider">Width:</span>
+                        {[
+                            { label: '650px', val: '650' },
+                            { label: '750px (Wide)', val: '750' },
+                            { label: '800px (Max)', val: '800' },
+                        ].map((w) => (
+                            <button
+                                key={w.val}
+                                type="button"
+                                onClick={() => updateField('templateWidth', w.val)}
+                                className={`px-2 py-0.5 rounded-lg text-xs font-bold transition ${
+                                    (fields.templateWidth || '750') === w.val
+                                        ? 'bg-indigo-600 text-white shadow-sm'
+                                        : 'text-slate-400 hover:text-slate-200'
+                                }`}
+                            >
+                                {w.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <span className="text-[11px] text-slate-400 font-semibold mr-1">Preview:</span>
+                        <button
+                            type="button"
+                            onClick={() => setPreviewDevice('desktop')}
+                            className={`p-1.5 rounded-lg transition ${
+                                previewDevice === 'desktop' ? 'bg-indigo-600/30 text-indigo-400 border border-indigo-500/40' : 'text-slate-500 hover:text-white'
+                            }`}
+                            title="Desktop Preview"
+                        >
+                            <Monitor className="h-4 w-4" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setPreviewDevice('mobile')}
+                            className={`p-1.5 rounded-lg transition ${
+                                previewDevice === 'mobile' ? 'bg-indigo-600/30 text-indigo-400 border border-indigo-500/40' : 'text-slate-500 hover:text-white'
+                            }`}
+                            title="Mobile Preview"
+                        >
+                            <Smartphone className="h-4 w-4" />
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -424,7 +462,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
                 
                 {/* Left Side: Form Controls / Code Editor */}
-                <div className="xl:col-span-6 space-y-5 max-h-[750px] overflow-y-auto pr-1">
+                <div className="xl:col-span-5 space-y-5 max-h-[850px] overflow-y-auto pr-1">
                     {editorMode === 'visual' ? (
                         <div className="space-y-4">
                             {/* Preheader Section */}
@@ -731,21 +769,24 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                 </div>
 
                 {/* Right Side: Instant Live Mobile / Desktop Email Preview */}
-                <div className="xl:col-span-6 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col items-center justify-start overflow-hidden min-h-[600px]">
+                <div className="xl:col-span-7 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col items-center justify-start overflow-hidden min-h-[600px]">
                     <div className="w-full flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
                         <span className="text-xs font-extrabold text-white flex items-center">
                             <Eye className="h-4 w-4 mr-1.5 text-indigo-400" /> Real-Time Live Preview
                         </span>
-                        <span className="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full font-semibold">
-                            {previewDevice === 'mobile' ? 'Mobile View (375px)' : 'Desktop View (650px)'}
+                        <span className="text-[10px] text-slate-400 bg-slate-800 px-2.5 py-0.5 rounded-full font-semibold">
+                            {previewDevice === 'mobile' ? 'Mobile View (375px)' : `Desktop View (${fields.templateWidth || '750'}px)`}
                         </span>
                     </div>
 
                     <div className="w-full flex-1 flex justify-center overflow-y-auto">
                         <div
                             className={`bg-white text-slate-900 rounded-xl shadow-2xl transition-all duration-300 overflow-hidden ${
-                                previewDevice === 'mobile' ? 'w-[375px] min-h-[550px] my-2 border-4 border-slate-800' : 'w-full max-w-[650px]'
+                                previewDevice === 'mobile' ? 'w-[375px] min-h-[550px] my-2 border-4 border-slate-800' : 'w-full'
                             }`}
+                            style={{
+                                maxWidth: previewDevice === 'mobile' ? '375px' : `${fields.templateWidth || '750'}px`,
+                            }}
                         >
                             <div
                                 dangerouslySetInnerHTML={{
