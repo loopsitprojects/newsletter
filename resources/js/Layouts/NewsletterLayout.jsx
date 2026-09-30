@@ -164,11 +164,6 @@ export default function NewsletterLayout({ children, header }) {
                     <div className="flex items-center space-x-4">
                         <h2 className="text-lg font-bold text-white tracking-tight">{header}</h2>
                     </div>
-                    <div className="flex items-center space-x-4">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-2 animate-pulse"></span> MySQL Active
-                        </span>
-                    </div>
                 </header>
 
                 {/* Flash Messages */}

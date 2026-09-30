@@ -1,0 +1,1 @@
+import{t as e}from"./app-BVZJ19ME.js";var t=e();function n({className:e=`h-9 w-auto`,...n}){return(0,t.jsx)(`img`,{src:`/favicon.png`,alt:`SL Newsletter`,className:`object-contain rounded-xl ${e}`,...n})}export{n as t};
