@@ -1,2 +1,4 @@
 *
 !.gitignore
+!newsletter_images/
+!newsletter_images/**

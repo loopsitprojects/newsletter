@@ -18,13 +18,13 @@ class SendCampaignBatchJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $campaignId;
+
     public array $logIds;
 
     /**
      * Create a new job instance.
      *
-     * @param int $campaignId
-     * @param array $logIds List of CampaignLog IDs (up to 50) to process in this batch
+     * @param  array  $logIds  List of CampaignLog IDs (up to 50) to process in this batch
      */
     public function __construct(int $campaignId, array $logIds)
     {
@@ -38,7 +38,7 @@ class SendCampaignBatchJob implements ShouldQueue
     public function handle(): void
     {
         $campaign = Campaign::find($this->campaignId);
-        if (!$campaign || $campaign->status === 'cancelled') {
+        if (! $campaign || $campaign->status === 'cancelled') {
             return;
         }
 
@@ -51,8 +51,9 @@ class SendCampaignBatchJob implements ShouldQueue
 
         foreach ($logs as $log) {
             $subscriber = $log->subscriber;
-            if (!$subscriber || $subscriber->status !== 'active') {
+            if (! $subscriber || $subscriber->status !== 'active') {
                 $log->update(['status' => 'failed']);
+
                 continue;
             }
 
@@ -68,9 +69,10 @@ class SendCampaignBatchJob implements ShouldQueue
 
                 $sentInThisBatch++;
             } catch (\Throwable $e) {
-                Log::error("Failed to send campaign email to {$subscriber->email}: " . $e->getMessage());
+                Log::error("Failed to send campaign email to {$subscriber->email}: ".$e->getMessage());
                 $log->update([
                     'status' => 'failed',
+                    'user_agent' => mb_substr($e->getMessage(), 0, 500),
                 ]);
             }
         }

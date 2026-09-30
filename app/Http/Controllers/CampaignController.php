@@ -43,7 +43,11 @@ class CampaignController extends Controller
 
     public function create(Request $request): Response
     {
-        $templates = EmailTemplate::all();
+        $templates = EmailTemplate::all()->map(function ($t) {
+            $t->content_html = self::normalizeMediaUrls($t->content_html);
+
+            return $t;
+        });
         $groups = SubscriberGroup::withCount('subscribers')->get();
         $initialTemplateId = $request->query('template_id');
 
@@ -84,7 +88,7 @@ class CampaignController extends Controller
             'subject' => $validated['subject'],
             'sender_name' => $validated['sender_name'] ?? config('app.name'),
             'sender_email' => $senderEmail,
-            'content_html' => $validated['content_html'],
+            'content_html' => self::normalizeMediaUrls($validated['content_html']),
             'template_id' => $validated['template_id'] ?? null,
             'target_type' => $validated['target_type'],
             'subscriber_group_id' => $validated['subscriber_group_id'] ?? null,
@@ -112,6 +116,7 @@ class CampaignController extends Controller
     public function show(Campaign $campaign): Response
     {
         $campaign->load(['template', 'group']);
+        $campaign->content_html = self::normalizeMediaUrls($campaign->content_html);
 
         $logs = CampaignLog::with('subscriber')
             ->where('campaign_id', $campaign->id)
@@ -135,7 +140,12 @@ class CampaignController extends Controller
 
     public function edit(Campaign $campaign): Response
     {
-        $templates = EmailTemplate::all();
+        $campaign->content_html = self::normalizeMediaUrls($campaign->content_html);
+        $templates = EmailTemplate::all()->map(function ($t) {
+            $t->content_html = self::normalizeMediaUrls($t->content_html);
+
+            return $t;
+        });
         $groups = SubscriberGroup::withCount('subscribers')->get();
 
         return Inertia::render('Campaigns/Edit', [
@@ -181,7 +191,7 @@ class CampaignController extends Controller
             'subject' => $validated['subject'],
             'sender_name' => $validated['sender_name'] ?? config('app.name'),
             'sender_email' => $senderEmail,
-            'content_html' => $validated['content_html'],
+            'content_html' => self::normalizeMediaUrls($validated['content_html']),
             'template_id' => $validated['template_id'] ?? null,
             'target_type' => $validated['target_type'],
             'subscriber_group_id' => $validated['subscriber_group_id'] ?? null,
@@ -225,6 +235,41 @@ class CampaignController extends Controller
         SendCampaignBatchJob::dispatchSync($campaign->id, $queuedLogs);
 
         return back()->with('success', 'Processed batch of 50 queued emails successfully!');
+    }
+
+    public function retryFailed(Campaign $campaign): RedirectResponse
+    {
+        $failedLogs = CampaignLog::where('campaign_id', $campaign->id)
+            ->where('status', 'failed')
+            ->get();
+
+        if ($failedLogs->isEmpty()) {
+            return back()->with('info', 'No failed delivery logs found to retry.');
+        }
+
+        $logIds = [];
+        foreach ($failedLogs as $log) {
+            $log->update([
+                'status' => 'queued',
+                'user_agent' => null,
+            ]);
+            $logIds[] = $log->id;
+        }
+
+        $campaign->update(['status' => 'sending']);
+
+        $batchSize = 50;
+        $chunks = array_chunk($logIds, $batchSize);
+
+        foreach ($chunks as $index => $chunkLogIds) {
+            if ($index === 0) {
+                SendCampaignBatchJob::dispatchSync($campaign->id, $chunkLogIds);
+            } else {
+                SendCampaignBatchJob::dispatch($campaign->id, $chunkLogIds);
+            }
+        }
+
+        return back()->with('success', 'Retrying delivery for '.count($logIds).' failed recipient(s)!');
     }
 
     public function cancelSchedule(Campaign $campaign, Request $request): RedirectResponse
@@ -335,5 +380,24 @@ class CampaignController extends Controller
                 'batch_size' => $batchSize,
             ],
         ]);
+    }
+
+    /**
+     * Normalize localhost or relative media URLs in campaign content.
+     */
+    public static function normalizeMediaUrls(?string $content): string
+    {
+        if (empty($content)) {
+            return '';
+        }
+
+        // Replace any localhost or 127.0.0.1:port /storage/ with root-relative /storage/
+        $content = preg_replace(
+            '#https?://(?:127\.0\.0\.1|localhost)(?::\d+)?/storage/#i',
+            '/storage/',
+            $content
+        );
+
+        return $content;
     }
 }

@@ -11,16 +11,25 @@ import {
     Play,
     CheckCircle2,
     Layers,
+    AlertCircle,
+    RotateCcw,
 } from 'lucide-react';
 
 export default function CampaignsShow({ campaign, logs }) {
     const openRate = campaign.sent_count > 0 ? Math.round((campaign.open_count / campaign.sent_count) * 1000) / 10 : 0;
     const clickRate = campaign.sent_count > 0 ? Math.round((campaign.click_count / campaign.sent_count) * 1000) / 10 : 0;
     const queuedCount = campaign.queued_count || 0;
+    const failedCount = campaign.failed_count || 0;
 
     const handleProcessBatch = () => {
         if (confirm('Process the next batch of 50 emails now?')) {
             router.post(route('campaigns.process-batch', campaign.id));
+        }
+    };
+
+    const handleRetryFailed = () => {
+        if (confirm(`Retry sending emails to ${failedCount} failed recipient(s)?`)) {
+            router.post(route('campaigns.retry-failed', campaign.id));
         }
     };
 
@@ -52,17 +61,55 @@ export default function CampaignsShow({ campaign, logs }) {
                         </div>
                     </div>
 
-                    {/* Batch Processing Action Button */}
-                    {queuedCount > 0 && (
-                        <button
-                            onClick={handleProcessBatch}
-                            className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition shadow-lg shadow-indigo-600/20"
-                        >
-                            <Play className="h-4 w-4 fill-white" />
-                            <span>Process Next Batch (50 Emails)</span>
-                        </button>
-                    )}
+                    {/* Header Action Buttons */}
+                    <div className="flex items-center space-x-3">
+                        {failedCount > 0 && (
+                            <button
+                                onClick={handleRetryFailed}
+                                className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-semibold text-xs transition shadow-lg shadow-rose-600/20"
+                            >
+                                <RotateCcw className="h-4 w-4" />
+                                <span>Retry Failed ({failedCount})</span>
+                            </button>
+                        )}
+                        {queuedCount > 0 && (
+                            <button
+                                onClick={handleProcessBatch}
+                                className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition shadow-lg shadow-indigo-600/20"
+                            >
+                                <Play className="h-4 w-4 fill-white" />
+                                <span>Process Next Batch (50 Emails)</span>
+                            </button>
+                        )}
+                    </div>
                 </div>
+
+                {/* Failed Deliveries Banner */}
+                {failedCount > 0 && (
+                    <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div className="flex items-center space-x-3">
+                            <div className="p-2 rounded-xl bg-rose-500/20 text-rose-400">
+                                <AlertCircle className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-bold text-rose-200">
+                                    {failedCount} {failedCount === 1 ? 'recipient failed' : 'recipients failed'} delivery
+                                </h4>
+                                <p className="text-xs text-rose-300/80">
+                                    Check failure error details below in the delivery logs. You can retry sending to failed recipients at any time.
+                                </p>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={handleRetryFailed}
+                            className="px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center space-x-1.5 transition"
+                        >
+                            <RotateCcw className="h-3.5 w-3.5" />
+                            <span>Retry Failed Now</span>
+                        </button>
+                    </div>
+                )}
 
                 {/* Queue Banner */}
                 {queuedCount > 0 && (
@@ -175,6 +222,11 @@ export default function CampaignsShow({ campaign, logs }) {
                                                 }`}>
                                                     {log.status}
                                                 </span>
+                                                {log.status === 'failed' && log.user_agent && (
+                                                    <p className="text-[10px] text-rose-400/90 mt-1 max-w-xs break-words font-mono bg-rose-950/40 p-1.5 rounded border border-rose-900/30" title={log.user_agent}>
+                                                        {log.user_agent}
+                                                    </p>
+                                                )}
                                             </td>
                                             <td className="py-3 px-4 text-xs text-slate-400">{log.sent_at ? new Date(log.sent_at).toLocaleString() : '-'}</td>
                                             <td className="py-3 px-4 text-xs">

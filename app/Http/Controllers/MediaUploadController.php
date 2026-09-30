@@ -17,13 +17,14 @@ class MediaUploadController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $extension = $file->getClientOriginalExtension();
-            $filename = time() . '_' . Str::random(10) . '.' . $extension;
+            $filename = time().'_'.Str::random(10).'.'.$extension;
 
             // Store in public disk under newsletter_images
             $path = $file->storeAs('newsletter_images', $filename, 'public');
 
-            // Generate full public URL
-            $url = asset('storage/' . $path);
+            // Generate full public URL using configured APP_URL
+            $baseUrl = rtrim(config('app.url', url('/')), '/');
+            $url = $baseUrl.'/storage/'.$path;
 
             return response()->json([
                 'success' => true,

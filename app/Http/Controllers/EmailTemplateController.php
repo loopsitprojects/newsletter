@@ -13,7 +13,11 @@ class EmailTemplateController extends Controller
 {
     public function index(): Response
     {
-        $templates = EmailTemplate::orderBy('created_at', 'desc')->get();
+        $templates = EmailTemplate::orderBy('created_at', 'desc')->get()->map(function ($t) {
+            $t->content_html = CampaignController::normalizeMediaUrls($t->content_html);
+
+            return $t;
+        });
 
         return Inertia::render('Templates/Index', [
             'templates' => $templates,
@@ -37,7 +41,7 @@ class EmailTemplateController extends Controller
             'is_default' => 'nullable|boolean',
         ]);
 
-        if (!empty($validated['is_default'])) {
+        if (! empty($validated['is_default'])) {
             EmailTemplate::where('is_default', true)->update(['is_default' => false]);
         }
 
@@ -45,7 +49,7 @@ class EmailTemplateController extends Controller
             'name' => $validated['name'],
             'subject_template' => $validated['subject_template'] ?? null,
             'category' => $validated['category'],
-            'content_html' => $validated['content_html'],
+            'content_html' => CampaignController::normalizeMediaUrls($validated['content_html']),
             'header_content' => $validated['header_content'] ?? null,
             'footer_content' => $validated['footer_content'] ?? null,
             'is_default' => $validated['is_default'] ?? false,
@@ -64,6 +68,8 @@ class EmailTemplateController extends Controller
 
     public function edit(EmailTemplate $template): Response
     {
+        $template->content_html = CampaignController::normalizeMediaUrls($template->content_html);
+
         return Inertia::render('Templates/Edit', [
             'template' => $template,
         ]);
@@ -72,7 +78,7 @@ class EmailTemplateController extends Controller
     public function update(Request $request, EmailTemplate $template): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:email_templates,name,' . $template->id,
+            'name' => 'required|string|max:255|unique:email_templates,name,'.$template->id,
             'subject_template' => 'nullable|string|max:255',
             'category' => 'required|string|max:50',
             'content_html' => 'required|string',
@@ -81,7 +87,7 @@ class EmailTemplateController extends Controller
             'is_default' => 'nullable|boolean',
         ]);
 
-        if (!empty($validated['is_default']) && !$template->is_default) {
+        if (! empty($validated['is_default']) && ! $template->is_default) {
             EmailTemplate::where('is_default', true)->update(['is_default' => false]);
         }
 
@@ -89,7 +95,7 @@ class EmailTemplateController extends Controller
             'name' => $validated['name'],
             'subject_template' => $validated['subject_template'] ?? null,
             'category' => $validated['category'],
-            'content_html' => $validated['content_html'],
+            'content_html' => CampaignController::normalizeMediaUrls($validated['content_html']),
             'header_content' => $validated['header_content'] ?? null,
             'footer_content' => $validated['footer_content'] ?? null,
             'is_default' => $validated['is_default'] ?? false,

@@ -12,6 +12,7 @@ use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\SubscriberGroupController;
 use App\Http\Controllers\TrackingController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 // Root Route - Serve the signup frontend directly on root URL
 Route::get('/', function () {
@@ -36,6 +37,17 @@ Route::post('/preferences/{token}', [PublicSubscriptionController::class, 'updat
 // Tracking Endpoints
 Route::get('/t/open/{token}', [TrackingController::class, 'trackOpen'])->name('tracking.open');
 Route::get('/t/click/{token}', [TrackingController::class, 'trackClick'])->name('tracking.click');
+
+// Storage Media Fallback Route (guarantees image delivery on cPanel environments without requiring symlink)
+Route::get('/storage/{path}', function (string $path) {
+    if (! Storage::disk('public')->exists($path)) {
+        abort(404);
+    }
+
+    return Storage::disk('public')->response($path, headers: [
+        'Cache-Control' => 'public, max-age=31536000',
+    ]);
+})->where('path', '.*')->name('storage.media');
 
 // Authenticated Admin Dashboard & Management Routes
 Route::middleware(['auth'])->group(function () {
@@ -65,6 +77,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/campaigns/{campaign}', [CampaignController::class, 'destroy'])->name('campaigns.destroy');
     Route::post('/campaigns/{campaign}/send-now', [CampaignController::class, 'sendNow'])->name('campaigns.send-now');
     Route::post('/campaigns/{campaign}/process-batch', [CampaignController::class, 'processQueueBatch'])->name('campaigns.process-batch');
+    Route::post('/campaigns/{campaign}/retry-failed', [CampaignController::class, 'retryFailed'])->name('campaigns.retry-failed');
     Route::post('/campaigns/{campaign}/cancel', [CampaignController::class, 'cancelSchedule'])->name('campaigns.cancel');
 
     // Template Management
