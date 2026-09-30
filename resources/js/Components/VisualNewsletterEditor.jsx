@@ -30,6 +30,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
     // Visual Form State for Non-Tech Users
     const [fields, setFields] = useState({
         preheader: "Short preview text shown in the recipient's inbox",
+        logoUrl: '/favicon.png',
         headerTitle: 'Weekly Tech & Product Digest',
         headerSubtitle: 'Weekly Updates & Insights',
         headerImage: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&h=500&fit=crop&q=80',
@@ -68,6 +69,9 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
 
             const preheaderDiv = doc.querySelector('div[style*="display: none"]');
             const preheader = preheaderDiv ? preheaderDiv.textContent.replace(/&zwnj;|\s+/g, ' ').trim() : '';
+
+            const logoImg = doc.querySelector('img[alt="Logo"]') || doc.querySelector('td[style*="background-color: #0f172a"] img:not([alt="Banner"])');
+            const logoUrl = logoImg ? logoImg.getAttribute('src') || '' : '/favicon.png';
 
             const h1 = doc.querySelector('h1');
             const headerTitle = h1 ? h1.textContent.trim() : '';
@@ -115,6 +119,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
 
             return {
                 preheader: preheader || "Short preview text shown in recipient's inbox",
+                logoUrl: logoUrl,
                 headerTitle: headerTitle || 'Newsletter Title',
                 headerSubtitle: headerSubtitle || 'Weekly Updates & Insights',
                 headerImage: headerImage || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&h=500&fit=crop&q=80',
@@ -175,9 +180,13 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                     
                     <!-- Header Bar -->
                     <tr>
-                        <td align="center" style="background-color: #0f172a; padding: 24px 30px; text-align: center;">
+                        <td align="center" style="background-color: #0f172a; padding: 28px 30px 24px 30px; text-align: center;">
+                            ${f.logoUrl ? `
+                            <div style="margin-bottom: 14px;">
+                                <img src="${escapeHtml(f.logoUrl)}" alt="Logo" width="56" height="56" style="width: 56px; height: 56px; object-fit: contain; border-radius: 12px; display: inline-block; border: 0; vertical-align: middle; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);" />
+                            </div>` : ''}
                             <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">${escapeHtml(f.headerTitle)}</h1>
-                            ${f.headerSubtitle ? `<p style="color: #94a3b8; font-size: 12px; margin: 4px 0 0 0; text-transform: uppercase; letter-spacing: 1px;">${escapeHtml(f.headerSubtitle)}</p>` : ''}
+                            ${f.headerSubtitle ? `<p style="color: #94a3b8; font-size: 12px; margin: 6px 0 0 0; text-transform: uppercase; letter-spacing: 1px;">${escapeHtml(f.headerSubtitle)}</p>` : ''}
                         </td>
                     </tr>
 
@@ -437,7 +446,24 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                 <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center">
                                     <ImageIcon className="h-3.5 w-3.5 mr-1.5 text-sky-400" /> Newsletter Banner & Title
                                 </h4>
-                                <div className="space-y-2">
+                                <div className="space-y-3">
+                                    <div className="space-y-1">
+                                        <ImageUploaderField
+                                            label="Site / Brand Logo"
+                                            value={fields.logoUrl}
+                                            onChange={(url) => updateField('logoUrl', url)}
+                                            placeholder="/favicon.png or https://..."
+                                        />
+                                        {fields.logoUrl !== '/favicon.png' && (
+                                            <button
+                                                type="button"
+                                                onClick={() => updateField('logoUrl', '/favicon.png')}
+                                                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold"
+                                            >
+                                                ↺ Reset to default site logo
+                                            </button>
+                                        )}
+                                    </div>
                                     <div>
                                         <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Newsletter Title</label>
                                         <input

@@ -1,11 +1,12 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
 use App\Models\EmailTemplate;
+use Illuminate\Contracts\Console\Kernel;
 
 $htmlContent = <<<'HTML'
 <!DOCTYPE html>
@@ -30,9 +31,12 @@ $htmlContent = <<<'HTML'
                     
                     <!-- Header Bar / Newsletter Title -->
                     <tr>
-                        <td align="center" style="background-color: #0f172a; padding: 24px 30px; text-align: center;">
+                        <td align="center" style="background-color: #0f172a; padding: 28px 30px 24px 30px; text-align: center;">
+                            <div style="margin-bottom: 14px;">
+                                <img src="/favicon.png" alt="Logo" width="56" height="56" style="width: 56px; height: 56px; object-fit: contain; border-radius: 12px; display: inline-block; border: 0; vertical-align: middle; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);" />
+                            </div>
                             <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">[Newsletter Title]</h1>
-                            <p style="color: #94a3b8; font-size: 12px; margin: 4px 0 0 0; text-transform: uppercase; letter-spacing: 1px;">Weekly Updates & Insights</p>
+                            <p style="color: #94a3b8; font-size: 12px; margin: 6px 0 0 0; text-transform: uppercase; letter-spacing: 1px;">Weekly Updates & Insights</p>
                         </td>
                     </tr>
 
