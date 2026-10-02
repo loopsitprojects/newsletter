@@ -35,6 +35,7 @@ class EmailTemplateController extends Controller
             'name' => 'required|string|max:255|unique:email_templates,name',
             'subject_template' => 'nullable|string|max:255',
             'category' => 'required|string|max:50',
+            'template_type' => 'nullable|string|in:base,content',
             'content_html' => 'required|string',
             'header_content' => 'nullable|string',
             'footer_content' => 'nullable|string',
@@ -49,6 +50,7 @@ class EmailTemplateController extends Controller
             'name' => $validated['name'],
             'subject_template' => $validated['subject_template'] ?? null,
             'category' => $validated['category'],
+            'template_type' => $validated['template_type'] ?? 'base',
             'content_html' => CampaignController::normalizeMediaUrls($validated['content_html']),
             'header_content' => $validated['header_content'] ?? null,
             'footer_content' => $validated['footer_content'] ?? null,
@@ -81,6 +83,7 @@ class EmailTemplateController extends Controller
             'name' => 'required|string|max:255|unique:email_templates,name,'.$template->id,
             'subject_template' => 'nullable|string|max:255',
             'category' => 'required|string|max:50',
+            'template_type' => 'nullable|string|in:base,content',
             'content_html' => 'required|string',
             'header_content' => 'nullable|string',
             'footer_content' => 'nullable|string',
@@ -95,6 +98,7 @@ class EmailTemplateController extends Controller
             'name' => $validated['name'],
             'subject_template' => $validated['subject_template'] ?? null,
             'category' => $validated['category'],
+            'template_type' => $validated['template_type'] ?? $template->template_type ?? 'base',
             'content_html' => CampaignController::normalizeMediaUrls($validated['content_html']),
             'header_content' => $validated['header_content'] ?? null,
             'footer_content' => $validated['footer_content'] ?? null,
@@ -133,6 +137,7 @@ class EmailTemplateController extends Controller
             'name' => 'required|string|max:255',
             'subject_template' => 'nullable|string|max:255',
             'category' => 'nullable|string|max:50',
+            'template_type' => 'nullable|string|in:base,content',
             'content_html' => 'required|string',
             'header_content' => 'nullable|string',
             'footer_content' => 'nullable|string',
@@ -150,6 +155,7 @@ class EmailTemplateController extends Controller
             'name' => $name,
             'subject_template' => $validated['subject_template'] ?? null,
             'category' => $validated['category'] ?? 'newsletter',
+            'template_type' => $validated['template_type'] ?? 'content',
             'content_html' => CampaignController::normalizeMediaUrls($validated['content_html']),
             'header_content' => $validated['header_content'] ?? null,
             'footer_content' => $validated['footer_content'] ?? null,
@@ -164,7 +170,7 @@ class EmailTemplateController extends Controller
             'ip_address' => $request->ip(),
         ]);
 
-        if ($request->wantsJson() || $request->ajax() || $request->header('X-Inertia') === null && $request->acceptsJson()) {
+        if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
                 'message' => "Template '{$template->name}' saved successfully!",
@@ -189,6 +195,7 @@ class EmailTemplateController extends Controller
             'name' => $name,
             'subject_template' => $template->subject_template,
             'category' => $template->category,
+            'template_type' => $template->template_type ?? 'content',
             'content_html' => $template->content_html,
             'header_content' => $template->header_content,
             'footer_content' => $template->footer_content,

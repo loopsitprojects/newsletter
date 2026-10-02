@@ -13,6 +13,8 @@ import {
     Layers,
     AlertCircle,
     RotateCcw,
+    Copy,
+    BookmarkPlus,
 } from 'lucide-react';
 
 export default function CampaignsShow({ campaign, logs }) {
@@ -62,7 +64,38 @@ export default function CampaignsShow({ campaign, logs }) {
                     </div>
 
                     {/* Header Action Buttons */}
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-2.5">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                if (confirm('Duplicate this campaign into a new editable draft?')) {
+                                    router.post(route('campaigns.duplicate', campaign.id));
+                                }
+                            }}
+                            className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition"
+                            title="Duplicate this campaign into a new draft"
+                        >
+                            <Copy className="h-4 w-4" />
+                            <span>Duplicate</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => {
+                                const name = prompt('Enter a name for the new template:', `${campaign.title} Template`);
+                                if (name && name.trim()) {
+                                    router.post(route('campaigns.save-as-template', campaign.id), {
+                                        name: name.trim(),
+                                    });
+                                }
+                            }}
+                            className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 font-semibold text-xs border border-emerald-500/40 transition"
+                            title="Save this campaign's design & content as a reusable template"
+                        >
+                            <BookmarkPlus className="h-4 w-4" />
+                            <span>Save as Template</span>
+                        </button>
+
                         {failedCount > 0 && (
                             <button
                                 onClick={handleRetryFailed}

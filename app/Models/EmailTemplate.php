@@ -16,6 +16,7 @@ class EmailTemplate extends Model
         'content_html',
         'content_json',
         'category',
+        'template_type',
         'header_content',
         'footer_content',
         'is_default',

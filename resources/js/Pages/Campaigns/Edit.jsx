@@ -13,6 +13,8 @@ import {
     X,
     Sparkles,
     Check,
+    BookmarkPlus,
+    Layers,
 } from 'lucide-react';
 
 export default function CampaignsEdit({ campaign, templates: initialTemplates = [], groups }) {
@@ -31,6 +33,15 @@ export default function CampaignsEdit({ campaign, templates: initialTemplates = 
     });
 
     const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+    const [templateTab, setTemplateTab] = useState('all');
+
+    const baseTemplates = templates.filter((t) => t.template_type === 'base' || !t.template_type);
+    const contentTemplates = templates.filter((t) => t.template_type === 'content');
+    const displayedTemplates = templateTab === 'base'
+        ? baseTemplates
+        : templateTab === 'content'
+        ? contentTemplates
+        : templates;
 
     const handleTemplateSelect = (tId) => {
         setData('template_id', tId);
@@ -111,51 +122,111 @@ export default function CampaignsEdit({ campaign, templates: initialTemplates = 
                                 Select a template below to load pre-designed layout blocks into the visual editor:
                             </p>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                                {templates.map((t) => {
-                                    const isSelected = data.template_id == t.id;
-                                    return (
-                                        <div
-                                            key={t.id}
-                                            onClick={() => handleTemplateSelect(t.id)}
-                                            className={`p-4 rounded-xl border cursor-pointer transition flex items-start justify-between space-x-2 ${
-                                                isSelected
-                                                    ? 'bg-indigo-600/20 border-indigo-500 text-white shadow-lg shadow-indigo-500/20 ring-1 ring-indigo-500'
-                                                    : 'bg-slate-800/60 border-slate-700/80 hover:bg-slate-800 text-slate-300 hover:border-slate-600'
-                                            }`}
-                                        >
-                                            <div className="space-y-1 overflow-hidden">
-                                                <div className="flex items-center space-x-2">
-                                                    <span className="text-xs font-extrabold text-white truncate">{t.name}</span>
-                                                    {t.is_default && (
-                                                        <span className="text-[9px] bg-emerald-500/20 text-emerald-400 font-semibold px-1.5 py-0.5 rounded border border-emerald-500/30 shrink-0">
-                                                            Default
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <div className="text-[11px] text-indigo-300 font-mono truncate">
-                                                    Subject: {t.subject_template || 'No default subject'}
-                                                </div>
-                                                <div className="text-[10px] text-slate-400 capitalize">
-                                                    Category: {t.category || 'Newsletter'}
-                                                </div>
-                                            </div>
-                                            {isSelected ? (
-                                                <span className="p-1.5 rounded-full bg-indigo-500 text-white shrink-0">
-                                                    <Check className="h-4 w-4" />
-                                                </span>
-                                            ) : (
-                                                <button
-                                                    type="button"
-                                                    className="px-2.5 py-1 text-[10px] font-semibold rounded-lg bg-slate-700 text-slate-300 hover:bg-indigo-600 hover:text-white transition shrink-0"
-                                                >
-                                                    Select
-                                                </button>
-                                            )}
-                                        </div>
-                                    );
-                                })}
+                            {/* Separate Tabs for Base vs Content Templates */}
+                            <div className="flex items-center space-x-2 pt-1 border-b border-indigo-500/20 pb-2.5">
+                                <button
+                                    type="button"
+                                    onClick={() => setTemplateTab('all')}
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${
+                                        templateTab === 'all'
+                                            ? 'bg-indigo-600 text-white shadow-sm'
+                                            : 'bg-slate-800/80 text-slate-400 hover:text-white'
+                                    }`}
+                                >
+                                    <Layers className="h-3.5 w-3.5" />
+                                    <span>All ({templates.length})</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setTemplateTab('base')}
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${
+                                        templateTab === 'base'
+                                            ? 'bg-indigo-600 text-white shadow-sm'
+                                            : 'bg-slate-800/80 text-slate-400 hover:text-white'
+                                    }`}
+                                >
+                                    <LayoutTemplate className="h-3.5 w-3.5 text-indigo-300" />
+                                    <span>Base Templates ({baseTemplates.length})</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setTemplateTab('content')}
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${
+                                        templateTab === 'content'
+                                            ? 'bg-emerald-600 text-white shadow-sm'
+                                            : 'bg-slate-800/80 text-slate-400 hover:text-white'
+                                    }`}
+                                >
+                                    <BookmarkPlus className="h-3.5 w-3.5 text-emerald-400" />
+                                    <span>Templates with Content ({contentTemplates.length})</span>
+                                </button>
                             </div>
+
+                            {displayedTemplates.length === 0 ? (
+                                <div className="p-6 rounded-xl bg-slate-800/40 border border-slate-700/60 text-center space-y-1.5">
+                                    <p className="text-xs text-slate-300 font-semibold">No templates found in this tab.</p>
+                                    <p className="text-[11px] text-slate-400">
+                                        Customize any base template and click <strong>"Save as Template"</strong> in the builder below to store your customized content here.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                                    {displayedTemplates.map((t) => {
+                                        const isSelected = data.template_id == t.id;
+                                        return (
+                                            <div
+                                                key={t.id}
+                                                onClick={() => handleTemplateSelect(t.id)}
+                                                className={`p-4 rounded-xl border cursor-pointer transition flex items-start justify-between space-x-2 ${
+                                                    isSelected
+                                                        ? 'bg-indigo-600/20 border-indigo-500 text-white shadow-lg shadow-indigo-500/20 ring-1 ring-indigo-500'
+                                                        : 'bg-slate-800/60 border-slate-700/80 hover:bg-slate-800 text-slate-300 hover:border-slate-600'
+                                                }`}
+                                            >
+                                                <div className="space-y-1.5 overflow-hidden">
+                                                    <div className="flex items-center space-x-2">
+                                                        <span className="text-xs font-extrabold text-white truncate">{t.name}</span>
+                                                        {t.is_default && (
+                                                            <span className="text-[9px] bg-emerald-500/20 text-emerald-400 font-semibold px-1.5 py-0.5 rounded border border-emerald-500/30 shrink-0">
+                                                                Default
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center space-x-1.5">
+                                                        {t.template_type === 'content' ? (
+                                                            <span className="text-[9px] bg-emerald-500/10 text-emerald-400 font-bold px-1.5 py-0.5 rounded border border-emerald-500/20">
+                                                                Content Edition
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-[9px] bg-slate-700 text-slate-400 font-semibold px-1.5 py-0.5 rounded">
+                                                                Base Layout
+                                                            </span>
+                                                        )}
+                                                        <span className="text-[10px] text-slate-400 capitalize">
+                                                            {t.category || 'Newsletter'}
+                                                        </span>
+                                                    </div>
+                                                    <div className="text-[11px] text-indigo-300 font-mono truncate">
+                                                        Subject: {t.subject_template || 'No default subject'}
+                                                    </div>
+                                                </div>
+                                                {isSelected ? (
+                                                    <span className="p-1.5 rounded-full bg-indigo-500 text-white shrink-0">
+                                                        <Check className="h-4 w-4" />
+                                                    </span>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        className="px-2.5 py-1 text-[10px] font-semibold rounded-lg bg-slate-700 text-slate-300 hover:bg-indigo-600 hover:text-white transition shrink-0"
+                                                    >
+                                                        Select
+                                                    </button>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
 
                         <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">

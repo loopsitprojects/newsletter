@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import NewsletterLayout from '@/Layouts/NewsletterLayout';
 import VisualNewsletterEditor from '@/Components/VisualNewsletterEditor';
-import { LayoutTemplate, ArrowLeft, Code, Eye, X, Sparkles } from 'lucide-react';
+import { LayoutTemplate, ArrowLeft, Code, Eye, X, Sparkles, BookmarkPlus } from 'lucide-react';
 
 export default function TemplatesCreate() {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         subject_template: '',
         category: 'newsletter',
+        template_type: 'base',
         content_html: '<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;"><h1>Title</h1><p>Body copy here...</p></div>',
         header_content: '',
         footer_content: '',
@@ -63,6 +64,58 @@ export default function TemplatesCreate() {
                                     onChange={(e) => setData('name', e.target.value)}
                                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
                                 />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Template Type *</label>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <label
+                                        onClick={() => setData('template_type', 'base')}
+                                        className={`p-3 rounded-xl border cursor-pointer transition flex items-center space-x-2.5 ${
+                                            data.template_type === 'base'
+                                                ? 'bg-indigo-600/20 border-indigo-500 text-white ring-1 ring-indigo-500'
+                                                : 'bg-slate-800/80 border-slate-700/80 text-slate-400 hover:text-white'
+                                        }`}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="template_type"
+                                            value="base"
+                                            checked={data.template_type === 'base'}
+                                            onChange={() => setData('template_type', 'base')}
+                                            className="text-indigo-600 focus:ring-0"
+                                        />
+                                        <div>
+                                            <div className="text-xs font-bold text-white flex items-center">
+                                                <LayoutTemplate className="h-3.5 w-3.5 mr-1.5 text-indigo-400" /> Base Template
+                                            </div>
+                                            <div className="text-[10px] text-slate-400">Clean layout structure (no filled content)</div>
+                                        </div>
+                                    </label>
+                                    <label
+                                        onClick={() => setData('template_type', 'content')}
+                                        className={`p-3 rounded-xl border cursor-pointer transition flex items-center space-x-2.5 ${
+                                            data.template_type === 'content'
+                                                ? 'bg-emerald-600/20 border-emerald-500 text-white ring-1 ring-emerald-500'
+                                                : 'bg-slate-800/80 border-slate-700/80 text-slate-400 hover:text-white'
+                                        }`}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="template_type"
+                                            value="content"
+                                            checked={data.template_type === 'content'}
+                                            onChange={() => setData('template_type', 'content')}
+                                            className="text-emerald-600 focus:ring-0"
+                                        />
+                                        <div>
+                                            <div className="text-xs font-bold text-white flex items-center">
+                                                <BookmarkPlus className="h-3.5 w-3.5 mr-1.5 text-emerald-400" /> Template with Content
+                                            </div>
+                                            <div className="text-[10px] text-slate-400">Pre-filled edition with copy & imagery</div>
+                                        </div>
+                                    </label>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

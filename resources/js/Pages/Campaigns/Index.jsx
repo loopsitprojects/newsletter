@@ -16,15 +16,57 @@ import {
     ArrowRight,
     Play,
     StopCircle,
+    Copy,
+    BookmarkPlus,
+    X,
+    Check,
 } from 'lucide-react';
 
 export default function CampaignsIndex({ campaigns, filters }) {
     const [search, setSearch] = useState(filters.search || '');
     const [status, setStatus] = useState(filters.status || 'all');
+    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+    const [selectedCampaign, setSelectedCampaign] = useState(null);
+    const [templateName, setTemplateName] = useState('');
+    const [templateCategory, setTemplateCategory] = useState('newsletter');
+    const [isSavingTemplate, setIsSavingTemplate] = useState(false);
 
     const handleFilter = (e) => {
         e.preventDefault();
         router.get(route('campaigns.index'), { search, status }, { preserveState: true });
+    };
+
+    const handleDuplicate = (id) => {
+        if (confirm('Create an editable duplicate of this campaign?')) {
+            router.post(route('campaigns.duplicate', id));
+        }
+    };
+
+    const openSaveAsTemplateModal = (campaign) => {
+        setSelectedCampaign(campaign);
+        setTemplateName(`${campaign.title} Template`);
+        setTemplateCategory('newsletter');
+        setIsSaveModalOpen(true);
+    };
+
+    const handleSaveCampaignAsTemplate = (e) => {
+        e.preventDefault();
+        if (!selectedCampaign || !templateName.trim()) return;
+
+        setIsSavingTemplate(true);
+        router.post(
+            route('campaigns.save-as-template', selectedCampaign.id),
+            {
+                name: templateName.trim(),
+                category: templateCategory,
+            },
+            {
+                onFinish: () => {
+                    setIsSavingTemplate(false);
+                    setIsSaveModalOpen(false);
+                },
+            }
+        );
     };
 
     const handleSendNow = (id) => {
@@ -209,6 +251,22 @@ export default function CampaignsIndex({ campaigns, filters }) {
                                             </button>
                                         )}
 
+                                        <button
+                                            onClick={() => handleDuplicate(campaign.id)}
+                                            title="Duplicate this campaign (create new editable copy)"
+                                            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition"
+                                        >
+                                            <Copy className="h-4 w-4" />
+                                        </button>
+
+                                        <button
+                                            onClick={() => openSaveAsTemplateModal(campaign)}
+                                            title="Save this campaign's customized content as a reusable template"
+                                            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 hover:text-emerald-300 transition"
+                                        >
+                                            <BookmarkPlus className="h-4 w-4" />
+                                        </button>
+
                                         <Link
                                             href={route('campaigns.show', campaign.id)}
                                             className="px-3.5 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-xs font-semibold flex items-center border border-indigo-500/30"
@@ -229,6 +287,85 @@ export default function CampaignsIndex({ campaigns, filters }) {
                     )}
                 </div>
             </div>
+
+            {/* Save Campaign as Template Modal */}
+            {isSaveModalOpen && selectedCampaign && (
+                <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+                    <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                            <div className="flex items-center space-x-2.5">
+                                <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                    <BookmarkPlus className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <h3 className="font-extrabold text-white text-base">Save Campaign as Template</h3>
+                                    <p className="text-[11px] text-slate-400">Add to your Template Library to reuse across future campaigns</p>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setIsSaveModalOpen(false)}
+                                className="text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-xs text-emerald-300 leading-relaxed">
+                            💡 This takes the content, articles, and layout from <strong>"{selectedCampaign.title}"</strong> and saves it directly to your <strong>Templates with Content</strong> tab, keeping your base layout templates clean and untouched.
+                        </div>
+
+                        <form onSubmit={handleSaveCampaignAsTemplate} className="space-y-3.5">
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                                    Template Name *
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={templateName}
+                                    onChange={(e) => setTemplateName(e.target.value)}
+                                    placeholder="e.g. October Newsletter Template"
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                                    Category
+                                </label>
+                                <select
+                                    value={templateCategory}
+                                    onChange={(e) => setTemplateCategory(e.target.value)}
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                                >
+                                    <option value="newsletter">Newsletter</option>
+                                    <option value="promotion">Promotion / Sale</option>
+                                    <option value="automation">Automation / Onboarding</option>
+                                    <option value="transactional">Product Update / Announcement</option>
+                                </select>
+                            </div>
+
+                            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-800">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsSaveModalOpen(false)}
+                                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSavingTemplate}
+                                    className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-bold shadow-lg shadow-emerald-600/20 transition flex items-center space-x-1.5"
+                                >
+                                    {isSavingTemplate ? 'Saving...' : 'Save as Reusable Template'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </NewsletterLayout>
     );
 }

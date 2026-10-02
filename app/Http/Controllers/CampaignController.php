@@ -454,6 +454,7 @@ class CampaignController extends Controller
             'name' => $name,
             'subject_template' => $campaign->subject,
             'category' => $validated['category'] ?? 'newsletter',
+            'template_type' => 'content',
             'content_html' => $campaign->content_html,
             'is_default' => false,
         ]);
@@ -466,7 +467,7 @@ class CampaignController extends Controller
             'ip_address' => $request->ip(),
         ]);
 
-        if ($request->wantsJson() || $request->ajax() || $request->header('X-Inertia') === null && $request->acceptsJson()) {
+        if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'success' => true,
                 'message' => "Campaign content saved as template '{$template->name}'!",
