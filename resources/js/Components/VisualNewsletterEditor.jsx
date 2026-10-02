@@ -18,311 +18,356 @@ import {
     LayoutTemplate,
     Check,
     X,
+    Layers,
+    Sun,
+    Moon,
+    AlignLeft,
+    AlignCenter,
+    AlignRight,
+    Palette,
+    BookmarkPlus,
+    Save,
 } from 'lucide-react';
 
-export default function VisualNewsletterEditor({ value, onChange, templates = [], onSelectTemplate }) {
-    const [editorMode, setEditorMode] = useState('visual'); // 'visual' | 'code'
-    const [previewDevice, setPreviewDevice] = useState('desktop');
-    const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
-    const lastCompiledRef = useRef('');
+export const LOOPS_LOGO_PALETTE = [
+    { name: 'Loops Electric Blue', hex: '#0057c5', bg: '#e6f0fd' },
+    { name: 'Loops Purple', hex: '#8035d1', bg: '#f3eafd' },
+    { name: 'Loops Magenta', hex: '#ff0878', bg: '#ffe6f0' },
+    { name: 'Loops Teal', hex: '#2fd0ca', bg: '#e2faf8' },
+];
 
-    // Visual Form State for Non-Tech Users
-    const [fields, setFields] = useState({
-        templateWidth: '750',
-        preheader: "Short preview text shown in the recipient's inbox",
-        logoUrl: '/images/loops-logo-white.png',
-        headerTitle: 'Weekly Tech & Product Digest',
-        headerSubtitle: 'Weekly Updates & Insights',
-        headerImage: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&h=500&fit=crop&q=80',
-        mainHeading: 'Welcome to Our Latest Edition',
-        introText: 'Thank you for subscribing to our newsletter! Here is our latest roundup of news, feature updates, and exclusive tutorials.',
-        showFeatured: true,
-        featuredSectionTitle: 'Featured Highlights',
-        featuredSectionSubtitle: '',
-        featuredImage: '',
-        featuredTitle: 'Special Announcement',
-        featuredText: 'Get early access to our upcoming release with exclusive pro features.',
-        ctaText: 'READ MORE NOW',
-        ctaUrl: 'https://example.com',
-        extraCards: [],
-        section2Title: 'Community & Highlights',
-        section2Text: 'Discover stories from our active community members and top contributors around the globe.',
-        section2CtaText: 'LEARN MORE',
-        section2CtaUrl: 'https://example.com',
-        websiteUrl: 'https://example.com',
-        facebookUrl: 'https://facebook.com',
-        instagramUrl: 'https://instagram.com',
-        linkedinUrl: 'https://linkedin.com',
-        companyName: 'Loops Marketing Inc.',
-        companyAddress: '123 Enterprise Way, Tech District',
-        companyPhone: '+1 (555) 019-2834',
-        companyEmail: 'info@slmartech.com',
-    });
+const defaultFields = {
+    templateWidth: '760',
+    preheader: 'Discover our latest updates, products, news and special offers.',
+    logoAlign: 'center',
+    brandName: 'Loops Integrated',
+    brandLogoUrl: '/images/loops-logo-white.png',
+    brandLogoDarkUrl: '/images/loops-logo-white.png',
+    brandColor: '#0057c5',
+    edition: 'October Edition',
+    headerTitle: "What's New This Month?",
+    headerSubtitle: 'Discover our latest updates, products, news and special offers.',
+    headerButtonText: 'Explore More',
+    headerButtonUrl: 'https://example.com',
+    headerButtonColor: '#ff0878',
+    headerImage: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1280&h=720&fit=crop&q=80',
+    introGreeting: 'Hello {{first_name}},',
+    introText: "Here are the latest updates, highlights and news from our team. It's been a busy month — we hope you enjoy what we've been working on.",
+    showFeatured: true,
+    featuredItems: [
+        {
+            badge: 'Featured',
+            title: 'Discover What\'s New',
+            text: 'Explore our latest products, services and updates — designed with feedback from customers like you.',
+            linkText: 'Read More →',
+            linkUrl: 'https://example.com',
+            image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&h=750&fit=crop&q=80',
+        },
+    ],
+    featuredBadge: 'Featured',
+    featuredTitle: 'Discover What\'s New',
+    featuredText: 'Explore our latest products, services and updates — designed with feedback from customers like you.',
+    featuredLinkText: 'Read More →',
+    featuredLinkUrl: 'https://example.com',
+    featuredImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&h=750&fit=crop&q=80',
+    showCta: true,
+    ctaTitle: 'Ready to Discover More?',
+    ctaSubtitle: "Explore our latest updates and find something you'll love.",
+    ctaButtonText: 'Explore Now',
+    ctaButtonUrl: 'https://example.com',
+    showCtaSecondaryButton: true,
+    ctaSecondaryButtonText: 'Contact Us',
+    ctaSecondaryButtonUrl: 'https://example.com/contact',
+    showCeoNote: false,
+    companyName: 'Loops Integrated',
+    companyAddress: '',
+    companyContact: '',
+    facebookUrl: 'https://facebook.com',
+    linkedinUrl: 'https://linkedin.com',
+    instagramUrl: 'https://instagram.com',
+    tiktokUrl: 'https://tiktok.com',
+    youtubeUrl: 'https://youtube.com',
+};
 
-    const extractFieldsFromHtml = (htmlStr) => {
-        if (!htmlStr || typeof htmlStr !== 'string') return null;
-        try {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlStr, 'text/html');
+const escapeHtml = (str) => {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+};
 
-            const preheaderDiv = doc.querySelector('div[style*="display: none"]');
-            const preheader = preheaderDiv ? preheaderDiv.textContent.replace(/&zwnj;|\s+/g, ' ').trim() : '';
+const cleanUrl = (url) => (url ? String(url).replace(/^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?\//i, '/') : '');
 
-            const cleanExtract = (url) => url ? String(url).replace(/^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?\//i, '/') : '';
+const getFeaturedItems = (f) => {
+    if (Array.isArray(f?.featuredItems) && f.featuredItems.length > 0) {
+        return f.featuredItems;
+    }
+    if (f?.featuredTitle || f?.featuredText || f?.featuredImage) {
+        return [
+            {
+                badge: f.featuredBadge || 'Featured',
+                title: f.featuredTitle || "Discover What's New",
+                text: f.featuredText || '',
+                linkText: f.featuredLinkText || 'Read More →',
+                linkUrl: f.featuredLinkUrl || 'https://example.com',
+                image: f.featuredImage || '',
+            },
+        ];
+    }
+    return [
+        {
+            badge: 'Featured',
+            title: "Discover What's New",
+            text: 'Explore our latest products, services and updates — designed with feedback from customers like you.',
+            linkText: 'Read More →',
+            linkUrl: 'https://example.com',
+            image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&h=750&fit=crop&q=80',
+        },
+    ];
+};
 
-            const logoImg = doc.querySelector('img[alt="Logo"]') || doc.querySelector('td[style*="background-color: #0f172a"] img:not([alt="Banner"])');
-            const logoUrl = cleanExtract(logoImg ? logoImg.getAttribute('src') || '' : '/images/loops-logo-white.png');
+const compileHtml = (f) => {
+    const maxWidth = parseInt(f.templateWidth) || 760;
+    const brandColor = f.brandColor || '#0057c5';
+    const align = f.logoAlign || 'center';
+    const margin = align === 'center' ? '0 auto' : align === 'right' ? '0 0 0 auto' : '0 auto 0 0';
 
-            const h1 = doc.querySelector('h1');
-            const headerTitle = h1 ? h1.textContent.trim() : '';
-
-            const headerSubtitleElem = doc.querySelector('h1 + p') || doc.querySelector('td[style*="background-color: #0f172a"] p');
-            const headerSubtitle = headerSubtitleElem ? headerSubtitleElem.textContent.trim() : '';
-
-            const bannerImg = doc.querySelector('img[alt="Banner"]') || doc.querySelector('table tr:nth-child(2) img') || doc.querySelector('img');
-            const headerImage = cleanExtract(bannerImg ? bannerImg.getAttribute('src') || '' : '');
-
-            const h2 = doc.querySelector('h2');
-            const mainHeading = h2 ? h2.textContent.trim() : '';
-
-            const introElem = doc.querySelector('h2 + p');
-            const introText = introElem ? introElem.textContent.trim() : '';
-
-            const bodyH3s = Array.from(doc.querySelectorAll('table table td:not([style*="0f172a"]) h3, table table tr:not(:last-child) h3'));
-            const sec2H3 = bodyH3s.length > 0 ? bodyH3s[bodyH3s.length - 1] : null;
-            const section2Title = sec2H3 ? sec2H3.textContent.trim() : '';
-            const section2TextElem = sec2H3 ? sec2H3.nextElementSibling : null;
-            const section2Text = (section2TextElem && section2TextElem.tagName === 'P') ? section2TextElem.textContent.trim() : '';
-
-            const sec2CtaBtn = doc.querySelector('[data-section="section2-cta"]');
-            const section2CtaText = sec2CtaBtn ? sec2CtaBtn.textContent.trim() : '';
-            const section2CtaUrl = sec2CtaBtn ? sec2CtaBtn.getAttribute('href') || '' : '';
-
-            const featH3 = doc.querySelector('[data-section="featured-title"]');
-            const featSub = doc.querySelector('[data-section="featured-subtitle"]');
-            let featuredSectionTitle = featH3 ? featH3.textContent.trim() : '';
-            let featuredSectionSubtitle = featSub ? featSub.textContent.trim() : '';
-
-            // Fallback for featured section title if data attribute not found
-            const highlightBox = doc.querySelector('div[style*="border-left"]');
-            if (!featuredSectionTitle && highlightBox && highlightBox.parentElement) {
-                const prevH3 = highlightBox.parentElement.querySelector('div:first-child h3, h3');
-                if (prevH3 && prevH3 !== highlightBox.querySelector('h3') && (prevH3.compareDocumentPosition(highlightBox) & Node.DOCUMENT_POSITION_FOLLOWING)) {
-                    featuredSectionTitle = prevH3.textContent.trim();
-                }
-            }
-
-            const featuredImg = doc.querySelector('img[alt="Featured Image"]');
-            const featuredImage = cleanExtract(featuredImg ? featuredImg.getAttribute('src') || '' : '');
-
-            const h4 = doc.querySelector('h4');
-            const featuredTitle = h4 ? h4.textContent.trim() : '';
-            const featuredTextElem = h4 ? h4.nextElementSibling : null;
-            const featuredText = (featuredTextElem && featuredTextElem.tagName === 'P') ? featuredTextElem.textContent.trim() : '';
-
-            const ctaBtn = doc.querySelector('a[href]:not([href*="unsubscribe"]):not([href*="facebook"]):not([href*="instagram"]):not([href*="linkedin"])');
-            const ctaText = ctaBtn ? ctaBtn.textContent.trim() : '';
-            const ctaUrl = ctaBtn ? ctaBtn.getAttribute('href') || '' : '';
-
-            const showFeatured = !!(featuredSectionTitle || featuredTitle || featuredText || ctaText || featuredImage);
-
-            const companyHeading = doc.querySelector('footer h3') || doc.querySelector('td[style*="0f172a"] h3');
-            const companyName = companyHeading ? companyHeading.textContent.trim() : '';
-
-            let templateWidth = '750';
-            const mainTable = doc.querySelector('table[style*="max-width"]');
-            if (mainTable) {
-                const match = mainTable.getAttribute('style').match(/max-width:\s*(\d+)px/i);
-                if (match && match[1]) {
-                    templateWidth = match[1];
-                }
-            }
-
-            return {
-                templateWidth: templateWidth,
-                preheader: preheader || "Short preview text shown in recipient's inbox",
-                logoUrl: logoUrl,
-                headerTitle: headerTitle || 'Newsletter Title',
-                headerSubtitle: headerSubtitle || 'Weekly Updates & Insights',
-                headerImage: headerImage || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&h=500&fit=crop&q=80',
-                mainHeading: mainHeading || 'Welcome to Our Latest Edition',
-                introText: introText || 'Thank you for subscribing to our newsletter!',
-                showFeatured: showFeatured,
-                featuredSectionTitle: featuredSectionTitle || 'Featured Highlights',
-                featuredSectionSubtitle: featuredSectionSubtitle || '',
-                featuredImage: featuredImage,
-                featuredTitle: featuredTitle || 'Special Announcement',
-                featuredText: featuredText || 'Get early access to our upcoming release.',
-                ctaText: ctaText || 'READ MORE NOW',
-                ctaUrl: ctaUrl || 'https://example.com',
-                extraCards: [],
-                section2Title: section2Title || 'Community & Highlights',
-                section2Text: section2Text || 'Discover stories from our active community.',
-                section2CtaText: section2CtaText || '',
-                section2CtaUrl: section2CtaUrl || 'https://example.com',
-                websiteUrl: 'https://example.com',
-                facebookUrl: 'https://facebook.com',
-                instagramUrl: 'https://instagram.com',
-                linkedinUrl: 'https://linkedin.com',
-                companyName: companyName || 'Loops Marketing Inc.',
-                companyAddress: '',
-                companyPhone: '',
-                companyEmail: 'aspect@loops.lk',
-            };
-        } catch (e) {
-            return null;
-        }
-    };
-
-    // Generate clean responsive HTML from form fields
-    const compileHtml = (f) => {
-        const maxWidth = parseInt(f.templateWidth) || 750;
-        const innerImageWidth = maxWidth - 64;
-        const cleanUrl = (url) => url ? String(url).replace(/^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?\//i, '/') : '';
-
-        return `<!DOCTYPE html>
+    return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
+    <title>${escapeHtml(f.headerTitle || "What's New This Month?")} | ${escapeHtml(f.brandName || 'Loops Integrated')}</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+    <style>
+        :root {
+            color-scheme: light dark;
+            supported-color-schemes: light dark;
+        }
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+        @media only screen and (max-width: 620px) {
+            .container-table { width: 100% !important; max-width: 100% !important; }
+            .mobile-padding { padding-left: 20px !important; padding-right: 20px !important; }
+            .mobile-stack { display: block !important; width: 100% !important; max-width: 100% !important; }
+            .mobile-img { width: 100% !important; height: auto !important; min-height: auto !important; }
+            .mobile-headline { font-size: 30px !important; line-height: 1.25 !important; }
+            .mobile-cta-box { padding: 36px 16px !important; }
+            .mobile-cta-cell { display: inline-block !important; padding: 4px !important; }
+            .card-spacer { display: none !important; }
+            .card-item { margin-bottom: 16px !important; }
+        }
+    </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #334155; line-height: 1.6;">
+<body style="margin: 0; padding: 0; background-color: #eef0f6; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #151a29; line-height: 1.6; -webkit-font-smoothing: antialiased;">
 
-    <!-- Hidden Preheader -->
+    <!-- Hidden Preheader Preview Text -->
+    ${f.preheader ? `
     <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
-        ${escapeHtml(f.preheader)} &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
-    </div>
+        ${escapeHtml(f.preheader)} &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+    </div>` : ''}
 
-    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 24px 10px;">
+    <!-- Outer Wrapper -->
+    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #eef0f6; padding: 36px 12px;">
         <tr>
             <td align="center">
-                <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: ${maxWidth}px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
+                <!-- Inner Container Card -->
+                <table role="presentation" class="container-table" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: ${maxWidth}px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px -15px rgba(43, 42, 142, 0.08); border: 1px solid #e2e4ea;">
                     
-                    <!-- Header Bar -->
+                    <!-- Header / Company Logo (Black Header Bar) -->
                     <tr>
-                        <td align="center" style="background-color: #0f172a; padding: 28px 30px 24px 30px; text-align: center;">
-                            ${f.logoUrl ? `
-                            <div style="margin-bottom: 14px;">
-                                <img src="${escapeHtml(cleanUrl(f.logoUrl))}" alt="Logo" width="190" style="width: 190px; max-width: 100%; height: auto; object-fit: contain; display: inline-block; border: 0; vertical-align: middle;" />
-                            </div>` : ''}
-                            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">${escapeHtml(f.headerTitle)}</h1>
-                            ${f.headerSubtitle ? `<p style="color: #94a3b8; font-size: 12px; margin: 6px 0 0 0; text-transform: uppercase; letter-spacing: 1px;">${escapeHtml(f.headerSubtitle)}</p>` : ''}
-                        </td>
-                    </tr>
-
-                    <!-- Header Banner Image -->
-                    ${f.headerImage ? `
-                    <tr>
-                        <td style="padding: 0;">
-                            <img src="${escapeHtml(cleanUrl(f.headerImage))}" alt="Banner" width="${maxWidth}" style="width: 100%; max-width: ${maxWidth}px; height: auto; display: block; border: 0;" />
-                        </td>
-                    </tr>` : ''}
-
-                    <!-- Intro Section -->
-                    <tr>
-                        <td style="padding: 32px 32px 20px 32px;">
-                            ${f.mainHeading ? `<h2 style="color: #0f172a; font-size: 22px; font-weight: 700; margin: 0 0 12px 0;">${escapeHtml(f.mainHeading)}</h2>` : ''}
-                            ${f.introText ? `<p style="color: #475569; font-size: 15px; margin: 0; line-height: 1.6;">${escapeHtml(f.introText)}</p>` : ''}
-                        </td>
-                    </tr>
-
-                    <!-- Divider -->
-                    <tr>
-                        <td style="padding: 0 32px;">
-                            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 10px 0 20px 0;" />
-                        </td>
-                    </tr>
-
-                    <!-- Featured Highlight Box -->
-                    ${(f.showFeatured !== false && (f.featuredSectionTitle || f.featuredSectionSubtitle || f.featuredTitle || f.featuredText || f.ctaText || f.featuredImage || (f.extraCards && f.extraCards.length > 0))) ? `
-                    <tr>
-                        <td style="padding: 0 32px 28px 32px;">
-                            ${(f.featuredSectionTitle || f.featuredSectionSubtitle) ? `
-                            <div style="margin-bottom: 16px;">
-                                ${f.featuredSectionTitle ? `<h3 data-section="featured-title" style="color: #0f172a; font-size: 19px; font-weight: 700; margin: 0 0 6px 0; letter-spacing: -0.3px;">${escapeHtml(f.featuredSectionTitle)}</h3>` : ''}
-                                ${f.featuredSectionSubtitle ? `<p data-section="featured-subtitle" style="color: #64748b; font-size: 13px; margin: 0; line-height: 1.5;">${escapeHtml(f.featuredSectionSubtitle)}</p>` : ''}
-                            </div>` : ''}
-
-                            ${(f.featuredTitle || f.featuredText || f.ctaText || f.featuredImage) ? `
-                            <div style="background-color: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 20px; margin-bottom: ${(f.extraCards && f.extraCards.length > 0) ? '16px' : '0'};">
-                                ${f.featuredImage ? `
-                                <div style="margin-bottom: 14px;">
-                                    ${f.ctaUrl ? `<a href="${escapeHtml(f.ctaUrl)}" target="_blank" style="text-decoration: none; display: block;">` : ''}
-                                        <img src="${escapeHtml(cleanUrl(f.featuredImage))}" alt="Featured Image" width="${innerImageWidth - 40}" style="width: 100%; max-width: ${innerImageWidth - 40}px; height: auto; display: block; border-radius: 8px; border: 0;" />
-                                    ${f.ctaUrl ? `</a>` : ''}
-                                </div>` : ''}
-                                ${f.featuredTitle ? `<h4 style="color: #1e3a8a; font-size: 16px; font-weight: 700; margin: 0 0 8px 0;">${escapeHtml(f.featuredTitle)}</h4>` : ''}
-                                ${f.featuredText ? `<p style="color: #334155; font-size: 14px; margin: 0 0 16px 0; line-height: 1.6;">${escapeHtml(f.featuredText)}</p>` : ''}
-                                ${f.ctaText ? `
-                                <table role="presentation" border="0" cellspacing="0" cellpadding="0">
-                                    <tr>
-                                        <td align="center" style="border-radius: 8px; background-color: #2563eb;">
-                                            <a href="${escapeHtml(f.ctaUrl || '#')}" target="_blank" style="font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; border: 1px solid #2563eb; display: inline-block;">${escapeHtml(f.ctaText)}</a>
-                                        </td>
-                                    </tr>
-                                </table>` : ''}
-                            </div>` : ''}
-
-                            ${(f.extraCards && f.extraCards.length > 0) ? f.extraCards.map((card) => `
-                            <div style="background-color: #f8fafc; border-left: 4px solid #6366f1; border-radius: 8px; padding: 20px; margin-top: 16px;">
-                                ${card.image ? `
-                                <div style="margin-bottom: 14px;">
-                                    ${card.ctaUrl ? `<a href="${escapeHtml(card.ctaUrl)}" target="_blank" style="text-decoration: none; display: block;">` : ''}
-                                        <img src="${escapeHtml(cleanUrl(card.image))}" alt="Featured Card Image" width="${innerImageWidth - 40}" style="width: 100%; max-width: ${innerImageWidth - 40}px; height: auto; display: block; border-radius: 8px; border: 0;" />
-                                    ${card.ctaUrl ? `</a>` : ''}
-                                </div>` : ''}
-                                ${card.title ? `<h4 style="color: #312e81; font-size: 16px; font-weight: 700; margin: 0 0 8px 0;">${escapeHtml(card.title)}</h4>` : ''}
-                                ${card.text ? `<p style="color: #334155; font-size: 14px; margin: 0 0 16px 0; line-height: 1.6;">${escapeHtml(card.text)}</p>` : ''}
-                                ${card.ctaText ? `
-                                <table role="presentation" border="0" cellspacing="0" cellpadding="0">
-                                    <tr>
-                                        <td align="center" style="border-radius: 8px; background-color: #4f46e5;">
-                                            <a href="${escapeHtml(card.ctaUrl || '#')}" target="_blank" style="font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; border: 1px solid #4f46e5; display: inline-block;">${escapeHtml(card.ctaText)}</a>
-                                        </td>
-                                    </tr>
-                                </table>` : ''}
-                            </div>
-                            `).join('') : ''}
-                        </td>
-                    </tr>` : ''}
-
-                    <!-- Section 2 -->
-                    ${(f.section2Title || f.section2Text || f.section2CtaText) ? `
-                    <tr>
-                        <td style="padding: 0 32px 28px 32px;">
-                            ${f.section2Title ? `<h3 data-section="section2-title" style="color: #1e293b; font-size: 18px; font-weight: 700; margin: 0 0 10px 0;">${escapeHtml(f.section2Title)}</h3>` : ''}
-                            ${f.section2Text ? `<p style="color: #475569; font-size: 14px; margin: 0 0 ${(f.section2CtaText) ? '18px' : '0'}; line-height: 1.6;">${escapeHtml(f.section2Text)}</p>` : ''}
-                            ${f.section2CtaText ? `
-                            <table role="presentation" border="0" cellspacing="0" cellpadding="0">
+                        <td align="${align}" style="background-color: #0b0f19; padding: 26px 36px; text-align: ${align}; border-radius: 15px 15px 0 0;" class="mobile-padding">
+                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="${align}" style="margin: ${margin};">
                                 <tr>
-                                    <td align="center" style="border-radius: 8px; background-color: #0f172a;">
-                                        <a href="${escapeHtml(f.section2CtaUrl || '#')}" target="_blank" data-section="section2-cta" style="font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; border: 1px solid #0f172a; display: inline-block;">${escapeHtml(f.section2CtaText)}</a>
+                                    <td align="${align}" valign="middle">
+                                        <a href="{{app_url}}" target="_blank" style="text-decoration: none; display: inline-block;">
+                                            ${(f.brandLogoDarkUrl || f.brandLogoUrl) ? `
+                                            <img src="${escapeHtml(cleanUrl(f.brandLogoDarkUrl || f.brandLogoUrl))}" alt="${escapeHtml(f.brandName || 'Loops Integrated')}" height="42" style="height: 42px; max-height: 42px; width: auto; max-width: 220px; display: block; margin: ${margin}; border: 0;" />
+                                            ` : `
+                                            <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">
+                                                ${escapeHtml(f.brandName || 'Loops Integrated')}
+                                            </span>
+                                            `}
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Hero Section -->
+                    <tr>
+                        <td align="center" style="padding: 36px 36px 32px 36px; text-align: center;" class="mobile-padding">
+                            ${f.edition ? `
+                            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: ${brandColor}; text-transform: uppercase; letter-spacing: 2.2px;">
+                                ${escapeHtml(f.edition)}
+                            </p>` : ''}
+                            ${f.headerTitle ? `
+                            <h1 class="mobile-headline" style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 40px; font-weight: 700; color: #151a29; line-height: 1.2; letter-spacing: -0.5px;">
+                                ${escapeHtml(f.headerTitle)}
+                            </h1>` : ''}
+                            ${f.headerSubtitle ? `
+                            <p style="margin: 14px auto 0 auto; max-width: 480px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #636978; line-height: 1.6;">
+                                ${escapeHtml(f.headerSubtitle)}
+                            </p>` : ''}
+                            
+                            ${f.headerButtonText ? `
+                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="margin: 24px auto 0 auto;">
+                                <tr>
+                                    <td align="center" style="border-radius: 9999px; background-color: ${escapeHtml(f.headerButtonColor || '#ff0878')};">
+                                        <a href="${escapeHtml(cleanUrl(f.headerButtonUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 13px 32px; border-radius: 9999px; display: inline-block; border: 1px solid ${escapeHtml(f.headerButtonColor || '#ff0878')}; box-shadow: 0 4px 12px rgba(255, 8, 120, 0.25);">
+                                            ${escapeHtml(f.headerButtonText)}
+                                        </a>
                                     </td>
                                 </tr>
                             </table>` : ''}
-                        </td>
-                    </tr>` : ''}
 
-                    <!-- Social Links -->
-                    <tr>
-                        <td align="center" style="background-color: #f8fafc; padding: 20px 32px; border-top: 1px solid #e2e8f0; text-align: center;">
-                            <h4 style="color: #0f172a; font-size: 13px; font-weight: 700; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px;">Stay Connected</h4>
-                            <p style="margin: 0; font-size: 13px;">
-                                ${f.websiteUrl ? `<a href="${escapeHtml(f.websiteUrl)}" style="color: #2563eb; text-decoration: none; font-weight: 600; margin: 0 6px;">Website</a> |` : ''}
-                                ${f.facebookUrl ? `<a href="${escapeHtml(f.facebookUrl)}" style="color: #2563eb; text-decoration: none; font-weight: 600; margin: 0 6px;">Facebook</a> |` : ''}
-                                ${f.instagramUrl ? `<a href="${escapeHtml(f.instagramUrl)}" style="color: #2563eb; text-decoration: none; font-weight: 600; margin: 0 6px;">Instagram</a> |` : ''}
-                                ${f.linkedinUrl ? `<a href="${escapeHtml(f.linkedinUrl)}" style="color: #2563eb; text-decoration: none; font-weight: 600; margin: 0 6px;">LinkedIn</a>` : ''}
-                            </p>
+                            ${f.headerImage ? `
+                            <div style="margin-top: 32px;">
+                                <img class="mobile-img" src="${escapeHtml(cleanUrl(f.headerImage))}" alt="Hero Banner" width="${maxWidth - 72}" style="width: 100%; max-width: ${maxWidth - 72}px; height: auto; display: block; border-radius: 16px; border: 0;" />
+                            </div>` : ''}
                         </td>
                     </tr>
 
-                    <!-- Footer -->
+                    <!-- Intro Section -->
+                    ${(f.introGreeting || f.introText) ? `
                     <tr>
-                        <td align="center" style="background-color: #0f172a; color: #94a3b8; padding: 24px 32px; text-align: center; font-size: 12px; line-height: 1.6;">
-                            ${f.companyName ? `<h3 style="color: #ffffff; font-size: 16px; margin: 0 0 8px 0; font-weight: 700;">${escapeHtml(f.companyName)}</h3>` : ''}
-                            <p style="margin: 0;">
-                                <a href="{{unsubscribe_url}}" style="color: #38bdf8; text-decoration: underline;">Unsubscribe</a> &nbsp;|&nbsp; 
-                                <a href="{{unsubscribe_url}}" style="color: #38bdf8; text-decoration: underline;">Manage Preferences</a>
+                        <td style="padding: 24px 36px 28px 36px;" class="mobile-padding">
+                            ${f.introGreeting ? `<p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #151a29;">${escapeHtml(f.introGreeting)}</p>` : ''}
+                            ${f.introText ? `<p style="margin: 8px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #636978; line-height: 1.65;">${escapeHtml(f.introText)}</p>` : ''}
+                        </td>
+                    </tr>` : ''}
+
+                    <!-- Featured Section -->
+                    ${(f.showFeatured !== false && getFeaturedItems(f).length > 0) ? `
+                    <tr>
+                        <td style="background-color: #f5f7fb; padding: 32px 36px;" class="mobile-padding">
+                            ${getFeaturedItems(f).map((item, idx) => {
+                                const badgeColors = [
+                                    { color: brandColor, bg: '#e6f0fd' },
+                                    { color: '#ff0878', bg: '#ffe6f0' },
+                                    { color: '#8035d1', bg: '#f3eafd' },
+                                    { color: '#09908a', bg: '#e2faf8' },
+                                ];
+                                const bStyle = badgeColors[idx % badgeColors.length];
+                                return `
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; ${idx > 0 ? 'margin-top: 24px;' : ''}">
+                                <tr>
+                                    ${item.image ? `
+                                    <td class="mobile-stack" width="50%" valign="top" style="padding: 0;">
+                                        <img class="mobile-img" src="${escapeHtml(cleanUrl(item.image))}" alt="${escapeHtml(item.title || 'Featured Image')}" width="${Math.floor((maxWidth - 72) / 2)}" style="width: 100%; height: 100%; min-height: 250px; object-fit: cover; display: block; border: 0;" />
+                                    </td>` : ''}
+                                    <td class="mobile-stack" width="${item.image ? '50%' : '100%'}" valign="middle" style="padding: 30px 26px;" class="mobile-padding">
+                                        ${item.badge ? `
+                                        <span style="display: inline-block; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: ${bStyle.color}; background-color: ${bStyle.bg}; padding: 4px 12px; border-radius: 9999px;">
+                                            ${escapeHtml(item.badge)}
+                                        </span>` : ''}
+                                        ${item.title ? `
+                                        <h2 style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 22px; font-weight: 700; color: #151a29; line-height: 1.3;">
+                                            ${escapeHtml(item.title)}
+                                        </h2>` : ''}
+                                        ${item.text ? `
+                                        <p style="margin: 10px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.6;">
+                                            ${escapeHtml(item.text)}
+                                        </p>` : ''}
+                                        ${item.linkText ? `
+                                        <div style="margin-top: 18px;">
+                                            <a href="${escapeHtml(cleanUrl(item.linkUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: ${brandColor}; text-decoration: none;">
+                                                ${escapeHtml(item.linkText)}
+                                            </a>
+                                        </div>` : ''}
+                                    </td>
+                                </tr>
+                            </table>
+                            `;
+                            }).join('')}
+                        </td>
+                    </tr>` : ''}
+
+                    <!-- Call To Action (Gradient Banner) -->
+                    ${(f.showCta !== false && (f.ctaTitle || f.ctaSubtitle || f.ctaButtonText || (f.showCtaSecondaryButton && f.ctaSecondaryButtonText))) ? `
+                    <tr>
+                        <td style="padding: 20px 36px 32px 36px;" class="mobile-padding">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background: linear-gradient(135deg, #0057c5 0%, #8035d1 50%, #ff0878 100%); background-color: #0057c5; border-radius: 16px; text-align: center;">
+                                <tr>
+                                    <td style="padding: 48px 32px;" class="mobile-cta-box">
+                                        ${f.ctaTitle ? `<h3 style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px;">${escapeHtml(f.ctaTitle)}</h3>` : ''}
+                                        ${f.ctaSubtitle ? `<p style="margin: 12px auto 0 auto; max-width: 380px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #ffffff; opacity: 0.88; line-height: 1.5;">${escapeHtml(f.ctaSubtitle)}</p>` : ''}
+                                        ${(f.ctaButtonText || (f.showCtaSecondaryButton && f.ctaSecondaryButtonText)) ? `
+                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 22px auto 0 auto;">
+                                            <tr>
+                                                ${f.ctaButtonText ? `
+                                                <td class="mobile-cta-cell" align="center" style="padding: 4px 6px;">
+                                                    <a href="${escapeHtml(cleanUrl(f.ctaButtonUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: #0057c5; text-decoration: none; padding: 11px 24px; border-radius: 9999px; display: inline-block; background-color: #ffffff; border: 1.5px solid #ffffff; white-space: nowrap; line-height: 1.2; box-shadow: 0 4px 12px rgba(0,0,0,0.12);">
+                                                        ${escapeHtml(f.ctaButtonText)}
+                                                    </a>
+                                                </td>` : ''}
+                                                ${(f.showCtaSecondaryButton && f.ctaSecondaryButtonText) ? `
+                                                <td class="mobile-cta-cell" align="center" style="padding: 4px 6px;">
+                                                    <a href="${escapeHtml(cleanUrl(f.ctaSecondaryButtonUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 11px 24px; border-radius: 9999px; display: inline-block; border: 1.5px solid rgba(255,255,255,0.85); background-color: rgba(255,255,255,0.15); white-space: nowrap; line-height: 1.2;">
+                                                        ${escapeHtml(f.ctaSecondaryButtonText)}
+                                                    </a>
+                                                </td>` : ''}
+                                            </tr>
+                                        </table>` : ''}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>` : ''}
+
+
+                    <!-- Footer Section -->
+                    <tr>
+                        <td style="background-color: #f5f7fb; border-top: 1px solid #e2e4ea; padding: 36px 32px 32px 32px; text-align: center;" class="mobile-padding">
+                            <!-- Footer Logo -->
+                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto 16px auto;">
+                                <tr>
+                                    <td align="center" valign="middle">
+                                        <a href="{{app_url}}" target="_blank" style="text-decoration: none; display: inline-block;">
+                                            <img src="/images/loops-logo-dark.png" alt="${escapeHtml(f.companyName || f.brandName || 'Loops Integrated')}" height="32" style="height: 32px; max-height: 32px; width: auto; max-width: 160px; display: block; margin: 0 auto; border: 0;" />
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; color: #151a29;">
+                                ${escapeHtml(f.companyName || f.brandName || 'Loops Integrated')}
+                            </p>
+                            ${f.companyAddress ? `<p style="margin: 4px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; color: #636978;">${escapeHtml(f.companyAddress)}</p>` : ''}
+                            ${f.companyContact ? `<p style="margin: 4px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; color: #636978;">${escapeHtml(f.companyContact)}</p>` : ''}
+
+                            <!-- Social Links -->
+                            <div style="margin: 18px 0 16px 0;">
+                                ${f.facebookUrl ? `<a href="${escapeHtml(cleanUrl(f.facebookUrl))}" target="_blank" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: bold; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">f</a>` : ''}
+                                ${f.linkedinUrl ? `<a href="${escapeHtml(cleanUrl(f.linkedinUrl))}" target="_blank" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: bold; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">in</a>` : ''}
+                                ${f.instagramUrl ? `<a href="${escapeHtml(cleanUrl(f.instagramUrl))}" target="_blank" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: bold; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">ig</a>` : ''}
+                                ${f.tiktokUrl ? `<a href="${escapeHtml(cleanUrl(f.tiktokUrl))}" target="_blank" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: bold; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">tt</a>` : ''}
+                                ${f.youtubeUrl ? `<a href="${escapeHtml(cleanUrl(f.youtubeUrl))}" target="_blank" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: bold; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">&#9654;</a>` : ''}
+                            </div>
+
+
+                            <hr style="border: 0; border-top: 1px solid #e2e4ea; margin: 16px 0;" />
+
+                            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; color: #8e95a5; line-height: 1.5;">
+                                You're receiving this email because you subscribed to our newsletter.
+                            </p>
+                            <p style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px;">
+                                <a href="{{unsubscribe_url}}" style="color: ${brandColor}; text-decoration: underline; font-weight: 600;">Unsubscribe</a>
                             </p>
                         </td>
                     </tr>
@@ -331,20 +376,310 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             </td>
         </tr>
     </table>
+
 </body>
 </html>`;
-    };
+};
 
-    const escapeHtml = (str) => {
-        if (!str) return '';
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-    };
+const extractFieldsFromHtml = (htmlStr) => {
+    if (!htmlStr || typeof htmlStr !== 'string') return null;
+    try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlStr, 'text/html');
 
-    // When fields change in visual mode, update parent HTML value
+        const cleanExtract = (url) => (url ? String(url).replace(/^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?\//i, '/') : '');
+
+        // Preheader
+        const preheaderDiv = doc.querySelector('div[style*="display: none"]');
+        const preheader = preheaderDiv ? preheaderDiv.textContent.replace(/&zwnj;|\s+/g, ' ').trim() : '';
+
+        // Company Logo & Brand Name & Alignment
+        let brandLogoUrl = '';
+        let brandLogoDarkUrl = '';
+        let brandName = '';
+        const headerLogoImg = doc.querySelector('tr:first-child img, td[style*="background-color: #0b0f19"] img, td[style*="background-color:#0b0f19"] img, img.light-logo, img.dark-logo');
+        if (headerLogoImg) {
+            brandLogoUrl = cleanExtract(headerLogoImg.getAttribute('src') || '');
+            brandLogoDarkUrl = brandLogoUrl;
+            brandName = headerLogoImg.getAttribute('alt') || '';
+        }
+        if (!brandName) {
+            const brandTd = doc.querySelector('table table td[style*="font-weight: 800"], table table td[style*="letter-spacing: -0.5px"], table table td[style*="letter-spacing: -0.4px"]');
+            if (brandTd) {
+                brandName = brandTd.textContent.trim();
+            }
+        }
+        const headerLogoTd = doc.querySelector('tr:first-child td.mobile-padding');
+        const logoAlign = headerLogoTd?.getAttribute('align') || (headerLogoTd?.style?.textAlign) || 'center';
+
+        // Edition
+        const editionP = doc.querySelector('p[style*="letter-spacing: 2"], p[style*="letter-spacing: 2.2px"], p[style*="uppercase"]');
+        const edition = editionP ? editionP.textContent.trim() : '';
+
+        // Hero Title (H1)
+        const h1 = doc.querySelector('h1');
+        const headerTitle = h1 ? h1.textContent.trim() : '';
+
+        // Hero Subtitle
+        let headerSubtitle = '';
+        if (h1) {
+            let next = h1.nextElementSibling;
+            while (next && next.tagName !== 'P') next = next.nextElementSibling;
+            if (next) headerSubtitle = next.textContent.trim();
+        }
+
+        // Hero Button
+        const heroBtn = doc.querySelector('table[style*="margin: 24px auto"] a, a[style*="Explore More"], td[align="center"] table a');
+        const headerButtonText = heroBtn ? heroBtn.textContent.trim() : '';
+        const headerButtonUrl = heroBtn ? heroBtn.getAttribute('href') || '' : '';
+        let headerButtonColor = '#ff0878';
+        if (heroBtn) {
+            const btnColorMatch = heroBtn.parentElement?.getAttribute('style')?.match(/background-color:\s*(#[0-9a-fA-F]{3,6})/i) ||
+                                  heroBtn.getAttribute('style')?.match(/background-color:\s*(#[0-9a-fA-F]{3,6})/i);
+            if (btnColorMatch && btnColorMatch[1]) headerButtonColor = btnColorMatch[1];
+        }
+
+        // Hero Image
+        const heroImg = doc.querySelector('img[alt*="workspace"], img[alt*="Banner"], img.mobile-img, table tr:nth-child(2) img');
+        const headerImage = cleanExtract(heroImg ? heroImg.getAttribute('src') || '' : '');
+
+        // Intro Greeting & Text
+        const introGreetingP = doc.querySelector('p[style*="font-size: 18px"], p[style*="font-weight: 700"]');
+        let introGreeting = '';
+        let introText = '';
+        if (introGreetingP && (introGreetingP.textContent.includes('Hello') || introGreetingP.textContent.includes('Welcome'))) {
+            introGreeting = introGreetingP.textContent.trim();
+            const introTextP = introGreetingP.nextElementSibling;
+            if (introTextP && introTextP.tagName === 'P') {
+                introText = introTextP.textContent.trim();
+            }
+        }
+
+        // Featured Section
+        let featuredTables = Array.from(doc.querySelectorAll('td[style*="#f5f7fb"] table, td[style*="rgb(245, 247, 251)"] table'))
+            .filter((tbl) => tbl.querySelector('h2'));
+        if (featuredTables.length === 0) {
+            featuredTables = Array.from(doc.querySelectorAll('table')).filter((tbl) => tbl.querySelector('h2'));
+        }
+
+        let featuredItems = [];
+        if (featuredTables.length > 0) {
+            featuredItems = featuredTables.map((tbl, i) => {
+                const featBadgeSpan = tbl.querySelector('span[style*="letter-spacing"], span[style*="border-radius"]');
+                const badge = featBadgeSpan ? featBadgeSpan.textContent.trim() : (i === 0 ? 'Featured' : 'Spotlight');
+
+                const h2 = tbl.querySelector('h2');
+                const title = h2 ? h2.textContent.trim() : '';
+
+                let text = '';
+                if (h2) {
+                    let next = h2.nextElementSibling;
+                    while (next && next.tagName !== 'P') next = next.nextElementSibling;
+                    if (next) text = next.textContent.trim();
+                }
+
+                const featLink = tbl.querySelector('a');
+                const linkText = featLink ? featLink.textContent.trim() : 'Read More →';
+                const linkUrl = featLink ? cleanExtract(featLink.getAttribute('href') || '') : '';
+
+                const featImg = tbl.querySelector('img');
+                const image = cleanExtract(featImg ? featImg.getAttribute('src') || '' : '');
+
+                return { badge, title, text, linkText, linkUrl, image };
+            });
+        } else {
+            const featBadgeSpan = doc.querySelector('span[style*="letter-spacing: 1.5px"], span[style*="border-radius: 9999px"]');
+            const featuredBadge = featBadgeSpan ? featBadgeSpan.textContent.trim() : 'Featured';
+
+            const h2 = doc.querySelector('h2');
+            const featuredTitle = h2 ? h2.textContent.trim() : '';
+
+            let featuredText = '';
+            if (h2) {
+                let next = h2.nextElementSibling;
+                while (next && next.tagName !== 'P') next = next.nextElementSibling;
+                if (next) featuredText = next.textContent.trim();
+            }
+
+            const featLink = doc.querySelector('a[style*="color: #0057c5"], a[style*="color: #4252cd"], a[style*="Read More"], h2 ~ div a');
+            const featuredLinkText = featLink ? featLink.textContent.trim() : '';
+            const featuredLinkUrl = featLink ? featLink.getAttribute('href') || '' : '';
+
+            const featImg = doc.querySelector('img[alt*="prototypes"], img[alt*="Featured"], td[width="50%"] img');
+            const featuredImage = cleanExtract(featImg ? featImg.getAttribute('src') || '' : '');
+
+            if (featuredTitle || featuredText || featuredImage) {
+                featuredItems = [{
+                    badge: featuredBadge,
+                    title: featuredTitle,
+                    text: featuredText,
+                    linkText: featuredLinkText,
+                    linkUrl: featuredLinkUrl,
+                    image: featuredImage,
+                }];
+            }
+        }
+
+        const showFeatured = featuredItems.length > 0;
+
+        // Highlight Cards
+        const cardTds = Array.from(doc.querySelectorAll('td.card-item, td[style*="border-radius: 14px"], td[style*="border-radius: 12px"]'));
+        let cards = [];
+        if (cardTds.length > 0) {
+            cards = cardTds.map((td) => {
+                const iconDiv = td.querySelector('div[style*="font-size: 24px"], div[style*="font-size: 22px"], div');
+                const catP = td.querySelector('p[style*="uppercase"]');
+                const titleH4 = td.querySelector('h4');
+                const textP = titleH4 ? titleH4.nextElementSibling : null;
+                return {
+                    icon: iconDiv ? iconDiv.textContent.trim() : '✨',
+                    cat: catP ? catP.textContent.trim() : '',
+                    title: titleH4 ? titleH4.textContent.trim() : '',
+                    text: textP && textP.tagName === 'P' ? textP.textContent.trim() : '',
+                };
+            });
+        }
+
+        // CTA Banner
+        const h3 = doc.querySelector('td.mobile-cta-box h3, h3');
+        const ctaTitle = h3 ? h3.textContent.trim() : '';
+        let ctaSubtitle = '';
+        if (h3) {
+            let next = h3.nextElementSibling;
+            while (next && next.tagName !== 'P') next = next.nextElementSibling;
+            if (next) ctaSubtitle = next.textContent.trim();
+        }
+        const ctaBtns = Array.from(doc.querySelectorAll('td.mobile-cta-box a, table[style*="linear-gradient"] a'));
+        const ctaBtn1 = ctaBtns[0];
+        const ctaBtn2 = ctaBtns[1];
+        const ctaButtonText = ctaBtn1 ? ctaBtn1.textContent.trim() : '';
+        const ctaButtonUrl = ctaBtn1 ? ctaBtn1.getAttribute('href') || '' : '';
+        const ctaSecondaryButtonText = ctaBtn2 ? ctaBtn2.textContent.trim() : '';
+        const ctaSecondaryButtonUrl = ctaBtn2 ? ctaBtn2.getAttribute('href') || '' : '';
+        const showCtaSecondaryButton = !!ctaSecondaryButtonText;
+        const showCta = !!(ctaTitle || ctaSubtitle || ctaButtonText || ctaSecondaryButtonText);
+
+        // CEO Note
+        const ceoAvatarDiv = doc.querySelector('div[style*="border-radius: 50%"]');
+        const ceoAvatar = ceoAvatarDiv ? ceoAvatarDiv.textContent.trim() : 'EL';
+
+        const ceoLabelP = doc.querySelector('p[style*="A note from our CEO"], p[style*="uppercase"]');
+        const ceoLabel = ceoLabelP ? ceoLabelP.textContent.trim() : 'A note from our CEO';
+
+        const ceoQuoteP = doc.querySelector('p[style*="font-style: italic"], p.italic');
+        const ceoQuote = ceoQuoteP ? ceoQuoteP.textContent.replace(/^[“"\s]+|[”"\s]+$/g, '').trim() : '';
+
+        let ceoName = '';
+        if (ceoQuoteP) {
+            let next = ceoQuoteP.nextElementSibling;
+            while (next && next.tagName !== 'P') next = next.nextElementSibling;
+            if (next) ceoName = next.textContent.trim();
+        }
+        const showCeoNote = !!(ceoQuote || ceoName);
+
+        // Footer & Social
+        const companyNameP = doc.querySelector('td.mobile-padding > p[style*="font-weight: 700"], footer p');
+        const companyName = companyNameP ? companyNameP.textContent.trim() : '';
+
+        const fbA = doc.querySelector('a[href*="facebook"]');
+        const liA = doc.querySelector('a[href*="linkedin"]');
+        const igA = doc.querySelector('a[href*="instagram"]');
+        const ttA = doc.querySelector('a[href*="tiktok"]');
+        const ytA = doc.querySelector('a[href*="youtube"]');
+
+        let brandColor = defaultFields.brandColor;
+        const heroBtnPill = doc.querySelector('td[style*="background-color: #"] a, p[style*="text-transform: uppercase"]');
+        if (heroBtnPill) {
+            const colorMatch = heroBtnPill.parentElement?.getAttribute('style')?.match(/background-color:\s*(#[0-9a-fA-F]{3,6})/i) ||
+                               heroBtnPill.getAttribute('style')?.match(/color:\s*(#[0-9a-fA-F]{3,6})/i);
+            if (colorMatch && colorMatch[1]) brandColor = colorMatch[1];
+        }
+
+        let templateWidth = '760';
+        const mainTable = doc.querySelector('table[style*="max-width"]');
+        if (mainTable) {
+            const match = mainTable.getAttribute('style').match(/max-width:\s*(\d+)px/i);
+            if (match && match[1]) templateWidth = match[1];
+        }
+
+        return {
+            templateWidth: templateWidth || defaultFields.templateWidth,
+            preheader: preheader || defaultFields.preheader,
+            logoAlign: logoAlign || defaultFields.logoAlign,
+            brandName: brandName || defaultFields.brandName,
+            brandLogoUrl: brandLogoUrl || defaultFields.brandLogoUrl,
+            brandLogoDarkUrl: brandLogoDarkUrl || defaultFields.brandLogoDarkUrl,
+            brandColor: brandColor || '#0057c5',
+            edition: edition || defaultFields.edition,
+            headerTitle: headerTitle || defaultFields.headerTitle,
+            headerSubtitle: headerSubtitle || defaultFields.headerSubtitle,
+            headerButtonText: headerButtonText || defaultFields.headerButtonText,
+            headerButtonUrl: headerButtonUrl || defaultFields.headerButtonUrl,
+            headerButtonColor: headerButtonColor || '#ff0878',
+            headerImage: headerImage || defaultFields.headerImage,
+            introGreeting: introGreeting || defaultFields.introGreeting,
+            introText: introText || defaultFields.introText,
+            showFeatured: showFeatured,
+            featuredItems: featuredItems.length > 0 ? featuredItems : defaultFields.featuredItems,
+            featuredBadge: featuredItems[0]?.badge || defaultFields.featuredBadge,
+            featuredTitle: featuredItems[0]?.title || defaultFields.featuredTitle,
+            featuredText: featuredItems[0]?.text || defaultFields.featuredText,
+            featuredLinkText: featuredItems[0]?.linkText || defaultFields.featuredLinkText,
+            featuredLinkUrl: featuredItems[0]?.linkUrl || defaultFields.featuredLinkUrl,
+            featuredImage: featuredItems[0]?.image || defaultFields.featuredImage,
+            cards: cards.length > 0 ? cards : [],
+            showCta: showCta,
+            ctaTitle: ctaTitle || defaultFields.ctaTitle,
+            ctaSubtitle: ctaSubtitle || defaultFields.ctaSubtitle,
+            ctaButtonText: ctaButtonText || defaultFields.ctaButtonText,
+            ctaButtonUrl: ctaButtonUrl || defaultFields.ctaButtonUrl,
+            showCtaSecondaryButton: showCtaSecondaryButton,
+            ctaSecondaryButtonText: ctaSecondaryButtonText || defaultFields.ctaSecondaryButtonText,
+            ctaSecondaryButtonUrl: ctaSecondaryButtonUrl || defaultFields.ctaSecondaryButtonUrl,
+            showCeoNote: showCeoNote,
+            ceoAvatar: ceoAvatar || defaultFields.ceoAvatar,
+            ceoLabel: ceoLabel || defaultFields.ceoLabel,
+            ceoQuote: ceoQuote || defaultFields.ceoQuote,
+            ceoName: ceoName || defaultFields.ceoName,
+            companyName: companyName || defaultFields.companyName,
+            companyAddress: '',
+            companyContact: '',
+            facebookUrl: fbA ? fbA.getAttribute('href') : defaultFields.facebookUrl,
+            linkedinUrl: liA ? liA.getAttribute('href') : defaultFields.linkedinUrl,
+            instagramUrl: igA ? igA.getAttribute('href') : defaultFields.instagramUrl,
+            tiktokUrl: ttA ? ttA.getAttribute('href') : defaultFields.tiktokUrl,
+            youtubeUrl: ytA ? ytA.getAttribute('href') : defaultFields.youtubeUrl,
+        };
+    } catch (e) {
+        return null;
+    }
+};
+
+export default function VisualNewsletterEditor({ value, onChange, templates = [], onSelectTemplate, onTemplateSaved }) {
+    const [editorMode, setEditorMode] = useState('visual'); // 'visual' | 'code'
+    const [previewDevice, setPreviewDevice] = useState('desktop');
+    const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+    const [saveTemplateName, setSaveTemplateName] = useState('');
+    const [saveTemplateSubject, setSaveTemplateSubject] = useState('');
+    const [saveTemplateCategory, setSaveTemplateCategory] = useState('newsletter');
+    const [isSavingTemplate, setIsSavingTemplate] = useState(false);
+    const [saveSuccessMessage, setSaveSuccessMessage] = useState('');
+    const [saveErrorMessage, setSaveErrorMessage] = useState('');
+    const lastCompiledRef = useRef(value || '');
+
+    // Initialize fields by parsing incoming value, or fallback to default
+    const [fields, setFields] = useState(() => {
+        if (value) {
+            const parsed = extractFieldsFromHtml(value);
+            if (parsed) return parsed;
+        }
+        return defaultFields;
+    });
+
+    const featuredItemsList = getFeaturedItems(fields);
+
+    // Update field value and compile if in visual mode
     const updateField = (key, val) => {
         let cleanVal = val;
         if (typeof val === 'string' && (val.includes('/storage/') || val.includes('/images/'))) {
@@ -359,6 +694,151 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
         }
     };
 
+    const updateFeaturedItem = (index, itemKey, val) => {
+        let cleanVal = val;
+        if (typeof val === 'string' && (val.includes('/storage/') || val.includes('/images/'))) {
+            cleanVal = val.replace(/^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?\//i, '/');
+        }
+        const currentList = getFeaturedItems(fields);
+        const nextList = currentList.map((item, idx) => {
+            if (idx === index) {
+                return { ...item, [itemKey]: cleanVal };
+            }
+            return item;
+        });
+
+        const next = {
+            ...fields,
+            featuredItems: nextList,
+            featuredBadge: nextList[0]?.badge || '',
+            featuredTitle: nextList[0]?.title || '',
+            featuredText: nextList[0]?.text || '',
+            featuredLinkText: nextList[0]?.linkText || '',
+            featuredLinkUrl: nextList[0]?.linkUrl || '',
+            featuredImage: nextList[0]?.image || '',
+        };
+        setFields(next);
+        if (editorMode === 'visual') {
+            const compiled = compileHtml(next);
+            lastCompiledRef.current = compiled;
+            onChange(compiled);
+        }
+    };
+
+    const addFeaturedItem = () => {
+        const currentList = getFeaturedItems(fields);
+        const newItem = {
+            badge: 'Spotlight',
+            title: 'Exciting New Innovation',
+            text: 'Explore our latest updates, breakthrough tools, and workflow improvements designed for your team.',
+            linkText: 'Learn More →',
+            linkUrl: 'https://example.com',
+            image: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=900&h=750&fit=crop&q=80',
+        };
+        const nextList = [...currentList, newItem];
+        const next = {
+            ...fields,
+            showFeatured: true,
+            featuredItems: nextList,
+            featuredBadge: nextList[0]?.badge || '',
+            featuredTitle: nextList[0]?.title || '',
+            featuredText: nextList[0]?.text || '',
+            featuredLinkText: nextList[0]?.linkText || '',
+            featuredLinkUrl: nextList[0]?.linkUrl || '',
+            featuredImage: nextList[0]?.image || '',
+        };
+        setFields(next);
+        if (editorMode === 'visual') {
+            const compiled = compileHtml(next);
+            lastCompiledRef.current = compiled;
+            onChange(compiled);
+        }
+    };
+
+    const removeFeaturedItem = (index) => {
+        const currentList = getFeaturedItems(fields);
+        if (currentList.length <= 1) return;
+        const nextList = currentList.filter((_, idx) => idx !== index);
+        const next = {
+            ...fields,
+            featuredItems: nextList,
+            featuredBadge: nextList[0]?.badge || '',
+            featuredTitle: nextList[0]?.title || '',
+            featuredText: nextList[0]?.text || '',
+            featuredLinkText: nextList[0]?.linkText || '',
+            featuredLinkUrl: nextList[0]?.linkUrl || '',
+            featuredImage: nextList[0]?.image || '',
+        };
+        setFields(next);
+        if (editorMode === 'visual') {
+            const compiled = compileHtml(next);
+            lastCompiledRef.current = compiled;
+            onChange(compiled);
+        }
+    };
+
+    const handleOpenSaveModal = () => {
+        const defaultName = fields.edition
+            ? `${fields.brandName || 'Newsletter'} - ${fields.edition}`
+            : (fields.headerTitle ? `${fields.headerTitle} (Template)` : 'Custom Newsletter with Content');
+        setSaveTemplateName(defaultName);
+        setSaveTemplateSubject(fields.headerTitle || fields.edition || '');
+        setSaveTemplateCategory('newsletter');
+        setSaveSuccessMessage('');
+        setSaveErrorMessage('');
+        setIsSaveModalOpen(true);
+    };
+
+    const handleSaveAsTemplate = async (e) => {
+        e.preventDefault();
+        if (!saveTemplateName.trim()) {
+            setSaveErrorMessage('Please enter a template name.');
+            return;
+        }
+
+        setIsSavingTemplate(true);
+        setSaveErrorMessage('');
+        setSaveSuccessMessage('');
+
+        const currentHtml = editorMode === 'visual' ? compileHtml(fields) : (value || '');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+        try {
+            const res = await fetch('/templates/save-as-new', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify({
+                    name: saveTemplateName.trim(),
+                    subject_template: saveTemplateSubject.trim(),
+                    category: saveTemplateCategory,
+                    content_html: currentHtml,
+                }),
+            });
+
+            const data = await res.json();
+            if (res.ok && data.success) {
+                setSaveSuccessMessage(data.message || 'Template saved successfully!');
+                if (onTemplateSaved && data.template) {
+                    onTemplateSaved(data.template);
+                }
+                setTimeout(() => {
+                    setIsSaveModalOpen(false);
+                    setSaveSuccessMessage('');
+                }, 1400);
+            } else {
+                setSaveErrorMessage(data.message || 'Failed to save template. Please check the name and try again.');
+            }
+        } catch (err) {
+            setSaveErrorMessage('Network error while saving template.');
+        } finally {
+            setIsSavingTemplate(false);
+        }
+    };
+
     // Sync external value changes (e.g. when template is selected in parent component)
     useEffect(() => {
         if (value && value !== lastCompiledRef.current) {
@@ -369,17 +849,6 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             }
         }
     }, [value]);
-
-    // Handle mode changes
-    useEffect(() => {
-        if (editorMode === 'visual') {
-            const compiled = compileHtml(fields);
-            if (lastCompiledRef.current !== compiled) {
-                lastCompiledRef.current = compiled;
-                onChange(compiled);
-            }
-        }
-    }, [editorMode]);
 
     return (
         <div className="space-y-4">
@@ -424,22 +893,32 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                             <LayoutTemplate className="h-3.5 w-3.5 mr-1.5 text-indigo-400" /> Select Template
                         </button>
                     )}
+
+                    <button
+                        type="button"
+                        onClick={handleOpenSaveModal}
+                        className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 transition flex items-center shadow-sm"
+                        title="Save your customized content as a reusable template preset in your library"
+                    >
+                        <BookmarkPlus className="h-3.5 w-3.5 mr-1.5 text-emerald-400" /> Save as Template
+                    </button>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
                     <div className="flex items-center space-x-1 bg-slate-900 border border-slate-800 p-1 rounded-xl">
-                        <span className="text-[10px] text-slate-400 font-bold px-1.5 uppercase tracking-wider">Width:</span>
+                        <span className="text-[10px] text-slate-400 font-bold px-1.5 uppercase tracking-wider">Desktop Width:</span>
                         {[
-                            { label: '650px', val: '650' },
-                            { label: '750px (Wide)', val: '750' },
-                            { label: '800px (Max)', val: '800' },
+                            { label: '680px', val: '680' },
+                            { label: '760px (Standard)', val: '760' },
+                            { label: '820px (Wide)', val: '820' },
+                            { label: '900px (Extra Wide)', val: '900' },
                         ].map((w) => (
                             <button
                                 key={w.val}
                                 type="button"
                                 onClick={() => updateField('templateWidth', w.val)}
                                 className={`px-2 py-0.5 rounded-lg text-xs font-bold transition ${
-                                    (fields.templateWidth || '750') === w.val
+                                    (fields.templateWidth || '760') === w.val
                                         ? 'bg-indigo-600 text-white shadow-sm'
                                         : 'text-slate-400 hover:text-slate-200'
                                 }`}
@@ -447,10 +926,23 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                 {w.label}
                             </button>
                         ))}
+                        <div className="flex items-center pl-1.5 pr-1 border-l border-slate-800">
+                            <input
+                                type="number"
+                                min="500"
+                                max="1200"
+                                step="10"
+                                value={fields.templateWidth || '760'}
+                                onChange={(e) => updateField('templateWidth', e.target.value)}
+                                className="w-14 bg-slate-800 border border-slate-700 rounded-md px-1 py-0.5 text-xs text-white text-center font-mono font-bold"
+                                title="Custom Desktop Width in pixels"
+                            />
+                            <span className="text-[10px] text-slate-400 font-semibold ml-1">px</span>
+                        </div>
                     </div>
 
                     <div className="flex items-center space-x-2">
-                        <span className="text-[11px] text-slate-400 font-semibold mr-1">Preview:</span>
+                        <span className="text-[11px] text-slate-400 font-semibold mr-1">Device:</span>
                         <button
                             type="button"
                             onClick={() => setPreviewDevice('desktop')}
@@ -475,457 +967,576 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                 </div>
             </div>
 
-            {/* Main Workspace Grid: Controls on Left, Live Preview on Right */}
+            {/* Main Workspace Grid */}
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-                
                 {/* Left Side: Form Controls / Code Editor */}
-                <div className="xl:col-span-5 space-y-5 max-h-[850px] overflow-y-auto pr-1">
+                <div className="xl:col-span-5 2xl:col-span-4 space-y-4 max-h-[850px] overflow-y-auto pr-1">
                     {editorMode === 'visual' ? (
                         <div className="space-y-4">
                             {/* Preheader Section */}
-                            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+                            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-2">
                                 <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center">
                                     <FileText className="h-3.5 w-3.5 mr-1.5 text-indigo-400" /> Inbox Preheader Snippet
                                 </h4>
                                 <input
                                     type="text"
-                                    value={fields.preheader}
+                                    value={fields.preheader || ''}
                                     onChange={(e) => updateField('preheader', e.target.value)}
-                                    placeholder="Short snippet text previewed in email clients..."
+                                    placeholder="Preview snippet shown in recipient inbox..."
                                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
                                 />
                             </div>
 
-                            {/* Header Banner */}
+                            {/* Company Logo & Branding */}
+                            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3.5">
+                                <div className="flex items-center justify-between">
+                                    <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center">
+                                        <Building2 className="h-3.5 w-3.5 mr-1.5 text-indigo-400" /> Header Logo & Branding
+                                    </h4>
+                                    <span className="text-[10px] text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full font-medium">
+                                        Black Header Bar
+                                    </span>
+                                </div>
+
+                                {/* Logo Alignment */}
+                                <div>
+                                    <label className="block text-[10px] text-slate-400 mb-1.5 font-semibold">Header Logo Alignment</label>
+                                    <div className="grid grid-cols-3 gap-1 bg-slate-800 p-1 rounded-xl">
+                                        {[
+                                            { id: 'left', label: 'Left', icon: AlignLeft },
+                                            { id: 'center', label: 'Center', icon: AlignCenter },
+                                            { id: 'right', label: 'Right', icon: AlignRight },
+                                        ].map(({ id, label, icon: Icon }) => (
+                                            <button
+                                                key={id}
+                                                type="button"
+                                                onClick={() => updateField('logoAlign', id)}
+                                                className={`py-1 text-xs font-bold rounded-lg transition flex items-center justify-center gap-1 ${
+                                                    (fields.logoAlign || 'center') === id
+                                                        ? 'bg-indigo-600 text-white shadow-sm'
+                                                        : 'text-slate-400 hover:text-white'
+                                                }`}
+                                            >
+                                                <Icon className="h-3 w-3" /> {label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                
+                                {/* Header Logo */}
+                                <ImageUploaderField
+                                    label="Header Logo (White / Contrast logo on black background)"
+                                    value={fields.brandLogoDarkUrl || fields.brandLogoUrl || ''}
+                                    onChange={(url) => {
+                                        updateField('brandLogoDarkUrl', url);
+                                        updateField('brandLogoUrl', url);
+                                    }}
+                                    placeholder="/images/loops-logo-white.png"
+                                />
+
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Company / Brand Name</label>
+                                        <input
+                                            type="text"
+                                            value={fields.brandName || ''}
+                                            onChange={(e) => updateField('brandName', e.target.value)}
+                                            placeholder="Loops Integrated"
+                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Edition Tagline (Top Pill)</label>
+                                        <input
+                                            type="text"
+                                            value={fields.edition || ''}
+                                            onChange={(e) => updateField('edition', e.target.value)}
+                                            placeholder="e.g. October Edition"
+                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Loops Logo Color Palette Swatches */}
+                                <div>
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <label className="text-[10px] text-slate-400 font-semibold flex items-center">
+                                            <Palette className="h-3 w-3 mr-1 text-indigo-400" /> Brand Theme Color (Loops Palette)
+                                        </label>
+                                        <span className="text-[10px] font-mono text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">
+                                            {fields.brandColor || '#0057c5'}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-1.5 bg-slate-800 p-1.5 rounded-xl border border-slate-700/60">
+                                            {LOOPS_LOGO_PALETTE.map(({ name, hex }) => {
+                                                const isSelected = (fields.brandColor || '#0057c5').toLowerCase() === hex.toLowerCase();
+                                                return (
+                                                    <button
+                                                        key={hex}
+                                                        type="button"
+                                                        onClick={() => updateField('brandColor', hex)}
+                                                        title={`${name} (${hex})`}
+                                                        className={`w-6 h-6 rounded-lg transition-all flex items-center justify-center ${
+                                                            isSelected ? 'ring-2 ring-white scale-110 shadow-lg' : 'hover:scale-105 opacity-85 hover:opacity-100'
+                                                        }`}
+                                                        style={{ backgroundColor: hex }}
+                                                    >
+                                                        {isSelected && <Check className="h-3.5 w-3.5 text-white stroke-[3]" />}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                        <div className="relative flex-1 flex items-center">
+                                            <input
+                                                type="color"
+                                                value={fields.brandColor || '#0057c5'}
+                                                onChange={(e) => updateField('brandColor', e.target.value)}
+                                                className="w-7 h-7 rounded-lg border-0 cursor-pointer bg-transparent"
+                                                title="Custom Hex Color"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={fields.brandColor || '#0057c5'}
+                                                onChange={(e) => updateField('brandColor', e.target.value)}
+                                                placeholder="#0057c5"
+                                                className="w-full ml-1.5 bg-slate-800 border border-slate-700 rounded-xl px-2 py-1 text-xs text-white font-mono uppercase"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Hero Story Section */}
                             <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
                                 <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center">
-                                    <ImageIcon className="h-3.5 w-3.5 mr-1.5 text-sky-400" /> Newsletter Banner & Title
+                                    <ImageIcon className="h-3.5 w-3.5 mr-1.5 text-sky-400" /> Hero Headline & Banner
                                 </h4>
-                                <div className="space-y-3">
-                                    <div className="space-y-2">
-                                        <ImageUploaderField
-                                            label="Site / Brand Logo"
-                                            value={fields.logoUrl}
-                                            onChange={(url) => updateField('logoUrl', url)}
-                                            placeholder="/images/loops-logo-white.png or https://..."
+                                <div className="space-y-2.5">
+                                    <div>
+                                        <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Main Headline (H1 Serif)</label>
+                                        <input
+                                            type="text"
+                                            value={fields.headerTitle || ''}
+                                            onChange={(e) => updateField('headerTitle', e.target.value)}
+                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold font-serif"
                                         />
-                                        <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Brand Logos:</span>
-                                            <button
-                                                type="button"
-                                                onClick={() => updateField('logoUrl', '/images/loops-logo-white.png')}
-                                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center transition border ${
-                                                    fields.logoUrl === '/images/loops-logo-white.png'
-                                                        ? 'bg-indigo-600/30 text-indigo-300 border-indigo-500 shadow-sm'
-                                                        : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
-                                                }`}
-                                            >
-                                                <span className="w-2.5 h-2.5 rounded-full bg-white mr-1.5 inline-block shadow-sm" />
-                                                White Logo (for Dark BG)
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => updateField('logoUrl', '/images/loops-logo-dark.png')}
-                                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center transition border ${
-                                                    fields.logoUrl === '/images/loops-logo-dark.png'
-                                                        ? 'bg-indigo-600/30 text-indigo-300 border-indigo-500 shadow-sm'
-                                                        : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
-                                                }`}
-                                            >
-                                                <span className="w-2.5 h-2.5 rounded-full bg-slate-900 border border-slate-400 mr-1.5 inline-block shadow-sm" />
-                                                Dark Logo (for Light BG)
-                                            </button>
-                                            {fields.logoUrl && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => updateField('logoUrl', '')}
-                                                    className="text-[10px] text-rose-400 hover:text-rose-300 font-semibold ml-auto"
-                                                >
-                                                    Remove Logo
-                                                </button>
-                                            )}
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Sub-headline Description</label>
+                                        <textarea
+                                            rows={2}
+                                            value={fields.headerSubtitle || ''}
+                                            onChange={(e) => updateField('headerSubtitle', e.target.value)}
+                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Hero Button Label</label>
+                                            <input
+                                                type="text"
+                                                value={fields.headerButtonText || ''}
+                                                onChange={(e) => updateField('headerButtonText', e.target.value)}
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Hero Button URL</label>
+                                            <input
+                                                type="text"
+                                                value={fields.headerButtonUrl || ''}
+                                                onChange={(e) => updateField('headerButtonUrl', e.target.value)}
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                                            />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Newsletter Title</label>
-                                        <input
-                                            type="text"
-                                            value={fields.headerTitle}
-                                            onChange={(e) => updateField('headerTitle', e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-bold"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Sub-heading / Tagline</label>
-                                        <input
-                                            type="text"
-                                            value={fields.headerSubtitle}
-                                            onChange={(e) => updateField('headerSubtitle', e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
-                                        />
+                                        <div className="flex items-center justify-between mb-1">
+                                            <label className="text-[10px] text-slate-400 font-semibold flex items-center">
+                                                <Palette className="h-3 w-3 mr-1 text-pink-400" /> Hero Button Color
+                                            </label>
+                                            <span className="text-[10px] font-mono text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">
+                                                {fields.headerButtonColor || '#ff0878'}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-1.5 bg-slate-800 p-1.5 rounded-xl border border-slate-700/60">
+                                                {LOOPS_LOGO_PALETTE.map(({ name, hex }) => {
+                                                    const isSelected = (fields.headerButtonColor || '#ff0878').toLowerCase() === hex.toLowerCase();
+                                                    return (
+                                                        <button
+                                                            key={hex}
+                                                            type="button"
+                                                            onClick={() => updateField('headerButtonColor', hex)}
+                                                            title={`${name} (${hex})`}
+                                                            className={`w-6 h-6 rounded-lg transition-all flex items-center justify-center ${
+                                                                isSelected ? 'ring-2 ring-white scale-110 shadow-lg' : 'hover:scale-105 opacity-85 hover:opacity-100'
+                                                            }`}
+                                                            style={{ backgroundColor: hex }}
+                                                        >
+                                                            {isSelected && <Check className="h-3.5 w-3.5 text-white stroke-[3]" />}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                            <div className="relative flex-1 flex items-center">
+                                                <input
+                                                    type="color"
+                                                    value={fields.headerButtonColor || '#ff0878'}
+                                                    onChange={(e) => updateField('headerButtonColor', e.target.value)}
+                                                    className="w-7 h-7 rounded-lg border-0 cursor-pointer bg-transparent"
+                                                    title="Custom Button Color"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    value={fields.headerButtonColor || '#ff0878'}
+                                                    onChange={(e) => updateField('headerButtonColor', e.target.value)}
+                                                    placeholder="#ff0878"
+                                                    className="w-full ml-1.5 bg-slate-800 border border-slate-700 rounded-xl px-2 py-1 text-xs text-white font-mono uppercase"
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
                                     <ImageUploaderField
-                                        label="Banner Header Image (1200 x 500 px)"
-                                        value={fields.headerImage}
+                                        label="Hero Banner Image (1280 x 720 px)"
+                                        value={fields.headerImage || ''}
                                         onChange={(url) => updateField('headerImage', url)}
                                     />
                                 </div>
                             </div>
 
-                            {/* Main Introduction */}
+                            {/* Greeting & Intro */}
                             <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
                                 <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center">
-                                    <Type className="h-3.5 w-3.5 mr-1.5 text-emerald-400" /> Main Heading & Introduction
+                                    <Type className="h-3.5 w-3.5 mr-1.5 text-emerald-400" /> Greeting & Intro Message
                                 </h4>
                                 <div className="space-y-2">
                                     <div>
-                                        <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Main Heading</label>
+                                        <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Greeting Line</label>
                                         <input
                                             type="text"
-                                            value={fields.mainHeading}
-                                            onChange={(e) => updateField('mainHeading', e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold"
+                                            value={fields.introGreeting || ''}
+                                            onChange={(e) => updateField('introGreeting', e.target.value)}
+                                            placeholder="Hello {{first_name}},"
+                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Introduction Text</label>
+                                        <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Message Text</label>
                                         <textarea
-                                            rows="3"
-                                            value={fields.introText}
+                                            rows={3}
+                                            value={fields.introText || ''}
                                             onChange={(e) => updateField('introText', e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-indigo-500 leading-relaxed"
+                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-xs text-white leading-relaxed"
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Featured Announcement Box & CTA */}
-                            {fields.showFeatured !== false ? (
-                                <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
-                                    <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-                                        <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center">
-                                            <Megaphone className="h-3.5 w-3.5 mr-1.5 text-rose-400" /> Featured Highlight & Call-To-Action
-                                        </h4>
-                                        <button
-                                            type="button"
-                                            onClick={() => updateField('showFeatured', false)}
-                                            className="text-[10px] text-rose-400 hover:text-rose-300 font-semibold flex items-center transition"
-                                            title="Exclude this section from newsletter"
-                                        >
-                                            <Trash2 className="h-3 w-3 mr-1" /> Remove Section
-                                        </button>
-                                    </div>
+                            {/* Featured Highlight Card */}
+                            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+                                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                                    <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center">
+                                        <Megaphone className="h-3.5 w-3.5 mr-1.5 text-amber-400" /> Featured Article Cards {featuredItemsList.length > 1 ? `(${featuredItemsList.length})` : ''}
+                                    </h4>
+                                    <button
+                                        type="button"
+                                        onClick={() => updateField('showFeatured', !fields.showFeatured)}
+                                        className={`text-[10px] font-semibold px-2 py-0.5 rounded transition ${
+                                            fields.showFeatured !== false ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 text-slate-400'
+                                        }`}
+                                    >
+                                        {fields.showFeatured !== false ? 'Active' : 'Disabled'}
+                                    </button>
+                                </div>
 
-                                    {/* Section Heading & Subtitle above the boxes */}
-                                    <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 space-y-2.5">
-                                        <div>
-                                            <label className="block text-[11px] text-indigo-300 mb-1 font-bold uppercase tracking-wider flex items-center">
-                                                <Type className="h-3 w-3 mr-1 text-indigo-400" /> Section Heading (Above this section)
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={fields.featuredSectionTitle || ''}
-                                                onChange={(e) => updateField('featuredSectionTitle', e.target.value)}
-                                                placeholder="e.g. Featured Highlights / Key Announcements"
-                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-bold"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">
-                                                Section Sub-heading (Optional small text under heading)
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={fields.featuredSectionSubtitle || ''}
-                                                onChange={(e) => updateField('featuredSectionSubtitle', e.target.value)}
-                                                placeholder="e.g. Explore our latest product features and updates"
-                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <ImageUploaderField
-                                        label="Featured Highlight Image / Banner (Optional)"
-                                        value={fields.featuredImage}
-                                        onChange={(url) => updateField('featuredImage', url)}
-                                        placeholder="https://... or upload banner"
-                                    />
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        <div>
-                                            <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Box Title</label>
-                                            <input
-                                                type="text"
-                                                value={fields.featuredTitle}
-                                                onChange={(e) => updateField('featuredTitle', e.target.value)}
-                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Button Label</label>
-                                            <input
-                                                type="text"
-                                                value={fields.ctaText}
-                                                onChange={(e) => updateField('ctaText', e.target.value)}
-                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none font-bold"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Box Highlight Description</label>
-                                        <textarea
-                                            rows="2"
-                                            value={fields.featuredText}
-                                            onChange={(e) => updateField('featuredText', e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Button & Image Target Link URL</label>
-                                        <input
-                                            type="text"
-                                            value={fields.ctaUrl}
-                                            onChange={(e) => updateField('ctaUrl', e.target.value)}
-                                            placeholder="https://example.com"
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-indigo-300 font-mono focus:outline-none"
-                                        />
-                                    </div>
-
-                                    {/* Additional Custom Highlight Cards */}
-                                    {fields.extraCards && fields.extraCards.length > 0 && (
-                                        <div className="space-y-3 pt-2 border-t border-slate-800">
-                                            <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider block">Additional Highlight Cards:</span>
-                                            {fields.extraCards.map((card, idx) => (
-                                                <div key={card.id || idx} className="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 relative">
-                                                    <div className="flex items-center justify-between">
-                                                        <span className="text-[10px] font-bold text-indigo-400">Card #{idx + 2}</span>
+                                {fields.showFeatured !== false && (
+                                    <div className="space-y-4">
+                                        {featuredItemsList.map((item, idx) => (
+                                            <div key={idx} className="bg-slate-800/40 border border-slate-700/60 rounded-xl p-3 space-y-2.5">
+                                                <div className="flex items-center justify-between border-b border-slate-700/50 pb-1.5">
+                                                    <div className="flex items-center space-x-1.5">
+                                                        <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded">
+                                                            Item #{idx + 1}
+                                                        </span>
+                                                        <span className="text-[11px] font-semibold text-slate-300 truncate max-w-[140px]">
+                                                            {item.title || 'Untitled Article'}
+                                                        </span>
+                                                    </div>
+                                                    {featuredItemsList.length > 1 && (
                                                         <button
                                                             type="button"
-                                                            onClick={() => {
-                                                                const nextCards = fields.extraCards.filter((_, i) => i !== idx);
-                                                                updateField('extraCards', nextCards);
-                                                            }}
-                                                            className="text-rose-400 hover:text-rose-300 text-[10px] font-semibold flex items-center"
+                                                            onClick={() => removeFeaturedItem(idx)}
+                                                            className="text-[10px] text-rose-400 hover:text-rose-300 flex items-center space-x-1 hover:bg-rose-500/10 px-2 py-0.5 rounded transition"
+                                                            title="Remove this featured item"
                                                         >
-                                                            <Trash2 className="h-3 w-3 mr-0.5" /> Delete
+                                                            <Trash2 className="h-3 w-3" />
+                                                            <span>Remove</span>
                                                         </button>
-                                                    </div>
-                                                    <ImageUploaderField
-                                                        label="Card Image"
-                                                        value={card.image || ''}
-                                                        onChange={(url) => {
-                                                            const cleanUrlVal = typeof url === 'string' ? url.replace(/^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?\//i, '/') : url;
-                                                            const nextCards = [...fields.extraCards];
-                                                            nextCards[idx] = { ...nextCards[idx], image: cleanUrlVal };
-                                                            updateField('extraCards', nextCards);
-                                                        }}
-                                                    />
-                                                    <div className="grid grid-cols-2 gap-2">
-                                                        <div>
-                                                            <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">Card Title</label>
-                                                            <input
-                                                                type="text"
-                                                                value={card.title || ''}
-                                                                onChange={(e) => {
-                                                                    const nextCards = [...fields.extraCards];
-                                                                    nextCards[idx] = { ...nextCards[idx], title: e.target.value };
-                                                                    updateField('extraCards', nextCards);
-                                                                }}
-                                                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">Button Text</label>
-                                                            <input
-                                                                type="text"
-                                                                value={card.ctaText || ''}
-                                                                onChange={(e) => {
-                                                                    const nextCards = [...fields.extraCards];
-                                                                    nextCards[idx] = { ...nextCards[idx], ctaText: e.target.value };
-                                                                    updateField('extraCards', nextCards);
-                                                                }}
-                                                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white"
-                                                            />
-                                                        </div>
-                                                    </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="grid grid-cols-3 gap-2">
                                                     <div>
-                                                        <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">Description</label>
-                                                        <textarea
-                                                            rows="2"
-                                                            value={card.text || ''}
-                                                            onChange={(e) => {
-                                                                const nextCards = [...fields.extraCards];
-                                                                nextCards[idx] = { ...nextCards[idx], text: e.target.value };
-                                                                updateField('extraCards', nextCards);
-                                                            }}
-                                                            className="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-xs text-white"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">Target Link URL</label>
+                                                        <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Pill Badge</label>
                                                         <input
                                                             type="text"
-                                                            value={card.ctaUrl || ''}
-                                                            onChange={(e) => {
-                                                                const nextCards = [...fields.extraCards];
-                                                                nextCards[idx] = { ...nextCards[idx], ctaUrl: e.target.value };
-                                                                updateField('extraCards', nextCards);
-                                                            }}
-                                                            placeholder="https://..."
-                                                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-indigo-300 font-mono"
+                                                            value={item.badge || ''}
+                                                            onChange={(e) => updateFeaturedItem(idx, 'badge', e.target.value)}
+                                                            placeholder="Featured"
+                                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-bold"
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-2">
+                                                        <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Article Title</label>
+                                                        <input
+                                                            type="text"
+                                                            value={item.title || ''}
+                                                            onChange={(e) => updateFeaturedItem(idx, 'title', e.target.value)}
+                                                            placeholder="e.g. Discover What's New"
+                                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-serif font-bold"
                                                         />
                                                     </div>
                                                 </div>
-                                            ))}
-                                        </div>
-                                    )}
 
-                                    <div className="pt-1">
+                                                <div>
+                                                    <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Description</label>
+                                                    <textarea
+                                                        rows={2}
+                                                        value={item.text || ''}
+                                                        onChange={(e) => updateFeaturedItem(idx, 'text', e.target.value)}
+                                                        placeholder="Write a brief summary of this featured highlight..."
+                                                        className="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white"
+                                                    />
+                                                </div>
+
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <div>
+                                                        <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Link Label</label>
+                                                        <input
+                                                            type="text"
+                                                            value={item.linkText || ''}
+                                                            onChange={(e) => updateFeaturedItem(idx, 'linkText', e.target.value)}
+                                                            placeholder="Read More →"
+                                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Link URL</label>
+                                                        <input
+                                                            type="text"
+                                                            value={item.linkUrl || ''}
+                                                            onChange={(e) => updateFeaturedItem(idx, 'linkUrl', e.target.value)}
+                                                            placeholder="https://example.com"
+                                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <ImageUploaderField
+                                                    label={`Featured Photo #${idx + 1}`}
+                                                    value={item.image || ''}
+                                                    onChange={(url) => updateFeaturedItem(idx, 'image', url)}
+                                                />
+                                            </div>
+                                        ))}
+
                                         <button
                                             type="button"
-                                            onClick={() => {
-                                                const nextCards = [...(fields.extraCards || []), {
-                                                    id: Date.now(),
-                                                    image: '',
-                                                    title: 'Featured Promotion',
-                                                    text: 'Discover our newest offering and take advantage of special pricing.',
-                                                    ctaText: 'CHECK IT OUT',
-                                                    ctaUrl: 'https://example.com',
-                                                }];
-                                                updateField('extraCards', nextCards);
-                                            }}
-                                            className="w-full py-2 border border-dashed border-indigo-500/40 rounded-xl text-xs font-bold text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 flex items-center justify-center transition"
+                                            onClick={addFeaturedItem}
+                                            className="w-full py-2.5 px-3 border border-dashed border-amber-500/40 hover:border-amber-400 text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 rounded-xl text-xs font-semibold flex items-center justify-center space-x-1.5 transition"
                                         >
-                                            <Plus className="h-3.5 w-3.5 mr-1" /> Add Another Highlight Card
+                                            <Plus className="h-3.5 w-3.5" />
+                                            <span>Add Another Feature Item</span>
                                         </button>
                                     </div>
-                                </div>
-                            ) : (
-                                <div className="bg-slate-900/60 border border-dashed border-slate-800 hover:border-slate-700 rounded-2xl p-4 flex items-center justify-between transition">
-                                    <div className="flex items-center space-x-3">
-                                        <div className="p-2.5 rounded-xl bg-slate-800/80 text-slate-400">
-                                            <Megaphone className="h-4 w-4" />
-                                        </div>
-                                        <div>
-                                            <h4 className="text-xs font-bold text-slate-300">Featured Highlight & CTA Box</h4>
-                                            <p className="text-[10px] text-slate-500">Currently excluded from this newsletter.</p>
-                                        </div>
-                                    </div>
+                                )}
+                            </div>
+
+                            {/* Call To Action Banner */}
+                            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+                                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                                    <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center">
+                                        <Sparkles className="h-3.5 w-3.5 mr-1.5 text-indigo-400" /> Gradient CTA Banner
+                                    </h4>
                                     <button
                                         type="button"
-                                        onClick={() => {
-                                            updateField('showFeatured', true);
-                                            if (!fields.featuredTitle) updateField('featuredTitle', 'Special Announcement');
-                                            if (!fields.ctaText) updateField('ctaText', 'READ MORE NOW');
-                                            if (!fields.ctaUrl) updateField('ctaUrl', 'https://example.com');
-                                        }}
-                                        className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center shadow-lg shadow-indigo-600/20 transition"
+                                        onClick={() => updateField('showCta', !fields.showCta)}
+                                        className={`text-[10px] font-semibold px-2 py-0.5 rounded transition ${
+                                            fields.showCta !== false ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 text-slate-400'
+                                        }`}
                                     >
-                                        <Plus className="h-3.5 w-3.5 mr-1" /> Add This Section
+                                        {fields.showCta !== false ? 'Active' : 'Disabled'}
                                     </button>
                                 </div>
-                            )}
 
-                            {/* Secondary Section */}
+                                {fields.showCta !== false && (
+                                    <div className="space-y-2.5">
+                                        <div>
+                                            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">CTA Headline</label>
+                                            <input
+                                                type="text"
+                                                value={fields.ctaTitle || ''}
+                                                onChange={(e) => updateField('ctaTitle', e.target.value)}
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-serif font-bold"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">CTA Subtitle</label>
+                                            <input
+                                                type="text"
+                                                value={fields.ctaSubtitle || ''}
+                                                onChange={(e) => updateField('ctaSubtitle', e.target.value)}
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Primary Button</label>
+                                                <input
+                                                    type="text"
+                                                    value={fields.ctaButtonText || ''}
+                                                    onChange={(e) => updateField('ctaButtonText', e.target.value)}
+                                                    placeholder="Explore Now"
+                                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-bold"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Primary Target URL</label>
+                                                <input
+                                                    type="text"
+                                                    value={fields.ctaButtonUrl || ''}
+                                                    onChange={(e) => updateField('ctaButtonUrl', e.target.value)}
+                                                    placeholder="https://example.com"
+                                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Option to Add New Button Next to it */}
+                                        <div className="pt-2.5 border-t border-slate-800/80">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <label className="text-[10px] text-slate-300 font-semibold flex items-center">
+                                                    Second Button (Next to Button)
+                                                </label>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const nextState = !fields.showCtaSecondaryButton;
+                                                        updateField('showCtaSecondaryButton', nextState);
+                                                        if (nextState && !fields.ctaSecondaryButtonText) {
+                                                            updateField('ctaSecondaryButtonText', 'Contact Us');
+                                                        }
+                                                        if (nextState && !fields.ctaSecondaryButtonUrl) {
+                                                            updateField('ctaSecondaryButtonUrl', 'https://example.com/contact');
+                                                        }
+                                                    }}
+                                                    className={`text-[10px] font-semibold px-2 py-0.5 rounded transition ${
+                                                        fields.showCtaSecondaryButton ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30' : 'bg-slate-800 text-slate-400 hover:text-white'
+                                                    }`}
+                                                >
+                                                    {fields.showCtaSecondaryButton ? 'Active' : '+ Add Button'}
+                                                </button>
+                                            </div>
+
+                                            {fields.showCtaSecondaryButton && (
+                                                <div className="grid grid-cols-2 gap-2 animate-fadeIn">
+                                                    <div>
+                                                        <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Second Button Label</label>
+                                                        <input
+                                                            type="text"
+                                                            value={fields.ctaSecondaryButtonText || ''}
+                                                            onChange={(e) => updateField('ctaSecondaryButtonText', e.target.value)}
+                                                            placeholder="Contact Us"
+                                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-bold"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Second Button URL</label>
+                                                        <input
+                                                            type="text"
+                                                            value={fields.ctaSecondaryButtonUrl || ''}
+                                                            onChange={(e) => updateField('ctaSecondaryButtonUrl', e.target.value)}
+                                                            placeholder="https://example.com/contact"
+                                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+
+                            {/* Footer & Company Details */}
                             <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
                                 <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center">
-                                    <Type className="h-3.5 w-3.5 mr-1.5 text-purple-400" /> Secondary Content Section
+                                    <Building2 className="h-3.5 w-3.5 mr-1.5 text-slate-400" /> Footer Info & Social Links
                                 </h4>
                                 <div className="space-y-2">
                                     <div>
-                                        <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Second Section Title</label>
+                                        <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Company Name</label>
                                         <input
                                             type="text"
-                                            value={fields.section2Title}
-                                            onChange={(e) => updateField('section2Title', e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"
+                                            value={fields.companyName || ''}
+                                            onChange={(e) => updateField('companyName', e.target.value)}
+                                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-semibold"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Second Section Text</label>
-                                        <textarea
-                                            rows="2"
-                                            value={fields.section2Text}
-                                            onChange={(e) => updateField('section2Text', e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none"
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                                    <div className="grid grid-cols-2 gap-2">
                                         <div>
-                                            <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Button Label (Optional)</label>
+                                            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Facebook</label>
                                             <input
                                                 type="text"
-                                                value={fields.section2CtaText || ''}
-                                                onChange={(e) => updateField('section2CtaText', e.target.value)}
-                                                placeholder="e.g. LEARN MORE / EXPLORE"
-                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none font-bold"
+                                                value={fields.facebookUrl || ''}
+                                                onChange={(e) => updateField('facebookUrl', e.target.value)}
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-[11px] text-slate-400 mb-1 font-semibold">Button Link URL</label>
+                                            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">LinkedIn</label>
                                             <input
                                                 type="text"
-                                                value={fields.section2CtaUrl || ''}
-                                                onChange={(e) => updateField('section2CtaUrl', e.target.value)}
-                                                placeholder="https://example.com"
-                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-indigo-300 font-mono focus:outline-none"
+                                                value={fields.linkedinUrl || ''}
+                                                onChange={(e) => updateField('linkedinUrl', e.target.value)}
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white"
                                             />
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            {/* Footer & Social Links */}
-                            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
-                                <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center">
-                                    <Building2 className="h-3.5 w-3.5 mr-1.5 text-amber-400" /> Social Links & Company Footer
-                                </h4>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">Website URL</label>
-                                        <input
-                                            type="text"
-                                            value={fields.websiteUrl}
-                                            onChange={(e) => updateField('websiteUrl', e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
-                                        />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Instagram</label>
+                                            <input
+                                                type="text"
+                                                value={fields.instagramUrl || ''}
+                                                onChange={(e) => updateField('instagramUrl', e.target.value)}
+                                                placeholder="https://instagram.com"
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">TikTok</label>
+                                            <input
+                                                type="text"
+                                                value={fields.tiktokUrl || ''}
+                                                onChange={(e) => updateField('tiktokUrl', e.target.value)}
+                                                placeholder="https://tiktok.com/@..."
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white"
+                                            />
+                                        </div>
                                     </div>
                                     <div>
-                                        <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">Facebook URL</label>
+                                        <label className="block text-[10px] text-slate-400 mb-1 font-semibold">YouTube</label>
                                         <input
                                             type="text"
-                                            value={fields.facebookUrl}
-                                            onChange={(e) => updateField('facebookUrl', e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                                            value={fields.youtubeUrl || ''}
+                                            onChange={(e) => updateField('youtubeUrl', e.target.value)}
+                                            placeholder="https://youtube.com"
+                                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">Instagram URL</label>
-                                        <input
-                                            type="text"
-                                            value={fields.instagramUrl}
-                                            onChange={(e) => updateField('instagramUrl', e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">LinkedIn URL</label>
-                                        <input
-                                            type="text"
-                                            value={fields.linkedinUrl}
-                                            onChange={(e) => updateField('linkedinUrl', e.target.value)}
-                                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="pt-1">
-                                    <label className="block text-[10px] text-slate-400 font-semibold mb-0.5">Company / Brand Name</label>
-                                    <input
-                                        type="text"
-                                        value={fields.companyName}
-                                        onChange={(e) => updateField('companyName', e.target.value)}
-                                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white"
-                                    />
                                 </div>
                             </div>
                         </div>
@@ -935,7 +1546,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                 <Code className="h-3.5 w-3.5 mr-1.5 text-indigo-400" /> HTML Code Editor
                             </h4>
                             <textarea
-                                rows="28"
+                                rows={28}
                                 value={value}
                                 onChange={(e) => onChange(e.target.value)}
                                 className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs font-mono text-slate-200 focus:outline-none focus:border-indigo-500 leading-relaxed"
@@ -945,38 +1556,37 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                 </div>
 
                 {/* Right Side: Instant Live Mobile / Desktop Email Preview */}
-                <div className="xl:col-span-7 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col items-center justify-start overflow-hidden min-h-[600px]">
+                <div className="xl:col-span-7 2xl:col-span-8 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col items-center justify-start overflow-hidden min-h-[600px]">
                     <div className="w-full flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
                         <span className="text-xs font-extrabold text-white flex items-center">
                             <Eye className="h-4 w-4 mr-1.5 text-indigo-400" /> Real-Time Live Preview
                         </span>
                         <span className="text-[10px] text-slate-400 bg-slate-800 px-2.5 py-0.5 rounded-full font-semibold">
-                            {previewDevice === 'mobile' ? 'Mobile View (375px)' : `Desktop View (${fields.templateWidth || '750'}px)`}
+                            {previewDevice === 'mobile' ? 'Mobile View (375px)' : `Desktop View (${fields.templateWidth || '760'}px)`}
                         </span>
                     </div>
 
-                    <div className="w-full flex-1 flex justify-center overflow-y-auto">
+                    <div className="w-full flex-1 flex justify-center overflow-x-auto overflow-y-auto p-2">
                         <div
                             className={`bg-white text-slate-900 rounded-xl shadow-2xl transition-all duration-300 overflow-hidden ${
-                                previewDevice === 'mobile' ? 'w-[375px] min-h-[550px] my-2 border-4 border-slate-800' : 'w-full'
+                                previewDevice === 'mobile' ? 'w-[375px] min-h-[550px] my-2 border-4 border-slate-800 shrink-0' : 'w-full shrink-0'
                             }`}
                             style={{
-                                maxWidth: previewDevice === 'mobile' ? '375px' : `${fields.templateWidth || '750'}px`,
+                                maxWidth: previewDevice === 'mobile' ? '375px' : `${fields.templateWidth || '760'}px`,
                             }}
                         >
                             <div
                                 dangerouslySetInnerHTML={{
                                     __html: (value || compileHtml(fields))
-                                        .replace(/\{\{first_name\}\}/g, 'Alex')
-                                        .replace(/\{\{email\}\}/g, 'alex.dev@example.com')
-                                        .replace(/\{\{company_name\}\}/g, fields.companyName || 'Loops Marketing')
+                                        .replace(/\{\{first_name\}\}/g, 'Sarah')
+                                        .replace(/\{\{email\}\}/g, 'sarah.dev@example.com')
+                                        .replace(/\{\{company_name\}\}/g, fields.companyName || 'Loops Integrated')
                                         .replace(/\{\{unsubscribe_url\}\}/g, '#'),
                                 }}
                             />
                         </div>
                     </div>
                 </div>
-
             </div>
 
             {/* Template Selection Modal */}
@@ -1035,6 +1645,119 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                 </div>
                             ))}
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Save as Reusable Template Modal */}
+            {isSaveModalOpen && (
+                <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+                    <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                            <div className="flex items-center space-x-2.5">
+                                <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                    <BookmarkPlus className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <h3 className="font-extrabold text-white text-base">Save as Reusable Template</h3>
+                                    <p className="text-[11px] text-slate-400">Keep base template clean &amp; save this content separately</p>
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setIsSaveModalOpen(false)}
+                                className="text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-xs text-emerald-300 leading-relaxed">
+                            💡 <strong>Reusable Content Template:</strong> This saves your customized headlines, articles, banners, colors, and buttons into your Template Library. Your original base template remains unchanged.
+                        </div>
+
+                        {saveSuccessMessage && (
+                            <div className="p-3 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-xs font-semibold text-emerald-300 flex items-center space-x-2">
+                                <Check className="h-4 w-4 shrink-0 text-emerald-400" />
+                                <span>{saveSuccessMessage}</span>
+                            </div>
+                        )}
+
+                        {saveErrorMessage && (
+                            <div className="p-3 bg-rose-500/20 border border-rose-500/40 rounded-xl text-xs font-semibold text-rose-300 flex items-center space-x-2">
+                                <X className="h-4 w-4 shrink-0 text-rose-400" />
+                                <span>{saveErrorMessage}</span>
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSaveAsTemplate} className="space-y-3.5">
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                                    New Template Name *
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={saveTemplateName}
+                                    onChange={(e) => setSaveTemplateName(e.target.value)}
+                                    placeholder="e.g. October Edition - Tech Digest"
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-semibold"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                                    Default Subject Line (Optional)
+                                </label>
+                                <input
+                                    type="text"
+                                    value={saveTemplateSubject}
+                                    onChange={(e) => setSaveTemplateSubject(e.target.value)}
+                                    placeholder="e.g. ⚡ What's New This Month"
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                                    Category
+                                </label>
+                                <select
+                                    value={saveTemplateCategory}
+                                    onChange={(e) => setSaveTemplateCategory(e.target.value)}
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                                >
+                                    <option value="newsletter">Newsletter</option>
+                                    <option value="promotion">Promotion / Special Offer</option>
+                                    <option value="automation">Automation / Onboarding</option>
+                                    <option value="transactional">Product Update / Announcement</option>
+                                </select>
+                            </div>
+
+                            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-800">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsSaveModalOpen(false)}
+                                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSavingTemplate}
+                                    className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-bold shadow-lg shadow-emerald-600/20 transition flex items-center space-x-1.5"
+                                >
+                                    {isSavingTemplate ? (
+                                        <span>Saving Template...</span>
+                                    ) : (
+                                        <>
+                                            <BookmarkPlus className="h-4 w-4" />
+                                            <span>Save Template with Content</span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}

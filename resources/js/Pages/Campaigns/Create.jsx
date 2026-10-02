@@ -17,14 +17,15 @@ import {
     Check,
 } from 'lucide-react';
 
-export default function CampaignsCreate({ templates, groups, initialTemplateId }) {
+export default function CampaignsCreate({ templates: initialTemplates = [], groups, initialTemplateId }) {
+    const [templates, setTemplates] = useState(initialTemplates || []);
     const { data, setData, post, processing, errors } = useForm({
         title: '',
-        subject: templates.length > 0 ? (templates[0].subject_template || '') : '',
+        subject: initialTemplates.length > 0 ? (initialTemplates[0].subject_template || '') : '',
         sender_name: 'Loops Marketing',
         sender_email: 'info@slmartech.com',
-        content_html: templates.length > 0 ? templates[0].content_html : '<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;"><h1>Your Newsletter Headline</h1><p>Type your message content here...</p></div>',
-        template_id: initialTemplateId || (templates.length > 0 ? templates[0].id : ''),
+        content_html: initialTemplates.length > 0 ? initialTemplates[0].content_html : '<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;"><h1>Your Newsletter Headline</h1><p>Type your message content here...</p></div>',
+        template_id: initialTemplateId || (initialTemplates.length > 0 ? initialTemplates[0].id : ''),
         target_type: 'all',
         subscriber_group_id: '',
         action: 'draft',
@@ -47,6 +48,15 @@ export default function CampaignsCreate({ templates, groups, initialTemplateId }
         }
     };
 
+    const handleTemplateSaved = (newTemplate) => {
+        setTemplates((prev) => [newTemplate, ...prev.filter((t) => t.id !== newTemplate.id)]);
+        setData((prev) => ({
+            ...prev,
+            template_id: newTemplate.id,
+            subject: prev.subject || newTemplate.subject_template || '',
+        }));
+    };
+
     React.useEffect(() => {
         if (initialTemplateId && templates.length > 0) {
             const found = templates.find((t) => t.id == initialTemplateId);
@@ -59,7 +69,7 @@ export default function CampaignsCreate({ templates, groups, initialTemplateId }
                 }));
             }
         }
-    }, [initialTemplateId]);
+    }, [initialTemplateId, templates]);
 
     const insertTag = (tag) => {
         setData('content_html', data.content_html + ' ' + tag);
@@ -71,7 +81,7 @@ export default function CampaignsCreate({ templates, groups, initialTemplateId }
     };
 
     return (
-        <NewsletterLayout header="Create Newsletter Campaign">
+        <NewsletterLayout header="Create Newsletter Campaign" fullWidth={true}>
             <Head title="Create Campaign - Email Marketing Hub" />
 
             <div className="space-y-6">
@@ -231,6 +241,7 @@ export default function CampaignsCreate({ templates, groups, initialTemplateId }
                                 onChange={(html) => setData('content_html', html)}
                                 templates={templates}
                                 onSelectTemplate={handleTemplateSelect}
+                                onTemplateSaved={handleTemplateSaved}
                             />
                             {errors.content_html && <p className="text-xs text-rose-400 mt-1">{errors.content_html}</p>}
                         </div>

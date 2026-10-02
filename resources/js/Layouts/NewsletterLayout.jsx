@@ -18,7 +18,7 @@ import {
     ChevronDown,
 } from 'lucide-react';
 
-export default function NewsletterLayout({ children, header }) {
+export default function NewsletterLayout({ children, header, fullWidth = false }) {
     const { auth, flash } = usePage().props;
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -179,7 +179,7 @@ export default function NewsletterLayout({ children, header }) {
                 )}
 
                 {/* Page Content */}
-                <main className="p-4 sm:p-6 md:p-8 flex-1 max-w-7xl w-full mx-auto">
+                <main className={`p-4 sm:p-6 md:p-8 flex-1 w-full mx-auto ${fullWidth ? 'max-w-[1720px]' : 'max-w-7xl'}`}>
                     {children}
                 </main>
             </div>

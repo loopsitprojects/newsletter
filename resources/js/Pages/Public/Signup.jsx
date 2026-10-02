@@ -3,7 +3,7 @@ import { Head, useForm, usePage } from '@inertiajs/react';
 import { Mail, Check, Sparkles, Send, ShieldCheck, Heart } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-export default function PublicSignup({ groups }) {
+export default function PublicSignup({ groups = [] }) {
     const { flash } = usePage().props;
     const [submitted, setSubmitted] = useState(false);
 
@@ -11,7 +11,7 @@ export default function PublicSignup({ groups }) {
         email: '',
         first_name: '',
         last_name: '',
-        group_ids: groups.map((g) => g.id),
+        group_ids: (groups || []).map((g) => g.id),
     });
 
     const handleSubmit = (e) => {
@@ -98,47 +98,6 @@ export default function PublicSignup({ groups }) {
                                     />
                                 </div>
                             </div>
-
-                            {/* Interest Topics */}
-                            {groups.length > 0 && (
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-300 mb-3 uppercase tracking-wider">
-                                        Select Topics of Interest
-                                    </label>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                                        {groups.map((g) => {
-                                            const isChecked = data.group_ids.includes(g.id);
-                                            return (
-                                                <label
-                                                    key={g.id}
-                                                    className={`flex items-center space-x-3 p-3 rounded-2xl border cursor-pointer transition ${
-                                                        isChecked
-                                                            ? 'bg-indigo-600/10 border-indigo-500/40 text-white'
-                                                            : 'bg-slate-800/30 border-slate-800 text-slate-400 hover:border-slate-700'
-                                                    }`}
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={isChecked}
-                                                        onChange={(e) => {
-                                                            if (e.target.checked) {
-                                                                setData('group_ids', [...data.group_ids, g.id]);
-                                                            } else {
-                                                                setData(
-                                                                    'group_ids',
-                                                                    data.group_ids.filter((id) => id !== g.id)
-                                                                );
-                                                            }
-                                                        }}
-                                                        className="rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-0"
-                                                    />
-                                                    <span className="text-xs font-semibold">{g.name}</span>
-                                                </label>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            )}
 
                             <button
                                 type="submit"

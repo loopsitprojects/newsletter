@@ -400,4 +400,80 @@ class CampaignController extends Controller
 
         return $content;
     }
+
+    public function duplicate(Campaign $campaign, Request $request): RedirectResponse
+    {
+        $baseTitle = $campaign->title.' (Copy)';
+        $title = $baseTitle;
+        $counter = 1;
+        while (Campaign::where('title', $title)->exists()) {
+            $counter++;
+            $title = "{$campaign->title} (Copy {$counter})";
+        }
+
+        $newCampaign = Campaign::create([
+            'title' => $title,
+            'subject' => $campaign->subject,
+            'sender_name' => $campaign->sender_name,
+            'sender_email' => $campaign->sender_email,
+            'content_html' => $campaign->content_html,
+            'template_id' => $campaign->template_id,
+            'target_type' => $campaign->target_type,
+            'subscriber_group_id' => $campaign->subscriber_group_id,
+            'status' => 'draft',
+            'scheduled_at' => null,
+        ]);
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'campaign.created',
+            'description' => "Duplicated campaign '{$campaign->title}' into new draft '{$newCampaign->title}'",
+            'properties' => ['campaign_id' => $newCampaign->id, 'source_campaign_id' => $campaign->id],
+            'ip_address' => $request->ip(),
+        ]);
+
+        return redirect()->route('campaigns.edit', $newCampaign->id)->with('success', 'Campaign duplicated! You can edit this copy now.');
+    }
+
+    public function saveAsTemplate(Campaign $campaign, Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'nullable|string|max:255',
+            'category' => 'nullable|string|max:50',
+        ]);
+
+        $baseName = ! empty($validated['name']) ? trim($validated['name']) : ($campaign->title.' Template');
+        $name = $baseName;
+        $counter = 1;
+        while (EmailTemplate::where('name', $name)->exists()) {
+            $counter++;
+            $name = "{$baseName} ({$counter})";
+        }
+
+        $template = EmailTemplate::create([
+            'name' => $name,
+            'subject_template' => $campaign->subject,
+            'category' => $validated['category'] ?? 'newsletter',
+            'content_html' => $campaign->content_html,
+            'is_default' => false,
+        ]);
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'template.created',
+            'description' => "Saved campaign '{$campaign->title}' as template '{$template->name}'",
+            'properties' => ['template_id' => $template->id, 'campaign_id' => $campaign->id],
+            'ip_address' => $request->ip(),
+        ]);
+
+        if ($request->wantsJson() || $request->ajax() || $request->header('X-Inertia') === null && $request->acceptsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Campaign content saved as template '{$template->name}'!",
+                'template' => $template,
+            ]);
+        }
+
+        return redirect()->route('templates.index')->with('success', "Campaign content saved as template '{$template->name}'!");
+    }
 }

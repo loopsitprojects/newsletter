@@ -23,7 +23,7 @@ export default function TemplatesCreate() {
     };
 
     return (
-        <NewsletterLayout header="Create Email Template">
+        <NewsletterLayout header="Create Email Template" fullWidth={true}>
             <Head title="Create Template - Email Marketing Hub" />
 
             <div className="space-y-6">
@@ -47,9 +47,10 @@ export default function TemplatesCreate() {
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Top Row: Template Details & Options */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
                             <h3 className="text-base font-bold text-white border-b border-slate-800 pb-3">Template Info</h3>
 
                             <div>
@@ -91,40 +92,42 @@ export default function TemplatesCreate() {
                             </div>
                         </div>
 
-                        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
-                            <h3 className="text-base font-bold text-white flex items-center">
-                                <Sparkles className="h-4 w-4 mr-2 text-indigo-400" /> Visual Template Builder
-                            </h3>
-
-                            <VisualNewsletterEditor
-                                value={data.content_html}
-                                onChange={(html) => setData('content_html', html)}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-6">
-                        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
-                            <h3 className="text-base font-bold text-white">Options</h3>
-
-                            <label className="flex items-center space-x-3 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={data.is_default}
-                                    onChange={(e) => setData('is_default', e.target.checked)}
-                                    className="rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-0"
-                                />
-                                <span className="text-xs text-slate-300 font-semibold">Set as System Default Template</span>
-                            </label>
+                        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between space-y-4">
+                            <div>
+                                <h3 className="text-base font-bold text-white border-b border-slate-800 pb-3 mb-4">Template Options</h3>
+                                <label className="flex items-center space-x-3 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={data.is_default}
+                                        onChange={(e) => setData('is_default', e.target.checked)}
+                                        className="rounded bg-slate-800 border-slate-700 text-indigo-600 focus:ring-0"
+                                    />
+                                    <span className="text-xs text-slate-300 font-semibold">Set as System Default Template</span>
+                                </label>
+                            </div>
 
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/20"
+                                className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/20 transition"
                             >
-                                Save Template
+                                {processing ? 'Saving...' : 'Save Template'}
                             </button>
                         </div>
+                    </div>
+
+                    {/* Full-Width Visual Template Builder */}
+                    <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
+                        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h3 className="text-base font-bold text-white flex items-center">
+                                <Sparkles className="h-4 w-4 mr-2 text-indigo-400" /> Visual Email Template Builder
+                            </h3>
+                        </div>
+
+                        <VisualNewsletterEditor
+                            value={data.content_html}
+                            onChange={(html) => setData('content_html', html)}
+                        />
                     </div>
                 </form>
             </div>

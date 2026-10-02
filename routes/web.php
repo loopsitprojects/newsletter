@@ -79,11 +79,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/campaigns/{campaign}/process-batch', [CampaignController::class, 'processQueueBatch'])->name('campaigns.process-batch');
     Route::post('/campaigns/{campaign}/retry-failed', [CampaignController::class, 'retryFailed'])->name('campaigns.retry-failed');
     Route::post('/campaigns/{campaign}/cancel', [CampaignController::class, 'cancelSchedule'])->name('campaigns.cancel');
+    Route::post('/campaigns/{campaign}/duplicate', [CampaignController::class, 'duplicate'])->name('campaigns.duplicate');
+    Route::post('/campaigns/{campaign}/save-as-template', [CampaignController::class, 'saveAsTemplate'])->name('campaigns.save-as-template');
 
     // Template Management
     Route::get('/templates', [EmailTemplateController::class, 'index'])->name('templates.index');
     Route::get('/templates/create', [EmailTemplateController::class, 'create'])->name('templates.create');
     Route::post('/templates', [EmailTemplateController::class, 'store'])->name('templates.store');
+    Route::post('/templates/save-as-new', [EmailTemplateController::class, 'saveAsNew'])->name('templates.save-as-new');
+    Route::post('/templates/{template}/duplicate', [EmailTemplateController::class, 'duplicate'])->name('templates.duplicate');
     Route::get('/templates/{template}/edit', [EmailTemplateController::class, 'edit'])->name('templates.edit');
     Route::put('/templates/{template}', [EmailTemplateController::class, 'update'])->name('templates.update');
     Route::delete('/templates/{template}', [EmailTemplateController::class, 'destroy'])->name('templates.destroy');

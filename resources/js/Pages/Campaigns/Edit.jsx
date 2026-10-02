@@ -15,7 +15,8 @@ import {
     Check,
 } from 'lucide-react';
 
-export default function CampaignsEdit({ campaign, templates, groups }) {
+export default function CampaignsEdit({ campaign, templates: initialTemplates = [], groups }) {
+    const [templates, setTemplates] = useState(initialTemplates || []);
     const { data, setData, put, processing, errors } = useForm({
         title: campaign.title,
         subject: campaign.subject,
@@ -44,6 +45,15 @@ export default function CampaignsEdit({ campaign, templates, groups }) {
         }
     };
 
+    const handleTemplateSaved = (newTemplate) => {
+        setTemplates((prev) => [newTemplate, ...prev.filter((t) => t.id !== newTemplate.id)]);
+        setData((prev) => ({
+            ...prev,
+            template_id: newTemplate.id,
+            subject: prev.subject || newTemplate.subject_template || '',
+        }));
+    };
+
     const insertTag = (tag) => {
         setData('content_html', data.content_html + ' ' + tag);
     };
@@ -54,7 +64,7 @@ export default function CampaignsEdit({ campaign, templates, groups }) {
     };
 
     return (
-        <NewsletterLayout header="Edit Campaign Draft">
+        <NewsletterLayout header="Edit Campaign Draft" fullWidth={true}>
             <Head title={`Edit ${campaign.title} - Email Marketing Hub`} />
 
             <div className="space-y-6">
@@ -205,6 +215,7 @@ export default function CampaignsEdit({ campaign, templates, groups }) {
                                 onChange={(html) => setData('content_html', html)}
                                 templates={templates}
                                 onSelectTemplate={handleTemplateSelect}
+                                onTemplateSaved={handleTemplateSaved}
                             />
                         </div>
                     </div>
