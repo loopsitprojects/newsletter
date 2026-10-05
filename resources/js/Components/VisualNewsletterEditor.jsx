@@ -169,61 +169,29 @@ const compileHtml = (f) => {
         img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
 
         /* Featured 2-Column Equal Fixed Size */
-        .featured-grid-table { width: 100% !important; }
-        .featured-grid-row { display: flex !important; align-items: stretch !important; }
-        .featured-grid-row > .col-left,
-        .featured-grid-row > .col-right {
-            display: flex !important;
-            flex-direction: column !important;
-            flex: 1 1 50% !important;
-            width: 50% !important;
-            box-sizing: border-box !important;
-        }
+        .featured-grid-table { width: 100% !important; border-collapse: separate !important; }
         .featured-card {
-            display: flex !important;
-            flex-direction: column !important;
-            flex: 1 1 100% !important;
-            height: 100% !important;
             width: 100% !important;
-            box-sizing: border-box !important;
             background-color: #ffffff;
+            border-collapse: separate !important;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
         }
-        .featured-card > tbody {
-            display: flex !important;
-            flex-direction: column !important;
-            flex: 1 1 100% !important;
-            height: 100% !important;
+        .featured-card-img-td {
+            padding: 0 !important;
+            line-height: 0 !important;
+            font-size: 0 !important;
+            background-color: #f1f3f7;
+        }
+        .featured-col-img {
             width: 100% !important;
-        }
-        .featured-card-img-tr {
+            max-width: 100% !important;
+            height: 210px !important;
+            max-height: 210px !important;
+            object-fit: cover !important;
             display: block !important;
-            flex-shrink: 0 !important;
-            width: 100% !important;
+            border: 0 !important;
         }
-        .featured-card-body-tr {
-            display: flex !important;
-            flex-direction: column !important;
-            flex: 1 1 auto !important;
-            width: 100% !important;
-        }
-        .featured-card-body-td {
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: space-between !important;
-            flex: 1 1 auto !important;
-            box-sizing: border-box !important;
-            width: 100% !important;
-            height: 100% !important;
-        }
-        .featured-card-content {
-            display: block !important;
-        }
-        .featured-card-action {
-            display: block !important;
-            margin-top: auto !important;
-            padding-top: 18px !important;
-        }
-
         .social-icon-btn {
             display: inline-block !important;
             width: 34px !important;
@@ -231,11 +199,13 @@ const compileHtml = (f) => {
             line-height: 34px !important;
             text-align: center !important;
             vertical-align: middle !important;
+            border-radius: 50% !important;
         }
-        .social-icon-btn svg {
+        .social-icon-btn img {
             vertical-align: middle !important;
             display: inline-block !important;
             margin-top: -2px !important;
+            border: 0 !important;
         }
 
         @media only screen and (max-width: 620px) {
@@ -248,13 +218,7 @@ const compileHtml = (f) => {
             .mobile-cta-cell { display: inline-block !important; padding: 4px !important; }
             .card-spacer { display: none !important; }
             .card-item { margin-bottom: 16px !important; }
-            .col-left, .col-right { padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 20px !important; width: 100% !important; flex: none !important; }
-            .featured-grid-row { display: block !important; }
-            .featured-card { display: table !important; height: auto !important; min-height: 0 !important; }
-            .featured-card > tbody { display: table-row-group !important; height: auto !important; }
-            .featured-card-img-tr { display: table-row !important; }
-            .featured-card-body-tr { display: table-row !important; }
-            .featured-card-body-td { display: table-cell !important; height: auto !important; }
+            .col-left, .col-right { padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 20px !important; width: 100% !important; display: block !important; }
             .featured-col-img { width: 100% !important; height: 210px !important; object-fit: cover !important; }
         }
     </style>
@@ -368,16 +332,16 @@ const compileHtml = (f) => {
                                     const cardHeightStyle = `min-height: ${cardHeightVal};`;
 
                                     return `
-                            <table class="featured-card" data-featured-card="true" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; height: 100%; ${cardHeightStyle} box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+                            <table class="featured-card" data-featured-card="true" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; border-collapse: separate; height: 100%; ${cardHeightStyle} box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
                                 <tbody>
                                     ${item.image ? `
                                     <tr class="featured-card-img-tr">
-                                        <td style="padding: 0; line-height: 0; background-color: #f1f3f7;">
-                                            <img class="mobile-img featured-col-img" src="${escapeHtml(cleanUrl(item.image))}" alt="${escapeHtml(item.title || 'Featured Image')}" width="${Math.floor((maxWidth - 72 - 24) / 2)}" style="width: 100%; height: 210px; max-height: 210px; object-fit: cover; display: block; border: 0;" />
+                                        <td class="featured-card-img-td" style="padding: 0; margin: 0; line-height: 0; font-size: 0; background-color: #f1f3f7;" align="center">
+                                            <img class="mobile-img featured-col-img" src="${escapeHtml(cleanUrl(item.image))}" alt="${escapeHtml(item.title || 'Featured Image')}" width="${Math.floor((maxWidth - 72 - 24) / 2)}" style="width: 100%; max-width: 100%; height: 210px; max-height: 210px; object-fit: cover; display: block; border: 0;" />
                                         </td>
                                     </tr>` : ''}
                                     <tr class="featured-card-body-tr">
-                                        <td valign="top" style="padding: 24px 22px 26px 22px;" class="mobile-padding featured-card-body-td">
+                                        <td valign="top" style="padding: 24px 22px 26px 22px; vertical-align: top;" class="mobile-padding featured-card-body-td">
                                             <div class="featured-card-content">
                                                 ${renderBadge(item, idx)}
                                                 ${item.title ? `
@@ -444,11 +408,11 @@ const compileHtml = (f) => {
                                     if (pair.length === 2) {
                                         return `
                             <table class="featured-grid-table" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="${pIdx > 0 ? 'margin-top: 24px;' : ''}">
-                                <tr class="featured-grid-row">
-                                    <td class="mobile-stack col-left" width="50%" valign="top" style="padding-right: 12px; padding-bottom: 0;">
+                                <tr>
+                                    <td class="mobile-stack col-left" width="50%" valign="top" style="width: 50%; padding-right: 12px; padding-bottom: 0; vertical-align: top;">
                                         ${renderColumnCard(pair[0], pIdx * 2)}
                                     </td>
-                                    <td class="mobile-stack col-right" width="50%" valign="top" style="padding-left: 12px; padding-bottom: 0;">
+                                    <td class="mobile-stack col-right" width="50%" valign="top" style="width: 50%; padding-left: 12px; padding-bottom: 0; vertical-align: top;">
                                         ${renderColumnCard(pair[1], pIdx * 2 + 1)}
                                     </td>
                                 </tr>
@@ -456,12 +420,12 @@ const compileHtml = (f) => {
                                     } else {
                                         return `
                             <table class="featured-grid-table" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="${pIdx > 0 ? 'margin-top: 24px;' : ''}">
-                                <tr class="featured-grid-row">
-                                    <td class="mobile-stack col-left" width="${items.length === 1 ? '100%' : '50%'}" valign="top" style="${items.length === 1 ? '' : 'padding-right: 12px;'}">
+                                <tr>
+                                    <td class="mobile-stack col-left" width="${items.length === 1 ? '100%' : '50%'}" valign="top" style="${items.length === 1 ? 'width: 100%;' : 'width: 50%; padding-right: 12px;'} vertical-align: top;">
                                         ${renderColumnCard(pair[0], pIdx * 2)}
                                     </td>
                                     ${items.length > 1 ? `
-                                    <td class="mobile-stack col-right" width="50%" valign="top" style="padding-left: 12px;">
+                                    <td class="mobile-stack col-right" width="50%" valign="top" style="width: 50%; padding-left: 12px; vertical-align: top;">
                                     </td>` : ''}
                                 </tr>
                             </table>`;
@@ -526,11 +490,11 @@ const compileHtml = (f) => {
 
                             <!-- Social Links -->
                             <div style="margin: 18px 0 16px 0;">
-                                ${f.facebookUrl ? `<a href="${escapeHtml(cleanUrl(f.facebookUrl))}" target="_blank" class="social-icon-btn" title="Facebook" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; vertical-align: middle; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>` : ''}
-                                ${f.linkedinUrl ? `<a href="${escapeHtml(cleanUrl(f.linkedinUrl))}" target="_blank" class="social-icon-btn" title="LinkedIn" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; vertical-align: middle; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>` : ''}
-                                ${f.instagramUrl ? `<a href="${escapeHtml(cleanUrl(f.instagramUrl))}" target="_blank" class="social-icon-btn" title="Instagram" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; vertical-align: middle; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg></a>` : ''}
-                                ${f.tiktokUrl ? `<a href="${escapeHtml(cleanUrl(f.tiktokUrl))}" target="_blank" class="social-icon-btn" title="TikTok" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; vertical-align: middle; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg></a>` : ''}
-                                ${f.youtubeUrl ? `<a href="${escapeHtml(cleanUrl(f.youtubeUrl))}" target="_blank" class="social-icon-btn" title="YouTube" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; vertical-align: middle; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path><polygon points="10 15 15 12 10 9" fill="currentColor"></polygon></svg></a>` : ''}
+                                ${f.facebookUrl ? `<a href="${escapeHtml(cleanUrl(f.facebookUrl))}" target="_blank" class="social-icon-btn" title="Facebook" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; vertical-align: middle; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"><img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/facebook.png" width="16" height="16" alt="Facebook" style="width: 16px; height: 16px; vertical-align: middle; display: inline-block; border: 0; margin-top: -2px;" /></a>` : ''}
+                                ${f.linkedinUrl ? `<a href="${escapeHtml(cleanUrl(f.linkedinUrl))}" target="_blank" class="social-icon-btn" title="LinkedIn" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; vertical-align: middle; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"><img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/linkedin.png" width="16" height="16" alt="LinkedIn" style="width: 16px; height: 16px; vertical-align: middle; display: inline-block; border: 0; margin-top: -2px;" /></a>` : ''}
+                                ${f.instagramUrl ? `<a href="${escapeHtml(cleanUrl(f.instagramUrl))}" target="_blank" class="social-icon-btn" title="Instagram" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; vertical-align: middle; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"><img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/instagram.png" width="16" height="16" alt="Instagram" style="width: 16px; height: 16px; vertical-align: middle; display: inline-block; border: 0; margin-top: -2px;" /></a>` : ''}
+                                ${f.tiktokUrl ? `<a href="${escapeHtml(cleanUrl(f.tiktokUrl))}" target="_blank" class="social-icon-btn" title="TikTok" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; vertical-align: middle; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"><img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/tiktok.png" width="16" height="16" alt="TikTok" style="width: 16px; height: 16px; vertical-align: middle; display: inline-block; border: 0; margin-top: -2px;" /></a>` : ''}
+                                ${f.youtubeUrl ? `<a href="${escapeHtml(cleanUrl(f.youtubeUrl))}" target="_blank" class="social-icon-btn" title="YouTube" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; vertical-align: middle; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"><img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/youtube.png" width="16" height="16" alt="YouTube" style="width: 16px; height: 16px; vertical-align: middle; display: inline-block; border: 0; margin-top: -2px;" /></a>` : ''}
                             </div>
 
 

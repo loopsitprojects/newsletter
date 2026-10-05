@@ -41,6 +41,43 @@ class NewsletterMailable extends Mailable
         $appBaseUrl = rtrim(config('app.url', url('/')), '/');
         $html = preg_replace('#(src|href)=[\'"]/(favicon\.png|(?:images/)?loops-logo-(?:white|dark)\.png)[\'"]#i', '$1="'.$appBaseUrl.'/$2"', $html);
 
+        // Normalize social icons: convert local or legacy SVGs to email-safe CDN PNG images
+        $socialCdnMap = [
+            'facebook' => 'https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/facebook.png',
+            'linkedin' => 'https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/linkedin.png',
+            'instagram' => 'https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/instagram.png',
+            'tiktok' => 'https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/tiktok.png',
+            'youtube' => 'https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/youtube.png',
+        ];
+
+        // Replace any relative /images/social/... or localhost /images/social/... with public CDN URLs for reliable email client rendering
+        foreach ($socialCdnMap as $platform => $cdnUrl) {
+            $html = preg_replace(
+                '#(?:https?://(?:127\.0\.0\.1|localhost)(?::\d+)?)?/images/social/'.$platform.'\.png#i',
+                $cdnUrl,
+                $html
+            );
+
+            // Replace legacy inline SVGs inside social links with email-safe PNG <img> tags
+            $html = preg_replace_callback(
+                '#(<a\b[^>]*?(?:href|title)=["\'][^"\']*?'.$platform.'[^"\']*?["\'][^>]*?>)\s*<svg\b[^>]*?>.*?</svg>\s*(</a>)#is',
+                function ($matches) use ($cdnUrl, $platform) {
+                    $imgTag = '<img src="'.$cdnUrl.'" width="16" height="16" alt="'.ucfirst($platform).'" style="width: 16px; height: 16px; vertical-align: middle; display: inline-block; border: 0; margin-top: -2px;" />';
+
+                    return $matches[1].$imgTag.$matches[2];
+                },
+                $html
+            );
+        }
+
+        // Clean legacy flexbox styles from table elements if present in older saved campaigns
+        $html = preg_replace('#\.featured-grid-row\s*\{\s*display:\s*flex[^}]*\}#i', '', $html);
+        $html = preg_replace('#\.featured-card\s*\{\s*display:\s*flex[^}]*\}#i', '.featured-card { width: 100% !important; background-color: #ffffff; border-collapse: separate !important; }', $html);
+        $html = preg_replace('#\.featured-card\s*>\s*tbody\s*\{[^}]*\}#i', '', $html);
+        $html = preg_replace('#\.featured-card-img-tr\s*\{[^}]*\}#i', '', $html);
+        $html = preg_replace('#\.featured-card-body-tr\s*\{[^}]*\}#i', '', $html);
+        $html = preg_replace('#\.featured-card-body-td\s*\{\s*display:\s*flex[^}]*\}#i', '', $html);
+
         // Perform variable replacement
         $firstName = $subscriber->first_name ?: 'Subscriber';
         $lastName = $subscriber->last_name ?: '';
