@@ -1,8 +1,15 @@
 import React from 'react';
+import { Facebook, Linkedin, Instagram, Youtube } from 'lucide-react';
 
 function cn(...classes) {
     return classes.filter(Boolean).join(' ');
 }
+
+const TikTokIcon = ({ className }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+    </svg>
+);
 
 const Logo = ({
     light = false,
@@ -85,6 +92,11 @@ export default function MeridianNewsletter({
     companyAddress = '',
     companyContact = '',
     unsubscribeUrl = '#',
+    facebookUrl = 'https://facebook.com',
+    linkedinUrl = 'https://linkedin.com',
+    instagramUrl = 'https://instagram.com',
+    tiktokUrl = 'https://tiktok.com',
+    youtubeUrl = 'https://youtube.com',
 }) {
     const px = mobile ? 'px-5' : 'px-10';
 
@@ -151,7 +163,7 @@ export default function MeridianNewsletter({
                 <div className={cn(
                     featuredLayout === 'rows'
                         ? 'space-y-6'
-                        : 'grid grid-cols-1 md:grid-cols-2 gap-6'
+                        : 'grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch'
                 )}>
                     {items.map((item, idx) => {
                         const badgeStyles = [
@@ -211,7 +223,7 @@ export default function MeridianNewsletter({
                         return (
                             <div
                                 key={idx}
-                                className="overflow-hidden rounded-2xl bg-white border border-[#e2e4ea] flex flex-col justify-between shadow-sm"
+                                className="overflow-hidden rounded-2xl bg-white border border-[#e2e4ea] flex flex-col justify-between shadow-sm h-full"
                             >
                                 {item.image && (
                                     <img
@@ -220,7 +232,7 @@ export default function MeridianNewsletter({
                                         width={640}
                                         height={400}
                                         loading="lazy"
-                                        className="h-52 w-full object-cover"
+                                        className="h-52 w-full object-cover shrink-0"
                                     />
                                 )}
                                 <div className="p-6 flex flex-col flex-1 justify-between">
@@ -295,13 +307,22 @@ export default function MeridianNewsletter({
                     </p>
                 )}
                 <div className="mt-5 flex justify-center gap-2.5">
-                    {['f', 'in', 'ig', 'tt', '▶'].map((s) => (
+                    {[
+                        { id: 'facebook', icon: Facebook, label: 'Facebook', href: facebookUrl || '#' },
+                        { id: 'linkedin', icon: Linkedin, label: 'LinkedIn', href: linkedinUrl || '#' },
+                        { id: 'instagram', icon: Instagram, label: 'Instagram', href: instagramUrl || '#' },
+                        { id: 'tiktok', icon: TikTokIcon, label: 'TikTok', href: tiktokUrl || '#' },
+                        { id: 'youtube', icon: Youtube, label: 'YouTube', href: youtubeUrl || '#' },
+                    ].map(({ id, icon: Icon, label, href }) => (
                         <a
-                            key={s}
-                            href="#"
-                            className="grid h-8 w-8 place-items-center rounded-full bg-white border border-[#e2e4ea] text-xs font-bold text-[#0057c5] shadow-xs hover:border-[#0057c5]"
+                            key={id}
+                            href={href}
+                            title={label}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="grid h-8 w-8 place-items-center rounded-full bg-white border border-[#e2e4ea] text-[#0057c5] shadow-xs hover:border-[#0057c5] hover:text-[#0057c5] transition"
                         >
-                            {s}
+                            <Icon className="h-4 w-4" />
                         </a>
                     ))}
                 </div>

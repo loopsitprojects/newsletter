@@ -58,6 +58,7 @@ const defaultFields = {
     introText: "Here are the latest updates, highlights and news from our team. It's been a busy month — we hope you enjoy what we've been working on.",
     showFeatured: true,
     featuredLayout: 'columns',
+    featuredCardHeight: '560',
     featuredItems: [
         {
             badge: 'Featured',
@@ -166,6 +167,77 @@ const compileHtml = (f) => {
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
         img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+
+        /* Featured 2-Column Equal Fixed Size */
+        .featured-grid-table { width: 100% !important; }
+        .featured-grid-row { display: flex !important; align-items: stretch !important; }
+        .featured-grid-row > .col-left,
+        .featured-grid-row > .col-right {
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 1 50% !important;
+            width: 50% !important;
+            box-sizing: border-box !important;
+        }
+        .featured-card {
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 1 100% !important;
+            height: 100% !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            background-color: #ffffff;
+        }
+        .featured-card > tbody {
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 1 100% !important;
+            height: 100% !important;
+            width: 100% !important;
+        }
+        .featured-card-img-tr {
+            display: block !important;
+            flex-shrink: 0 !important;
+            width: 100% !important;
+        }
+        .featured-card-body-tr {
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 1 auto !important;
+            width: 100% !important;
+        }
+        .featured-card-body-td {
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            flex: 1 1 auto !important;
+            box-sizing: border-box !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+        .featured-card-content {
+            display: block !important;
+        }
+        .featured-card-action {
+            display: block !important;
+            margin-top: auto !important;
+            padding-top: 18px !important;
+        }
+
+        .social-icon-btn {
+            display: inline-block !important;
+            width: 34px !important;
+            height: 34px !important;
+            line-height: 34px !important;
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+        .social-icon-btn svg {
+            vertical-align: middle !important;
+            display: inline-block !important;
+            margin-top: -2px !important;
+        }
+
         @media only screen and (max-width: 620px) {
             .container-table { width: 100% !important; max-width: 100% !important; }
             .mobile-padding { padding-left: 20px !important; padding-right: 20px !important; }
@@ -176,7 +248,13 @@ const compileHtml = (f) => {
             .mobile-cta-cell { display: inline-block !important; padding: 4px !important; }
             .card-spacer { display: none !important; }
             .card-item { margin-bottom: 16px !important; }
-            .col-left, .col-right { padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 20px !important; }
+            .col-left, .col-right { padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 20px !important; width: 100% !important; flex: none !important; }
+            .featured-grid-row { display: block !important; }
+            .featured-card { display: table !important; height: auto !important; min-height: 0 !important; }
+            .featured-card > tbody { display: table-row-group !important; height: auto !important; }
+            .featured-card-img-tr { display: table-row !important; }
+            .featured-card-body-tr { display: table-row !important; }
+            .featured-card-body-td { display: table-cell !important; height: auto !important; }
             .featured-col-img { width: 100% !important; height: 210px !important; object-fit: cover !important; }
         }
     </style>
@@ -263,7 +341,7 @@ const compileHtml = (f) => {
                     <!-- Featured Section -->
                     ${(f.showFeatured !== false && getFeaturedItems(f).length > 0) ? `
                     <tr>
-                        <td style="background-color: #f5f7fb; padding: 32px 36px;" class="mobile-padding" data-featured-layout="${(f.featuredLayout || 'columns') !== 'rows' ? 'columns' : 'rows'}">
+                        <td style="background-color: #f5f7fb; padding: 32px 36px;" class="mobile-padding" data-featured-layout="${(f.featuredLayout || 'columns') !== 'rows' ? 'columns' : 'rows'}" data-featured-card-height="${f.featuredCardHeight || '560'}">
                             ${(() => {
                                 const items = getFeaturedItems(f);
                                 const isColumns = (f.featuredLayout || 'columns') !== 'rows';
@@ -284,33 +362,42 @@ const compileHtml = (f) => {
                                 };
 
                                 const renderColumnCard = (item, idx) => {
+                                    const cardHeightVal = (f.featuredCardHeight && f.featuredCardHeight !== 'auto')
+                                        ? `${parseInt(f.featuredCardHeight, 10)}px`
+                                        : '560px';
+                                    const cardHeightStyle = `min-height: ${cardHeightVal};`;
+
                                     return `
-                            <table class="featured-card" data-featured-card="true" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; height: 100%; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
-                                ${item.image ? `
-                                <tr>
-                                    <td style="padding: 0; line-height: 0; background-color: #f1f3f7;">
-                                        <img class="mobile-img featured-col-img" src="${escapeHtml(cleanUrl(item.image))}" alt="${escapeHtml(item.title || 'Featured Image')}" width="${Math.floor((maxWidth - 72 - 24) / 2)}" style="width: 100%; height: 210px; object-fit: cover; display: block; border: 0;" />
-                                    </td>
-                                </tr>` : ''}
-                                <tr>
-                                    <td valign="top" style="padding: 24px 22px 26px 22px;" class="mobile-padding">
-                                        ${renderBadge(item, idx)}
-                                        ${item.title ? `
-                                        <h2 style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 20px; font-weight: 700; color: #151a29; line-height: 1.35;">
-                                            ${escapeHtml(item.title)}
-                                        </h2>` : ''}
-                                        ${item.text ? `
-                                        <p style="margin: 10px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.6;">
-                                            ${escapeHtml(item.text)}
-                                        </p>` : ''}
-                                        ${item.linkText ? `
-                                        <div style="margin-top: 18px;">
-                                            <a href="${escapeHtml(cleanUrl(item.linkUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: ${brandColor}; text-decoration: none; display: inline-block;">
-                                                ${escapeHtml(item.linkText)}
-                                            </a>
-                                        </div>` : ''}
-                                    </td>
-                                </tr>
+                            <table class="featured-card" data-featured-card="true" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; height: 100%; ${cardHeightStyle} box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+                                <tbody>
+                                    ${item.image ? `
+                                    <tr class="featured-card-img-tr">
+                                        <td style="padding: 0; line-height: 0; background-color: #f1f3f7;">
+                                            <img class="mobile-img featured-col-img" src="${escapeHtml(cleanUrl(item.image))}" alt="${escapeHtml(item.title || 'Featured Image')}" width="${Math.floor((maxWidth - 72 - 24) / 2)}" style="width: 100%; height: 210px; max-height: 210px; object-fit: cover; display: block; border: 0;" />
+                                        </td>
+                                    </tr>` : ''}
+                                    <tr class="featured-card-body-tr">
+                                        <td valign="top" style="padding: 24px 22px 26px 22px;" class="mobile-padding featured-card-body-td">
+                                            <div class="featured-card-content">
+                                                ${renderBadge(item, idx)}
+                                                ${item.title ? `
+                                                <h2 style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 20px; font-weight: 700; color: #151a29; line-height: 1.35;">
+                                                    ${escapeHtml(item.title)}
+                                                </h2>` : ''}
+                                                ${item.text ? `
+                                                <p style="margin: 10px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.6;">
+                                                    ${escapeHtml(item.text)}
+                                                </p>` : ''}
+                                            </div>
+                                            ${item.linkText ? `
+                                            <div class="featured-card-action" style="margin-top: 18px; padding-top: 4px;">
+                                                <a href="${escapeHtml(cleanUrl(item.linkUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: ${brandColor}; text-decoration: none; display: inline-block;">
+                                                    ${escapeHtml(item.linkText)}
+                                                </a>
+                                            </div>` : ''}
+                                        </td>
+                                    </tr>
+                                </tbody>
                             </table>`;
                                 };
 
@@ -356,8 +443,8 @@ const compileHtml = (f) => {
                                 return pairs.map((pair, pIdx) => {
                                     if (pair.length === 2) {
                                         return `
-                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="${pIdx > 0 ? 'margin-top: 24px;' : ''}">
-                                <tr>
+                            <table class="featured-grid-table" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="${pIdx > 0 ? 'margin-top: 24px;' : ''}">
+                                <tr class="featured-grid-row">
                                     <td class="mobile-stack col-left" width="50%" valign="top" style="padding-right: 12px; padding-bottom: 0;">
                                         ${renderColumnCard(pair[0], pIdx * 2)}
                                     </td>
@@ -368,8 +455,8 @@ const compileHtml = (f) => {
                             </table>`;
                                     } else {
                                         return `
-                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="${pIdx > 0 ? 'margin-top: 24px;' : ''}">
-                                <tr>
+                            <table class="featured-grid-table" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="${pIdx > 0 ? 'margin-top: 24px;' : ''}">
+                                <tr class="featured-grid-row">
                                     <td class="mobile-stack col-left" width="${items.length === 1 ? '100%' : '50%'}" valign="top" style="${items.length === 1 ? '' : 'padding-right: 12px;'}">
                                         ${renderColumnCard(pair[0], pIdx * 2)}
                                     </td>
@@ -439,11 +526,11 @@ const compileHtml = (f) => {
 
                             <!-- Social Links -->
                             <div style="margin: 18px 0 16px 0;">
-                                ${f.facebookUrl ? `<a href="${escapeHtml(cleanUrl(f.facebookUrl))}" target="_blank" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: bold; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">f</a>` : ''}
-                                ${f.linkedinUrl ? `<a href="${escapeHtml(cleanUrl(f.linkedinUrl))}" target="_blank" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: bold; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">in</a>` : ''}
-                                ${f.instagramUrl ? `<a href="${escapeHtml(cleanUrl(f.instagramUrl))}" target="_blank" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: bold; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">ig</a>` : ''}
-                                ${f.tiktokUrl ? `<a href="${escapeHtml(cleanUrl(f.tiktokUrl))}" target="_blank" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: bold; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">tt</a>` : ''}
-                                ${f.youtubeUrl ? `<a href="${escapeHtml(cleanUrl(f.youtubeUrl))}" target="_blank" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: bold; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">&#9654;</a>` : ''}
+                                ${f.facebookUrl ? `<a href="${escapeHtml(cleanUrl(f.facebookUrl))}" target="_blank" class="social-icon-btn" title="Facebook" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; vertical-align: middle; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>` : ''}
+                                ${f.linkedinUrl ? `<a href="${escapeHtml(cleanUrl(f.linkedinUrl))}" target="_blank" class="social-icon-btn" title="LinkedIn" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; vertical-align: middle; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>` : ''}
+                                ${f.instagramUrl ? `<a href="${escapeHtml(cleanUrl(f.instagramUrl))}" target="_blank" class="social-icon-btn" title="Instagram" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; vertical-align: middle; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg></a>` : ''}
+                                ${f.tiktokUrl ? `<a href="${escapeHtml(cleanUrl(f.tiktokUrl))}" target="_blank" class="social-icon-btn" title="TikTok" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; vertical-align: middle; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg></a>` : ''}
+                                ${f.youtubeUrl ? `<a href="${escapeHtml(cleanUrl(f.youtubeUrl))}" target="_blank" class="social-icon-btn" title="YouTube" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; vertical-align: middle; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; color: ${brandColor}; text-decoration: none; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path><polygon points="10 15 15 12 10 9" fill="currentColor"></polygon></svg></a>` : ''}
                             </div>
 
 
@@ -564,6 +651,16 @@ const extractFieldsFromHtml = (htmlStr) => {
         let detectedFeaturedLayout = 'columns';
         if (layoutAttr === 'rows' || (layoutAttr !== 'columns' && !hasColClasses && featuredTables.length > 1 && !doc.querySelector('table.featured-card'))) {
             detectedFeaturedLayout = 'rows';
+        }
+
+        const heightAttr = doc.querySelector('[data-featured-card-height]')?.getAttribute('data-featured-card-height');
+        let detectedFeaturedCardHeight = heightAttr || '560';
+        if (!heightAttr) {
+            const cardWithMinHeight = doc.querySelector('table.featured-card[style*="min-height"]');
+            if (cardWithMinHeight) {
+                const matchH = cardWithMinHeight.getAttribute('style')?.match(/min-height:\s*(\d+)px/i);
+                if (matchH && matchH[1]) detectedFeaturedCardHeight = matchH[1];
+            }
         }
 
         let featuredItems = [];
@@ -726,6 +823,7 @@ const extractFieldsFromHtml = (htmlStr) => {
             introText: introText || defaultFields.introText,
             showFeatured: showFeatured,
             featuredLayout: detectedFeaturedLayout || 'columns',
+            featuredCardHeight: detectedFeaturedCardHeight || defaultFields.featuredCardHeight || '560',
             featuredItems: featuredItems.length > 0 ? featuredItems : defaultFields.featuredItems,
             featuredBadge: featuredItems[0]?.badge || defaultFields.featuredBadge,
             featuredTitle: featuredItems[0]?.title || defaultFields.featuredTitle,
@@ -1435,6 +1533,58 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                                     <span>1 Column (Full Width Rows)</span>
                                                 </button>
                                             </div>
+
+                                            {/* Box / Card Fixed Height Controls */}
+                                            {(fields.featuredLayout || 'columns') !== 'rows' && (
+                                                <div className="mt-3 pt-3 border-t border-slate-800">
+                                                    <div className="flex items-center justify-between mb-1.5">
+                                                        <label className="text-[10px] text-slate-400 font-semibold flex items-center">
+                                                            Card Box Height (Fixed Size)
+                                                        </label>
+                                                        <span className="text-[10px] font-mono text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">
+                                                            {fields.featuredCardHeight === 'auto' ? 'Auto Equal' : `${fields.featuredCardHeight || '560'}px fixed`}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        {[
+                                                            { label: 'Auto Equal', val: 'auto' },
+                                                            { label: 'Compact', val: '500' },
+                                                            { label: 'Standard', val: '560' },
+                                                            { label: 'Tall', val: '620' },
+                                                        ].map(({ label, val }) => (
+                                                            <button
+                                                                key={val}
+                                                                type="button"
+                                                                onClick={() => updateField('featuredCardHeight', val)}
+                                                                className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition ${
+                                                                    (fields.featuredCardHeight || '560') === val
+                                                                        ? 'bg-indigo-600 text-white shadow-sm'
+                                                                        : 'bg-slate-800 text-slate-400 hover:text-white'
+                                                                }`}
+                                                            >
+                                                                {label}
+                                                            </button>
+                                                        ))}
+                                                        <div className="flex items-center pl-1 border-l border-slate-800">
+                                                            <input
+                                                                type="number"
+                                                                min="380"
+                                                                max="900"
+                                                                step="10"
+                                                                value={fields.featuredCardHeight === 'auto' ? '' : (fields.featuredCardHeight || '560')}
+                                                                placeholder="px"
+                                                                onChange={(e) => updateField('featuredCardHeight', e.target.value || 'auto')}
+                                                                className="w-14 bg-slate-800 border border-slate-700 rounded-lg px-1.5 py-1 text-xs text-white text-center font-mono font-bold"
+                                                                title="Custom Box Height (px)"
+                                                            />
+                                                            <span className="text-[10px] text-slate-400 ml-1 font-semibold">px</span>
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-[10px] text-slate-500 mt-1">
+                                                        Locks both cards to identical equal height with action links aligned at the bottom.
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
                                         {featuredItemsList.map((item, idx) => (
                                             <div key={idx} className="bg-slate-800/40 border border-slate-700/60 rounded-xl p-3 space-y-2.5">
@@ -1764,7 +1914,27 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                         .replace(/\{\{first_name\}\}/g, 'Sarah')
                                         .replace(/\{\{email\}\}/g, 'sarah.dev@example.com')
                                         .replace(/\{\{company_name\}\}/g, fields.companyName || 'Loops Integrated')
-                                        .replace(/\{\{unsubscribe_url\}\}/g, '#'),
+                                        .replace(/\{\{unsubscribe_url\}\}/g, '#')
+                                        .replace(
+                                            /<a([^>]*href="[^"]*instagram[^"]*"[^>]*)>ig<\/a>/gi,
+                                            `<a$1><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg></a>`
+                                        )
+                                        .replace(
+                                            /<a([^>]*href="[^"]*facebook[^"]*"[^>]*)>f<\/a>/gi,
+                                            `<a$1><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>`
+                                        )
+                                        .replace(
+                                            /<a([^>]*href="[^"]*linkedin[^"]*"[^>]*)>in<\/a>/gi,
+                                            `<a$1><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>`
+                                        )
+                                        .replace(
+                                            /<a([^>]*href="[^"]*tiktok[^"]*"[^>]*)>tt<\/a>/gi,
+                                            `<a$1><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg></a>`
+                                        )
+                                        .replace(
+                                            /<a([^>]*href="[^"]*youtube[^"]*"[^>]*)>(?:&#9654;|▶)<\/a>/gi,
+                                            `<a$1><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path><polygon points="10 15 15 12 10 9" fill="currentColor"></polygon></svg></a>`
+                                        ),
                                 }}
                             />
                         </div>
