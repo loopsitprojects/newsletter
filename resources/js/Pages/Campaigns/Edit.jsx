@@ -19,7 +19,7 @@ import {
 
 export default function CampaignsEdit({ campaign, templates: initialTemplates = [], groups }) {
     const [templates, setTemplates] = useState(initialTemplates || []);
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, put, processing, errors, transform } = useForm({
         title: campaign.title,
         subject: campaign.subject,
         sender_name: campaign.sender_name || 'Loops Marketing',
@@ -71,6 +71,10 @@ export default function CampaignsEdit({ campaign, templates: initialTemplates = 
 
     const handleSubmit = (actionType) => {
         setData('action', actionType);
+        transform((prevData) => ({
+            ...prevData,
+            action: actionType,
+        }));
         put(route('campaigns.update', campaign.id));
     };
 

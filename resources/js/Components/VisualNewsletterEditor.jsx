@@ -60,7 +60,7 @@ const defaultFields = {
     introText: "Here are the latest updates, highlights and news from our team. It's been a busy month — we hope you enjoy what we've been working on.",
     showFeatured: true,
     featuredLayout: 'columns',
-    featuredCardHeight: '460',
+    featuredCardHeight: '400',
     featuredLinkAlign: 'flow',
     featuredItems: [
         {
@@ -178,17 +178,14 @@ const compileHtml = (f) => {
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
         img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
 
-        /* Featured 2-Column Equal Fixed Size */
-        .featured-grid-table { width: 100% !important; height: 100% !important; border-collapse: separate !important; }
-        .featured-grid-row { height: 100% !important; }
+        /* Featured 2-Column Clean Grid */
+        .featured-grid-table { width: 100% !important; border-collapse: separate !important; }
         .featured-grid-row > .col-left,
         .featured-grid-row > .col-right {
-            height: 100% !important;
             vertical-align: top !important;
         }
         .featured-card {
             width: 100% !important;
-            height: 100% !important;
             background-color: #ffffff;
             border-collapse: separate !important;
             mso-table-lspace: 0pt;
@@ -379,7 +376,7 @@ const compileHtml = (f) => {
                     <!-- Featured Section -->
                     ${(f.showFeatured !== false && getFeaturedItems(f).length > 0) ? `
                     <tr>
-                        <td style="background-color: #f5f7fb; padding: 32px 36px;" class="mobile-padding" data-featured-layout="${(f.featuredLayout || 'columns') !== 'rows' ? 'columns' : 'rows'}" data-featured-card-height="${f.featuredCardHeight || '460'}" data-featured-link-align="${f.featuredLinkAlign || 'bottom'}">
+                        <td style="background-color: #f5f7fb; padding: 28px 32px;" class="mobile-padding" data-featured-layout="${(f.featuredLayout || 'columns') !== 'rows' ? 'columns' : 'rows'}" data-featured-card-height="${f.featuredCardHeight || '400'}" data-featured-link-align="${f.featuredLinkAlign || 'flow'}">
                             ${(() => {
                                 const items = getFeaturedItems(f);
                                 const isColumns = (f.featuredLayout || 'columns') !== 'rows';
@@ -394,20 +391,21 @@ const compileHtml = (f) => {
                                     ];
                                     const bStyle = badgeColors[idx % badgeColors.length];
                                     return `
-                                    <span style="display: inline-block; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: ${bStyle.color}; background-color: ${bStyle.bg}; padding: 4px 12px; border-radius: 9999px;">
+                                    <span style="display: inline-block; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: ${bStyle.color}; background-color: ${bStyle.bg}; padding: 3px 10px; border-radius: 9999px;">
                                         ${escapeHtml(item.badge)}
                                     </span>`;
                                 };
 
                                 const renderColumnCard = (item, idx) => {
+                                    const isFlowLink = (f.featuredLinkAlign !== 'bottom');
                                     const cardHeightValNum = (f.featuredCardHeight && f.featuredCardHeight !== 'auto')
                                         ? parseInt(f.featuredCardHeight, 10)
-                                        : 460;
-                                    const cardHeightStyle = `min-height: ${cardHeightValNum}px;`;
-                                    const isFlowLink = (f.featuredLinkAlign === 'flow');
+                                        : 400;
+                                    const cardHeightAttr = (!isFlowLink && cardHeightValNum) ? `height="${cardHeightValNum}"` : '';
+                                    const cardHeightStyle = (!isFlowLink && cardHeightValNum) ? `height: 100%; min-height: ${cardHeightValNum}px;` : '';
 
                                     return `
-                            <table class="featured-card" data-featured-card="true" role="presentation" width="100%" height="${cardHeightValNum}" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; border-collapse: separate; height: 100%; ${cardHeightStyle} box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+                            <table class="featured-card" data-featured-card="true" role="presentation" width="100%" ${cardHeightAttr} border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; border-collapse: separate; ${cardHeightStyle} box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
                                 <tbody>
                                     ${item.image ? `
                                     <tr class="featured-card-img-tr" height="175">
@@ -416,19 +414,19 @@ const compileHtml = (f) => {
                                         </td>
                                     </tr>` : ''}
                                     <tr class="featured-card-body-tr">
-                                        <td valign="top" style="padding: 20px 20px ${isFlowLink ? '20px' : '8px'} 20px; vertical-align: top;" class="mobile-padding featured-card-body-td">
+                                        <td valign="top" style="padding: 18px 18px ${isFlowLink ? '18px' : '6px'} 18px; vertical-align: top;" class="mobile-padding featured-card-body-td">
                                             <div class="featured-card-content">
                                                 ${renderBadge(item, idx)}
                                                 ${item.title ? `
-                                                <h2 style="margin: 10px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 19px; font-weight: 700; color: #151a29; line-height: 1.35;">
+                                                <h2 style="margin: 8px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700; color: #151a29; line-height: 1.35;">
                                                     ${escapeHtml(item.title)}
                                                 </h2>` : ''}
                                                 ${item.text ? `
-                                                <p style="margin: 8px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.55;">
+                                                <p style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.55;">
                                                     ${escapeHtml(item.text)}
                                                 </p>` : ''}
                                                 ${(item.linkText && isFlowLink) ? `
-                                                <div style="margin-top: 14px;">
+                                                <div style="margin-top: 10px; margin-bottom: 0;">
                                                     <a href="${escapeHtml(cleanUrl(item.linkUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: ${brandColor}; text-decoration: none; display: inline-block;">
                                                         ${escapeHtml(item.linkText)}
                                                     </a>
@@ -437,8 +435,8 @@ const compileHtml = (f) => {
                                         </td>
                                     </tr>
                                     ${(!isFlowLink && item.linkText) ? `
-                                    <tr class="featured-card-action-tr" height="34">
-                                        <td valign="bottom" height="34" style="padding: 0 20px 18px 20px; vertical-align: bottom; height: 34px;" class="featured-card-action-td">
+                                    <tr class="featured-card-action-tr" height="32">
+                                        <td valign="bottom" height="32" style="padding: 0 18px 14px 18px; vertical-align: bottom; height: 32px;" class="featured-card-action-td">
                                             <div class="featured-card-action">
                                                 <a href="${escapeHtml(cleanUrl(item.linkUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: ${brandColor}; text-decoration: none; display: inline-block;">
                                                     ${escapeHtml(item.linkText)}
@@ -740,13 +738,13 @@ const extractFieldsFromHtml = (htmlStr) => {
         }
 
         const heightAttr = doc.querySelector('[data-featured-card-height]')?.getAttribute('data-featured-card-height');
-        let detectedFeaturedCardHeight = heightAttr || '460';
-        if (detectedFeaturedCardHeight === '560') detectedFeaturedCardHeight = '460';
+        let detectedFeaturedCardHeight = heightAttr || '400';
+        if (detectedFeaturedCardHeight === '560' || detectedFeaturedCardHeight === '460') detectedFeaturedCardHeight = '400';
         if (!heightAttr) {
             const cardWithMinHeight = doc.querySelector('table.featured-card[style*="min-height"]');
             if (cardWithMinHeight) {
                 const matchH = cardWithMinHeight.getAttribute('style')?.match(/min-height:\s*(\d+)px/i);
-                if (matchH && matchH[1] && matchH[1] !== '560') detectedFeaturedCardHeight = matchH[1];
+                if (matchH && matchH[1] && matchH[1] !== '560' && matchH[1] !== '460') detectedFeaturedCardHeight = matchH[1];
             }
         }
 
@@ -945,7 +943,7 @@ const extractFieldsFromHtml = (htmlStr) => {
             introText: introText || defaultFields.introText,
             showFeatured: showFeatured,
             featuredLayout: detectedFeaturedLayout || 'columns',
-            featuredCardHeight: detectedFeaturedCardHeight || defaultFields.featuredCardHeight || '460',
+            featuredCardHeight: detectedFeaturedCardHeight || defaultFields.featuredCardHeight || '400',
             featuredLinkAlign: detectedFeaturedLinkAlign || defaultFields.featuredLinkAlign || 'flow',
             featuredItems: featuredItems.length > 0 ? featuredItems : defaultFields.featuredItems,
             featuredBadge: featuredItems[0]?.badge || defaultFields.featuredBadge,
@@ -1177,7 +1175,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                 setFields(parsed);
 
                 // Rebuild newsletter-structured HTML so stored templates pick up the latest layout.
-                const isNewsletterLayout = /data-featured-layout|class="featured-card"/.test(value);
+                const isNewsletterLayout = /data-featured-layout|class="featured-card"|background-color:\s*#f5f7fb|Featured Section/i.test(value);
                 if (editorMode === 'visual' && isNewsletterLayout) {
                     const compiled = compileHtml(parsed);
                     if (compiled !== value) {
@@ -1726,22 +1724,22 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                                                 Card Box Height (Fixed Size)
                                                             </label>
                                                             <span className="text-[10px] font-mono text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">
-                                                                {`${fields.featuredCardHeight || '460'}px fixed`}
+                                                                {`${fields.featuredCardHeight || '400'}px fixed`}
                                                             </span>
                                                         </div>
                                                         <div className="flex items-center gap-1.5">
                                                             {[
-                                                                { label: 'Tight', val: '430' },
-                                                                { label: 'Standard', val: '460' },
-                                                                { label: 'Medium', val: '490' },
-                                                                { label: 'Tall', val: '540' },
+                                                                { label: 'Compact', val: '400' },
+                                                                { label: 'Standard', val: '440' },
+                                                                { label: 'Medium', val: '480' },
+                                                                { label: 'Tall', val: '520' },
                                                             ].map(({ label, val }) => (
                                                                 <button
                                                                     key={val}
                                                                     type="button"
                                                                     onClick={() => updateField('featuredCardHeight', val)}
                                                                     className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition ${
-                                                                        (fields.featuredCardHeight || '460') === val
+                                                                        (fields.featuredCardHeight || '400') === val
                                                                             ? 'bg-indigo-600 text-white shadow-sm'
                                                                             : 'bg-slate-800 text-slate-400 hover:text-white'
                                                                     }`}
@@ -1752,10 +1750,10 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                                             <div className="flex items-center pl-1 border-l border-slate-800">
                                                                 <input
                                                                     type="number"
-                                                                    min="380"
+                                                                    min="340"
                                                                     max="900"
                                                                     step="10"
-                                                                    value={fields.featuredCardHeight || '460'}
+                                                                    value={fields.featuredCardHeight || '400'}
                                                                     placeholder="px"
                                                                     onChange={(e) => updateField('featuredCardHeight', e.target.value)}
                                                                     className="w-14 bg-slate-800 border border-slate-700 rounded-lg px-1.5 py-1 text-xs text-white text-center font-mono font-bold"

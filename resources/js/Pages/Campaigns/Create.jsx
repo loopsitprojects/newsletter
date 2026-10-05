@@ -22,7 +22,7 @@ import {
 export default function CampaignsCreate({ templates: initialTemplates = [], groups, initialTemplateId }) {
     const [templates, setTemplates] = useState(initialTemplates || []);
     const defaultTemplate = initialTemplates.find((t) => t.is_default) || (initialTemplates.length > 0 ? initialTemplates[0] : null);
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, transform } = useForm({
         title: '',
         subject: defaultTemplate ? (defaultTemplate.subject_template || '') : '',
         sender_name: 'Loops Marketing',
@@ -89,6 +89,10 @@ export default function CampaignsCreate({ templates: initialTemplates = [], grou
 
     const handleSubmit = (actionType) => {
         setData('action', actionType);
+        transform((prevData) => ({
+            ...prevData,
+            action: actionType,
+        }));
         post(route('campaigns.store'));
     };
 

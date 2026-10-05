@@ -79,79 +79,88 @@ class NewsletterMailable extends Mailable
         $html = preg_replace('#\.featured-card-body-td\s*\{\s*display:\s*flex[^}]*\}#i', '', $html);
 
         // Normalize equal height attributes on featured cards for maximum email client compatibility
-        $html = preg_replace_callback(
-            '#<table\b([^>]*class="[^"]*featured-grid-table[^"]*"[^>]*)>#i',
-            function ($matches) {
-                $tag = $matches[0];
-                if (! str_contains($tag, 'height=')) {
-                    $tag = str_replace('<table ', '<table height="100%" ', $tag);
-                }
-                if (str_contains($tag, 'style="') && ! str_contains($tag, 'height:')) {
-                    $tag = preg_replace('#style="([^"]*)"#i', 'style="$1 height: 100%;"', $tag);
-                } elseif (! str_contains($tag, 'style=')) {
-                    $tag = str_replace('<table ', '<table style="height: 100%;" ', $tag);
-                }
+        $isBottomAlign = str_contains($html, 'data-featured-link-align="bottom"');
 
-                return $tag;
-            },
-            $html
-        );
-
-        $html = preg_replace_callback(
-            '#<td\b([^>]*class="[^"]*(?:col-left|col-right)[^"]*"[^>]*)>#i',
-            function ($matches) {
-                $tag = $matches[0];
-                if (! str_contains($tag, 'height=')) {
-                    $tag = str_replace('<td ', '<td height="100%" ', $tag);
-                }
-                if (str_contains($tag, 'style="') && ! str_contains($tag, 'height:')) {
-                    $tag = preg_replace('#style="([^"]*)"#i', 'style="$1 height: 100%;"', $tag);
-                } elseif (! str_contains($tag, 'style=')) {
-                    $tag = str_replace('<td ', '<td style="height: 100%;" ', $tag);
-                }
-
-                return $tag;
-            },
-            $html
-        );
-
-        $html = preg_replace_callback(
-            '#<table\b([^>]*class="[^"]*featured-card[^"]*"[^>]*)>#i',
-            function ($matches) {
-                $tag = $matches[0];
-                $heightVal = '560';
-                if (preg_replace('#min-height:\s*(\d+)px#i', '$1', $tag) !== $tag) {
-                    preg_match('#min-height:\s*(\d+)px#i', $tag, $hMatch);
-                    if (! empty($hMatch[1])) {
-                        $heightVal = $hMatch[1];
+        if ($isBottomAlign) {
+            $html = preg_replace_callback(
+                '#<table\b([^>]*class="[^"]*featured-grid-table[^"]*"[^>]*)>#i',
+                function ($matches) {
+                    $tag = $matches[0];
+                    if (! str_contains($tag, 'height=')) {
+                        $tag = str_replace('<table ', '<table height="100%" ', $tag);
                     }
-                }
-                if (! str_contains($tag, 'height=')) {
-                    $tag = str_replace('<table ', '<table height="'.$heightVal.'" ', $tag);
-                }
-                if (str_contains($tag, 'style="') && ! str_contains($tag, 'height:')) {
-                    $tag = preg_replace('#style="([^"]*)"#i', 'style="$1 height: 100%;"', $tag);
-                }
+                    if (str_contains($tag, 'style="') && ! str_contains($tag, 'height:')) {
+                        $tag = preg_replace('#style="([^"]*)"#i', 'style="$1 height: 100%;"', $tag);
+                    } elseif (! str_contains($tag, 'style=')) {
+                        $tag = str_replace('<table ', '<table style="height: 100%;" ', $tag);
+                    }
 
-                return $tag;
-            },
-            $html
-        );
+                    return $tag;
+                },
+                $html
+            );
 
-        // Normalize legacy 2-row cards to 3-row layout (separate action link into bottom row)
-        $html = preg_replace_callback(
-            '#(<td[^>]*class="[^"]*featured-card-body-td[^"]*"[^>]*>)(.*?)(<div\s+class="featured-card-action"[^>]*>.*?</div>)\s*</td>\s*</tr>#is',
-            function ($matches) {
-                $bodyTdOpen = preg_replace('#padding:\s*24px\s+22px\s+26px\s+22px#i', 'padding: 24px 22px 14px 22px', $matches[1]);
-                $content = $matches[2];
-                $action = $matches[3];
+            $html = preg_replace_callback(
+                '#<td\b([^>]*class="[^"]*(?:col-left|col-right)[^"]*"[^>]*)>#i',
+                function ($matches) {
+                    $tag = $matches[0];
+                    if (! str_contains($tag, 'height=')) {
+                        $tag = str_replace('<td ', '<td height="100%" ', $tag);
+                    }
+                    if (str_contains($tag, 'style="') && ! str_contains($tag, 'height:')) {
+                        $tag = preg_replace('#style="([^"]*)"#i', 'style="$1 height: 100%;"', $tag);
+                    } elseif (! str_contains($tag, 'style=')) {
+                        $tag = str_replace('<td ', '<td style="height: 100%;" ', $tag);
+                    }
 
-                return $bodyTdOpen.$content.'</td></tr>'.
-                    '<tr class="featured-card-action-tr" height="42"><td valign="bottom" height="42" style="padding: 0 22px 26px 22px; vertical-align: bottom; height: 42px;" class="featured-card-action-td">'.
-                    $action.'</td></tr>';
-            },
-            $html
-        );
+                    return $tag;
+                },
+                $html
+            );
+
+            $html = preg_replace_callback(
+                '#<table\b([^>]*class="[^"]*featured-card[^"]*"[^>]*)>#i',
+                function ($matches) {
+                    $tag = $matches[0];
+                    $heightVal = '400';
+                    if (preg_replace('#min-height:\s*(\d+)px#i', '$1', $tag) !== $tag) {
+                        preg_match('#min-height:\s*(\d+)px#i', $tag, $hMatch);
+                        if (! empty($hMatch[1]) && $hMatch[1] !== '560') {
+                            $heightVal = $hMatch[1];
+                        }
+                    }
+                    if (! str_contains($tag, 'height=')) {
+                        $tag = str_replace('<table ', '<table height="'.$heightVal.'" ', $tag);
+                    }
+                    if (str_contains($tag, 'style="') && ! str_contains($tag, 'height:')) {
+                        $tag = preg_replace('#style="([^"]*)"#i', 'style="$1 height: 100%;"', $tag);
+                    }
+
+                    return $tag;
+                },
+                $html
+            );
+
+            // Normalize legacy 2-row cards to 3-row layout with compact action row
+            $html = preg_replace_callback(
+                '#(<td[^>]*class="[^"]*featured-card-body-td[^"]*"[^>]*>)(.*?)(<div\s+class="featured-card-action"[^>]*>.*?</div>)\s*</td>\s*</tr>#is',
+                function ($matches) {
+                    $bodyTdOpen = preg_replace('#padding:\s*24px\s+22px\s+26px\s+22px#i', 'padding: 18px 18px 6px 18px', $matches[1]);
+                    $content = $matches[2];
+                    $action = $matches[3];
+
+                    return $bodyTdOpen.$content.'</td></tr>'.
+                        '<tr class="featured-card-action-tr" height="32"><td valign="bottom" height="32" style="padding: 0 18px 14px 18px; vertical-align: bottom; height: 32px;" class="featured-card-action-td">'.
+                        $action.'</td></tr>';
+                },
+                $html
+            );
+        } else {
+            // For flow alignment (link directly under description), remove any legacy forced heights that create huge white space
+            $html = preg_replace('#(<table\b[^>]*class="[^"]*featured-card[^"]*"[^>]*)\s+height="(?:560|460)"#i', '$1', $html);
+            $html = preg_replace('#(<table\b[^>]*class="[^"]*featured-card[^"]*"[^>]*style="[^"]*)\s*height:\s*100%;?#i', '$1', $html);
+            $html = preg_replace('#(<table\b[^>]*class="[^"]*featured-card[^"]*"[^>]*style="[^"]*)\s*min-height:\s*(?:560|460)px;?#i', '$1', $html);
+        }
 
         // Perform variable replacement
         $firstName = $subscriber->first_name ?: 'Subscriber';
@@ -182,7 +191,7 @@ class NewsletterMailable extends Mailable
 
     public function envelope(): Envelope
     {
-        $subject = $this->campaign->subject;
+        $subject = $this->campaign->subject ?? '';
         $subject = str_replace('{{first_name}}', $this->subscriber->first_name ?: 'Subscriber', $subject);
         $subject = str_replace('{{last_name}}', $this->subscriber->last_name ?: '', $subject);
         $subject = str_replace('{{company_name}}', config('app.name', 'SL MarTech'), $subject);

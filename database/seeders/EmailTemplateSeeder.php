@@ -119,29 +119,70 @@ class EmailTemplateSeeder extends Seeder
 
                     <!-- Featured Section -->
                     <tr>
-                        <td style="background-color: #f5f7fb; padding: 32px 36px;" class="mobile-padding">
-                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea;">
+                        <td style="background-color: #f5f7fb; padding: 28px 32px;" class="mobile-padding" data-featured-layout="columns" data-featured-card-height="400" data-featured-link-align="flow">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" class="featured-grid-table">
                                 <tr>
-                                    <!-- Featured Image -->
-                                    <td class="mobile-stack" width="50%" valign="top" style="padding: 0;">
-                                        <img class="mobile-img" src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&h=750&fit=crop&q=80" alt="Team reviewing product prototypes" width="344" style="width: 100%; height: 100%; min-height: 250px; object-fit: cover; display: block; border: 0;" />
+                                    <td class="mobile-stack col-left" width="50%" valign="top" style="padding: 0 10px 0 0; vertical-align: top;">
+                                        <table class="featured-card" data-featured-card="true" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; border-collapse: separate; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+                                            <tbody>
+                                                <tr class="featured-card-img-tr" height="175">
+                                                    <td class="featured-card-img-td" height="175" style="padding: 0; margin: 0; line-height: 0; font-size: 0; background-color: #f1f3f7; height: 175px;" align="center">
+                                                        <img class="mobile-img featured-col-img" src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&amp;h=750&amp;fit=crop&amp;q=80" alt="Discover What's New" width="332" height="175" style="width: 100%; max-width: 100%; height: 175px; max-height: 175px; object-fit: cover; display: block; border: 0;" />
+                                                    </td>
+                                                </tr>
+                                                <tr class="featured-card-body-tr">
+                                                    <td valign="top" style="padding: 18px 18px 18px 18px; vertical-align: top;" class="mobile-padding featured-card-body-td">
+                                                        <div class="featured-card-content">
+                                                            <span style="display: inline-block; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #0057c5; background-color: #e6f0fd; padding: 3px 10px; border-radius: 9999px;">
+                                                                Featured
+                                                            </span>
+                                                            <h2 style="margin: 8px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700; color: #151a29; line-height: 1.35;">
+                                                                Discover What's New
+                                                            </h2>
+                                                            <p style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.55;">
+                                                                Explore our latest products, services and updates &mdash; designed with feedback from customers like you.
+                                                            </p>
+                                                            <div style="margin-top: 10px; margin-bottom: 0;">
+                                                                <a href="https://example.com" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: #0057c5; text-decoration: none; display: inline-block;">
+                                                                    Read More &rarr;
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </td>
-                                    <!-- Featured Text Content -->
-                                    <td class="mobile-stack" width="50%" valign="middle" style="padding: 30px 26px;" class="mobile-padding">
-                                        <span style="display: inline-block; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #0057c5; background-color: #e6f0fd; padding: 4px 12px; border-radius: 9999px;">
-                                            Featured
-                                        </span>
-                                        <h2 style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 22px; font-weight: 700; color: #151a29; line-height: 1.3;">
-                                            Discover What's New
-                                        </h2>
-                                        <p style="margin: 10px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.6;">
-                                            Explore our latest products, services and updates &mdash; designed with feedback from customers like you.
-                                        </p>
-                                        <div style="margin-top: 18px;">
-                                            <a href="https://example.com" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: #0057c5; text-decoration: none;">
-                                                Read More &rarr;
-                                            </a>
-                                        </div>
+                                    <td class="mobile-stack col-right" width="50%" valign="top" style="padding: 0 0 0 10px; vertical-align: top;">
+                                        <table class="featured-card" data-featured-card="true" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; border-collapse: separate; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+                                            <tbody>
+                                                <tr class="featured-card-img-tr" height="175">
+                                                    <td class="featured-card-img-td" height="175" style="padding: 0; margin: 0; line-height: 0; font-size: 0; background-color: #f1f3f7; height: 175px;" align="center">
+                                                        <img class="mobile-img featured-col-img" src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=900&amp;h=750&amp;fit=crop&amp;q=80" alt="Creative Spotlight" width="332" height="175" style="width: 100%; max-width: 100%; height: 175px; max-height: 175px; object-fit: cover; display: block; border: 0;" />
+                                                    </td>
+                                                </tr>
+                                                <tr class="featured-card-body-tr">
+                                                    <td valign="top" style="padding: 18px 18px 18px 18px; vertical-align: top;" class="mobile-padding featured-card-body-td">
+                                                        <div class="featured-card-content">
+                                                            <span style="display: inline-block; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #ff0878; background-color: #ffe6f0; padding: 3px 10px; border-radius: 9999px;">
+                                                                Spotlight
+                                                            </span>
+                                                            <h2 style="margin: 8px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700; color: #151a29; line-height: 1.35;">
+                                                                Creative Spotlight
+                                                            </h2>
+                                                            <p style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.55;">
+                                                                Insights, workflow highlights, and behind-the-scenes stories from our creative productions.
+                                                            </p>
+                                                            <div style="margin-top: 10px; margin-bottom: 0;">
+                                                                <a href="https://example.com" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: #0057c5; text-decoration: none; display: inline-block;">
+                                                                    Read More &rarr;
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </td>
                                 </tr>
                             </table>
