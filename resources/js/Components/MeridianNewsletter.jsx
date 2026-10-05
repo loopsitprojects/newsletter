@@ -80,6 +80,8 @@ export default function MeridianNewsletter({
     heroButtonColor = '#ff0878',
     featuredItems = null,
     featuredLayout = 'columns',
+    featuredCardHeight = '460',
+    featuredLinkAlign = 'bottom',
     featuredImage = 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&h=750&fit=crop&q=80',
     ctaStyle = 'clean',
     ctaTitle = 'See Our Latest Work',
@@ -222,6 +224,7 @@ export default function MeridianNewsletter({
                             );
                         }
 
+                        const isFlowLink = featuredLinkAlign === 'flow';
                         return (
                             <div
                                 key={idx}
@@ -232,31 +235,43 @@ export default function MeridianNewsletter({
                                         src={item.image || featuredImage}
                                         alt={item.title || "Featured"}
                                         width={640}
-                                        height={400}
+                                        height={360}
                                         loading="lazy"
-                                        className="h-52 w-full object-cover shrink-0"
+                                        className="h-44 w-full object-cover shrink-0"
                                     />
                                 )}
-                                <div className="p-6 flex flex-col flex-1 justify-between">
+                                <div className={cn("p-5 flex flex-col flex-1", isFlowLink ? "" : "justify-between")}>
                                     <div>
                                         <span className={cn('w-fit rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-widest', styleClass)}>
                                             {item.badge || 'Featured'}
                                         </span>
-                                        <h2 className="mt-3 font-serif text-xl font-bold leading-snug text-[#151a29]">
+                                        <h2 className="mt-2.5 font-serif text-lg font-bold leading-snug text-[#151a29]">
                                             {item.title}
                                         </h2>
                                         <p className="mt-2 text-sm leading-relaxed text-[#636978]">
                                             {item.text}
                                         </p>
+                                        {isFlowLink && (
+                                            <div className="mt-3.5">
+                                                <a
+                                                    href={item.linkUrl || '#'}
+                                                    className="text-sm font-semibold text-[#0057c5] hover:underline inline-flex items-center"
+                                                >
+                                                    {item.linkText || 'Read More →'}
+                                                </a>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="mt-5 pt-2">
-                                        <a
-                                            href={item.linkUrl || '#'}
-                                            className="text-sm font-semibold text-[#0057c5] hover:underline inline-flex items-center"
-                                        >
-                                            {item.linkText || 'Read More →'}
-                                        </a>
-                                    </div>
+                                    {!isFlowLink && (
+                                        <div className="mt-4 pt-1">
+                                            <a
+                                                href={item.linkUrl || '#'}
+                                                className="text-sm font-semibold text-[#0057c5] hover:underline inline-flex items-center"
+                                            >
+                                                {item.linkText || 'Read More →'}
+                                            </a>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         );

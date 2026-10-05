@@ -60,7 +60,8 @@ const defaultFields = {
     introText: "Here are the latest updates, highlights and news from our team. It's been a busy month — we hope you enjoy what we've been working on.",
     showFeatured: true,
     featuredLayout: 'columns',
-    featuredCardHeight: '560',
+    featuredCardHeight: '460',
+    featuredLinkAlign: 'bottom',
     featuredItems: [
         {
             badge: 'Featured',
@@ -378,7 +379,7 @@ const compileHtml = (f) => {
                     <!-- Featured Section -->
                     ${(f.showFeatured !== false && getFeaturedItems(f).length > 0) ? `
                     <tr>
-                        <td style="background-color: #f5f7fb; padding: 32px 36px;" class="mobile-padding" data-featured-layout="${(f.featuredLayout || 'columns') !== 'rows' ? 'columns' : 'rows'}" data-featured-card-height="${f.featuredCardHeight || '560'}">
+                        <td style="background-color: #f5f7fb; padding: 32px 36px;" class="mobile-padding" data-featured-layout="${(f.featuredLayout || 'columns') !== 'rows' ? 'columns' : 'rows'}" data-featured-card-height="${f.featuredCardHeight || '460'}" data-featured-link-align="${f.featuredLinkAlign || 'bottom'}">
                             ${(() => {
                                 const items = getFeaturedItems(f);
                                 const isColumns = (f.featuredLayout || 'columns') !== 'rows';
@@ -401,46 +402,53 @@ const compileHtml = (f) => {
                                 const renderColumnCard = (item, idx) => {
                                     const cardHeightValNum = (f.featuredCardHeight && f.featuredCardHeight !== 'auto')
                                         ? parseInt(f.featuredCardHeight, 10)
-                                        : 560;
+                                        : 460;
                                     const cardHeightStyle = `min-height: ${cardHeightValNum}px;`;
+                                    const isFlowLink = (f.featuredLinkAlign === 'flow');
 
                                     return `
                             <table class="featured-card" data-featured-card="true" role="presentation" width="100%" height="${cardHeightValNum}" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; border-collapse: separate; height: 100%; ${cardHeightStyle} box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
                                 <tbody>
                                     ${item.image ? `
-                                    <tr class="featured-card-img-tr" height="210">
-                                        <td class="featured-card-img-td" height="210" style="padding: 0; margin: 0; line-height: 0; font-size: 0; background-color: #f1f3f7; height: 210px;" align="center">
-                                            <img class="mobile-img featured-col-img" src="${escapeHtml(cleanUrl(item.image))}" alt="${escapeHtml(item.title || 'Featured Image')}" width="${Math.floor((maxWidth - 72 - 24) / 2)}" height="210" style="width: 100%; max-width: 100%; height: 210px; max-height: 210px; object-fit: cover; display: block; border: 0;" />
+                                    <tr class="featured-card-img-tr" height="175">
+                                        <td class="featured-card-img-td" height="175" style="padding: 0; margin: 0; line-height: 0; font-size: 0; background-color: #f1f3f7; height: 175px;" align="center">
+                                            <img class="mobile-img featured-col-img" src="${escapeHtml(cleanUrl(item.image))}" alt="${escapeHtml(item.title || 'Featured Image')}" width="${Math.floor((maxWidth - 72 - 24) / 2)}" height="175" style="width: 100%; max-width: 100%; height: 175px; max-height: 175px; object-fit: cover; display: block; border: 0;" />
                                         </td>
                                     </tr>` : ''}
                                     <tr class="featured-card-body-tr">
-                                        <td valign="top" style="padding: 24px 22px 14px 22px; vertical-align: top;" class="mobile-padding featured-card-body-td">
+                                        <td valign="top" style="padding: 20px 20px ${isFlowLink ? '20px' : '8px'} 20px; vertical-align: top;" class="mobile-padding featured-card-body-td">
                                             <div class="featured-card-content">
                                                 ${renderBadge(item, idx)}
                                                 ${item.title ? `
-                                                <h2 style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 20px; font-weight: 700; color: #151a29; line-height: 1.35;">
+                                                <h2 style="margin: 10px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 19px; font-weight: 700; color: #151a29; line-height: 1.35;">
                                                     ${escapeHtml(item.title)}
                                                 </h2>` : ''}
                                                 ${item.text ? `
-                                                <p style="margin: 10px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.6;">
+                                                <p style="margin: 8px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.55;">
                                                     ${escapeHtml(item.text)}
                                                 </p>` : ''}
+                                                ${(item.linkText && isFlowLink) ? `
+                                                <div style="margin-top: 14px;">
+                                                    <a href="${escapeHtml(cleanUrl(item.linkUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: ${brandColor}; text-decoration: none; display: inline-block;">
+                                                        ${escapeHtml(item.linkText)}
+                                                    </a>
+                                                </div>` : ''}
                                             </div>
                                         </td>
                                     </tr>
-                                    ${item.linkText ? `
-                                    <tr class="featured-card-action-tr" height="42">
-                                        <td valign="bottom" height="42" style="padding: 0 22px 26px 22px; vertical-align: bottom; height: 42px;" class="featured-card-action-td">
+                                    ${(!isFlowLink && item.linkText) ? `
+                                    <tr class="featured-card-action-tr" height="34">
+                                        <td valign="bottom" height="34" style="padding: 0 20px 18px 20px; vertical-align: bottom; height: 34px;" class="featured-card-action-td">
                                             <div class="featured-card-action">
                                                 <a href="${escapeHtml(cleanUrl(item.linkUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: ${brandColor}; text-decoration: none; display: inline-block;">
                                                     ${escapeHtml(item.linkText)}
                                                 </a>
                                             </div>
                                         </td>
-                                    </tr>` : `
-                                    <tr height="20">
-                                        <td height="20" style="height: 20px; padding: 0;">&nbsp;</td>
-                                    </tr>`}
+                                    </tr>` : (!isFlowLink ? `
+                                    <tr height="14">
+                                        <td height="14" style="height: 14px; padding: 0;">&nbsp;</td>
+                                    </tr>` : '')}
                                 </tbody>
                             </table>`;
                                 };
@@ -732,14 +740,18 @@ const extractFieldsFromHtml = (htmlStr) => {
         }
 
         const heightAttr = doc.querySelector('[data-featured-card-height]')?.getAttribute('data-featured-card-height');
-        let detectedFeaturedCardHeight = heightAttr || '560';
+        let detectedFeaturedCardHeight = heightAttr || '460';
+        if (detectedFeaturedCardHeight === '560') detectedFeaturedCardHeight = '460';
         if (!heightAttr) {
             const cardWithMinHeight = doc.querySelector('table.featured-card[style*="min-height"]');
             if (cardWithMinHeight) {
                 const matchH = cardWithMinHeight.getAttribute('style')?.match(/min-height:\s*(\d+)px/i);
-                if (matchH && matchH[1]) detectedFeaturedCardHeight = matchH[1];
+                if (matchH && matchH[1] && matchH[1] !== '560') detectedFeaturedCardHeight = matchH[1];
             }
         }
+
+        const linkAlignAttr = doc.querySelector('[data-featured-link-align]')?.getAttribute('data-featured-link-align');
+        let detectedFeaturedLinkAlign = linkAlignAttr || 'bottom';
 
         let featuredItems = [];
         if (featuredTables.length > 0) {
@@ -933,7 +945,8 @@ const extractFieldsFromHtml = (htmlStr) => {
             introText: introText || defaultFields.introText,
             showFeatured: showFeatured,
             featuredLayout: detectedFeaturedLayout || 'columns',
-            featuredCardHeight: detectedFeaturedCardHeight || defaultFields.featuredCardHeight || '560',
+            featuredCardHeight: detectedFeaturedCardHeight || defaultFields.featuredCardHeight || '460',
+            featuredLinkAlign: detectedFeaturedLinkAlign || defaultFields.featuredLinkAlign || 'bottom',
             featuredItems: featuredItems.length > 0 ? featuredItems : defaultFields.featuredItems,
             featuredBadge: featuredItems[0]?.badge || defaultFields.featuredBadge,
             featuredTitle: featuredItems[0]?.title || defaultFields.featuredTitle,
@@ -1696,53 +1709,89 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
 
                                             {/* Box / Card Fixed Height Controls */}
                                             {(fields.featuredLayout || 'columns') !== 'rows' && (
-                                                <div className="mt-3 pt-3 border-t border-slate-800">
-                                                    <div className="flex items-center justify-between mb-1.5">
-                                                        <label className="text-[10px] text-slate-400 font-semibold flex items-center">
-                                                            Card Box Height (Fixed Size)
-                                                        </label>
-                                                        <span className="text-[10px] font-mono text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">
-                                                            {fields.featuredCardHeight === 'auto' ? 'Auto Equal' : `${fields.featuredCardHeight || '560'}px fixed`}
-                                                        </span>
+                                                <div className="mt-3 pt-3 border-t border-slate-800 space-y-3">
+                                                    <div>
+                                                        <div className="flex items-center justify-between mb-1.5">
+                                                            <label className="text-[10px] text-slate-400 font-semibold flex items-center">
+                                                                Card Box Height (Fixed Size)
+                                                            </label>
+                                                            <span className="text-[10px] font-mono text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">
+                                                                {`${fields.featuredCardHeight || '460'}px fixed`}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1.5">
+                                                            {[
+                                                                { label: 'Tight', val: '430' },
+                                                                { label: 'Standard', val: '460' },
+                                                                { label: 'Medium', val: '490' },
+                                                                { label: 'Tall', val: '540' },
+                                                            ].map(({ label, val }) => (
+                                                                <button
+                                                                    key={val}
+                                                                    type="button"
+                                                                    onClick={() => updateField('featuredCardHeight', val)}
+                                                                    className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition ${
+                                                                        (fields.featuredCardHeight || '460') === val
+                                                                            ? 'bg-indigo-600 text-white shadow-sm'
+                                                                            : 'bg-slate-800 text-slate-400 hover:text-white'
+                                                                    }`}
+                                                                >
+                                                                    {label}
+                                                                </button>
+                                                            ))}
+                                                            <div className="flex items-center pl-1 border-l border-slate-800">
+                                                                <input
+                                                                    type="number"
+                                                                    min="380"
+                                                                    max="900"
+                                                                    step="10"
+                                                                    value={fields.featuredCardHeight || '460'}
+                                                                    placeholder="px"
+                                                                    onChange={(e) => updateField('featuredCardHeight', e.target.value)}
+                                                                    className="w-14 bg-slate-800 border border-slate-700 rounded-lg px-1.5 py-1 text-xs text-white text-center font-mono font-bold"
+                                                                    title="Custom Box Height (px)"
+                                                                />
+                                                                <span className="text-[10px] text-slate-400 ml-1 font-semibold">px</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div className="flex items-center gap-1.5">
-                                                        {[
-                                                            { label: 'Auto Equal', val: 'auto' },
-                                                            { label: 'Compact', val: '500' },
-                                                            { label: 'Standard', val: '560' },
-                                                            { label: 'Tall', val: '620' },
-                                                        ].map(({ label, val }) => (
+
+                                                    <div>
+                                                        <div className="flex items-center justify-between mb-1.5">
+                                                            <label className="text-[10px] text-slate-400 font-semibold">
+                                                                Read More Link Position
+                                                            </label>
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-1.5">
                                                             <button
-                                                                key={val}
                                                                 type="button"
-                                                                onClick={() => updateField('featuredCardHeight', val)}
-                                                                className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition ${
-                                                                    (fields.featuredCardHeight || '560') === val
+                                                                onClick={() => updateField('featuredLinkAlign', 'bottom')}
+                                                                className={`py-1.5 px-2 text-[11px] font-bold rounded-lg transition ${
+                                                                    (fields.featuredLinkAlign || 'bottom') === 'bottom'
                                                                         ? 'bg-indigo-600 text-white shadow-sm'
                                                                         : 'bg-slate-800 text-slate-400 hover:text-white'
                                                                 }`}
                                                             >
-                                                                {label}
+                                                                Bottom Aligned
                                                             </button>
-                                                        ))}
-                                                        <div className="flex items-center pl-1 border-l border-slate-800">
-                                                            <input
-                                                                type="number"
-                                                                min="380"
-                                                                max="900"
-                                                                step="10"
-                                                                value={fields.featuredCardHeight === 'auto' ? '' : (fields.featuredCardHeight || '560')}
-                                                                placeholder="px"
-                                                                onChange={(e) => updateField('featuredCardHeight', e.target.value || 'auto')}
-                                                                className="w-14 bg-slate-800 border border-slate-700 rounded-lg px-1.5 py-1 text-xs text-white text-center font-mono font-bold"
-                                                                title="Custom Box Height (px)"
-                                                            />
-                                                            <span className="text-[10px] text-slate-400 ml-1 font-semibold">px</span>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => updateField('featuredLinkAlign', 'flow')}
+                                                                className={`py-1.5 px-2 text-[11px] font-bold rounded-lg transition ${
+                                                                    fields.featuredLinkAlign === 'flow'
+                                                                        ? 'bg-indigo-600 text-white shadow-sm'
+                                                                        : 'bg-slate-800 text-slate-400 hover:text-white'
+                                                                }`}
+                                                            >
+                                                                Directly Under Text
+                                                            </button>
                                                         </div>
+                                                        <p className="text-[10px] text-slate-500 mt-1">
+                                                            {(fields.featuredLinkAlign || 'bottom') === 'bottom'
+                                                                ? 'Both cards remain locked to identical equal height with reduced spacing.'
+                                                                : 'Eliminates all empty white space between description and Read More link.'}
+                                                        </p>
                                                     </div>
-                                                    <p className="text-[10px] text-slate-500 mt-1">
-                                                        Locks both cards to identical equal height with action links aligned at the bottom.
-                                                    </p>
                                                 </div>
                                             )}
                                         </div>
