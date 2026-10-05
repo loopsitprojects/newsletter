@@ -81,12 +81,14 @@ export default function MeridianNewsletter({
     featuredItems = null,
     featuredLayout = 'columns',
     featuredImage = 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&h=750&fit=crop&q=80',
-    ctaTitle = 'Ready to Discover More?',
-    ctaSubtitle = "Explore our latest updates and find something you'll love.",
-    ctaButtonText = 'Explore Now',
+    ctaStyle = 'clean',
+    ctaTitle = 'See Our Latest Work',
+    ctaSubtitle = "From award-winning campaigns to new productions, take a look at what we've been creating recently.",
+    ctaButtonText = 'VISIT OUR WEBSITE',
     ctaButtonUrl = '#',
-    showCtaSecondaryButton = true,
-    ctaSecondaryButtonText = 'Contact Us',
+    ctaButtonColor = '#0b0f19',
+    showCtaSecondaryButton = false,
+    ctaSecondaryButtonText = '',
     ctaSecondaryButtonUrl = '#',
     companyName = 'Loops Integrated',
     companyAddress = '',
@@ -262,36 +264,64 @@ export default function MeridianNewsletter({
                 </div>
             </section>
 
-            {/* CTA Banner */}
+            {/* CTA Section */}
             <section className={cn(px, 'pb-8')}>
-                <div
-                    className={cn(
-                        'rounded-2xl text-center text-white',
-                        mobile ? 'px-6 py-10' : 'px-12 py-12'
-                    )}
-                    style={{
-                        background: 'linear-gradient(135deg, #0057c5 0%, #8035d1 50%, #ff0878 100%)',
-                        backgroundColor: '#0057c5',
-                    }}
-                >
-                    <h3 className={cn('font-serif font-bold', mobile ? 'text-2xl' : 'text-3xl')}>
-                        {ctaTitle}
-                    </h3>
-                    <p className="mx-auto mt-3 max-w-sm text-sm opacity-90 leading-relaxed">
-                        {ctaSubtitle}
-                    </p>
-                    <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-                        <Btn inverse href={ctaButtonUrl || '#'}>{ctaButtonText || 'Explore Now'}</Btn>
-                        {(showCtaSecondaryButton !== false && ctaSecondaryButtonText) && (
-                            <a
-                                href={ctaSecondaryButtonUrl || '#'}
-                                className="inline-block whitespace-nowrap rounded-full px-6 py-2.5 text-sm font-semibold transition-all hover:bg-white/20 active:scale-95 border border-white/80 bg-white/10 text-white backdrop-blur-sm shadow-sm"
-                            >
-                                {ctaSecondaryButtonText}
-                            </a>
+                {ctaStyle === 'gradient' ? (
+                    <div
+                        className={cn(
+                            'rounded-2xl text-center text-white',
+                            mobile ? 'px-6 py-10' : 'px-12 py-12'
                         )}
+                        style={{
+                            background: 'linear-gradient(135deg, #0057c5 0%, #8035d1 50%, #ff0878 100%)',
+                            backgroundColor: '#0057c5',
+                        }}
+                    >
+                        <h3 className={cn('font-serif font-bold', mobile ? 'text-2xl' : 'text-3xl')}>
+                            {ctaTitle}
+                        </h3>
+                        <p className="mx-auto mt-3 max-w-sm text-sm opacity-90 leading-relaxed">
+                            {ctaSubtitle}
+                        </p>
+                        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                            <Btn inverse href={ctaButtonUrl || '#'}>{ctaButtonText || 'Explore Now'}</Btn>
+                            {(showCtaSecondaryButton !== false && ctaSecondaryButtonText) && (
+                                <a
+                                    href={ctaSecondaryButtonUrl || '#'}
+                                    className="inline-block whitespace-nowrap rounded-full px-6 py-2.5 text-sm font-semibold transition-all hover:bg-white/20 active:scale-95 border border-white/80 bg-white/10 text-white backdrop-blur-sm shadow-sm"
+                                >
+                                    {ctaSecondaryButtonText}
+                                </a>
+                            )}
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    <div className="text-left py-2">
+                        <h3 className={cn('font-sans font-extrabold text-[#151a29] tracking-tight leading-tight', mobile ? 'text-xl' : 'text-2xl')}>
+                            {ctaTitle}
+                        </h3>
+                        <p className="mt-2.5 max-w-xl text-[15px] text-[#636978] leading-relaxed">
+                            {ctaSubtitle}
+                        </p>
+                        <div className="mt-5 flex flex-wrap items-center gap-3">
+                            <a
+                                href={ctaButtonUrl || '#'}
+                                className="inline-block rounded-lg px-6 py-3 text-xs font-extrabold uppercase tracking-wider text-white shadow-sm transition hover:opacity-90 active:scale-95"
+                                style={{ backgroundColor: ctaButtonColor || '#0b0f19' }}
+                            >
+                                {ctaButtonText || 'VISIT OUR WEBSITE'}
+                            </a>
+                            {(showCtaSecondaryButton !== false && ctaSecondaryButtonText) && (
+                                <a
+                                    href={ctaSecondaryButtonUrl || '#'}
+                                    className="inline-block rounded-lg px-6 py-3 text-xs font-bold uppercase tracking-wider text-[#151a29] bg-[#f1f5f9] border border-[#cbd5e1] shadow-sm transition hover:bg-[#e2e8f0] active:scale-95"
+                                >
+                                    {ctaSecondaryButtonText}
+                                </a>
+                            )}
+                        </div>
+                    </div>
+                )}
             </section>
 
             {/* Footer */}

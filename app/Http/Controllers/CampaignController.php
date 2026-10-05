@@ -43,7 +43,7 @@ class CampaignController extends Controller
 
     public function create(Request $request): Response
     {
-        $templates = EmailTemplate::all()->map(function ($t) {
+        $templates = EmailTemplate::orderByDesc('is_default')->get()->map(function ($t) {
             $t->content_html = self::normalizeMediaUrls($t->content_html);
 
             return $t;

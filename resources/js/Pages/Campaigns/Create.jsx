@@ -21,13 +21,14 @@ import {
 
 export default function CampaignsCreate({ templates: initialTemplates = [], groups, initialTemplateId }) {
     const [templates, setTemplates] = useState(initialTemplates || []);
+    const defaultTemplate = initialTemplates.find((t) => t.is_default) || (initialTemplates.length > 0 ? initialTemplates[0] : null);
     const { data, setData, post, processing, errors } = useForm({
         title: '',
-        subject: initialTemplates.length > 0 ? (initialTemplates[0].subject_template || '') : '',
+        subject: defaultTemplate ? (defaultTemplate.subject_template || '') : '',
         sender_name: 'Loops Marketing',
         sender_email: 'info@slmartech.com',
-        content_html: initialTemplates.length > 0 ? initialTemplates[0].content_html : '<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;"><h1>Your Newsletter Headline</h1><p>Type your message content here...</p></div>',
-        template_id: initialTemplateId || (initialTemplates.length > 0 ? initialTemplates[0].id : ''),
+        content_html: defaultTemplate ? defaultTemplate.content_html : '<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;"><h1>Your Newsletter Headline</h1><p>Type your message content here...</p></div>',
+        template_id: initialTemplateId || (defaultTemplate ? defaultTemplate.id : ''),
         target_type: 'all',
         subscriber_group_id: '',
         action: 'draft',

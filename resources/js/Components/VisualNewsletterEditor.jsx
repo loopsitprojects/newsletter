@@ -41,7 +41,9 @@ export const LOOPS_LOGO_PALETTE = [
 const defaultFields = {
     templateWidth: '760',
     preheader: 'Discover our latest updates, products, news and special offers.',
-    logoAlign: 'center',
+    headerLayout: 'side-by-side',
+    logoAlign: 'left',
+    heroAlign: 'left',
     brandName: 'Loops Integrated',
     brandLogoUrl: '/images/loops-logo-white.png',
     brandLogoDarkUrl: '/images/loops-logo-white.png',
@@ -76,13 +78,15 @@ const defaultFields = {
     featuredLinkUrl: 'https://example.com',
     featuredImage: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&h=750&fit=crop&q=80',
     showCta: true,
-    ctaTitle: 'Ready to Discover More?',
-    ctaSubtitle: "Explore our latest updates and find something you'll love.",
-    ctaButtonText: 'Explore Now',
+    ctaStyle: 'clean',
+    ctaTitle: 'See Our Latest Work',
+    ctaSubtitle: "From award-winning campaigns to new productions, take a look at what we've been creating recently.",
+    ctaButtonText: 'VISIT OUR WEBSITE',
     ctaButtonUrl: 'https://example.com',
-    showCtaSecondaryButton: true,
-    ctaSecondaryButtonText: 'Contact Us',
-    ctaSecondaryButtonUrl: 'https://example.com/contact',
+    ctaButtonColor: '#0b0f19',
+    showCtaSecondaryButton: false,
+    ctaSecondaryButtonText: '',
+    ctaSecondaryButtonUrl: '',
     showCeoNote: false,
     companyName: 'Loops Integrated',
     companyAddress: '',
@@ -136,10 +140,15 @@ const getFeaturedItems = (f) => {
 const compileHtml = (f) => {
     const maxWidth = parseInt(f.templateWidth) || 760;
     const brandColor = f.brandColor || '#0057c5';
-    const align = f.logoAlign || 'center';
-    const margin = align === 'center' ? '0 auto' : align === 'right' ? '0 0 0 auto' : '0 auto 0 0';
+    const align = f.logoAlign || 'left';
+    const margin = align === 'center' ? '0 auto' : align === 'right' ? '0 0 0 auto' : '0';
     const logoHeight = parseInt(f.logoHeight) || 64;
     const logoMaxWidth = Math.max(Math.round(logoHeight * 5), 280);
+
+    const headerLayout = f.headerLayout || 'side-by-side';
+    const isSideBySide = headerLayout === 'side-by-side';
+    const heroAlign = f.heroAlign || 'left';
+    const heroBtnMargin = heroAlign === 'center' ? '24px auto 0 auto' : heroAlign === 'right' ? '24px 0 0 auto' : '24px 0 0 0';
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -169,9 +178,16 @@ const compileHtml = (f) => {
         img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
 
         /* Featured 2-Column Equal Fixed Size */
-        .featured-grid-table { width: 100% !important; border-collapse: separate !important; }
+        .featured-grid-table { width: 100% !important; height: 100% !important; border-collapse: separate !important; }
+        .featured-grid-row { height: 100% !important; }
+        .featured-grid-row > .col-left,
+        .featured-grid-row > .col-right {
+            height: 100% !important;
+            vertical-align: top !important;
+        }
         .featured-card {
             width: 100% !important;
+            height: 100% !important;
             background-color: #ffffff;
             border-collapse: separate !important;
             mso-table-lspace: 0pt;
@@ -212,13 +228,16 @@ const compileHtml = (f) => {
             .container-table { width: 100% !important; max-width: 100% !important; }
             .mobile-padding { padding-left: 20px !important; padding-right: 20px !important; }
             .mobile-stack { display: block !important; width: 100% !important; max-width: 100% !important; }
+            .mobile-stack-right { padding-top: 16px !important; padding-left: 0 !important; text-align: left !important; }
             .mobile-img { width: 100% !important; height: auto !important; min-height: auto !important; }
             .mobile-headline { font-size: 30px !important; line-height: 1.25 !important; }
             .mobile-cta-box { padding: 36px 16px !important; }
             .mobile-cta-cell { display: inline-block !important; padding: 4px !important; }
             .card-spacer { display: none !important; }
             .card-item { margin-bottom: 16px !important; }
-            .col-left, .col-right { padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 20px !important; width: 100% !important; display: block !important; }
+            .col-left, .col-right { padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 20px !important; width: 100% !important; height: auto !important; display: block !important; }
+            .featured-grid-table, .featured-grid-row { height: auto !important; }
+            .featured-card { height: auto !important; min-height: 0 !important; }
             .featured-col-img { width: 100% !important; height: 210px !important; object-fit: cover !important; }
         }
     </style>
@@ -240,7 +259,55 @@ const compileHtml = (f) => {
                     
                     <!-- Header / Company Logo (Black Header Bar) -->
                     <tr>
-                        <td align="${align}" style="background-color: #0b0f19; padding: 26px 36px; text-align: ${align}; border-radius: 15px 15px 0 0;" class="mobile-padding">
+                        <td align="${isSideBySide ? 'left' : align}" style="background-color: #0b0f19; padding: 28px 36px; text-align: ${isSideBySide ? 'left' : align}; border-radius: 15px 15px 0 0;" class="mobile-padding" data-header-layout="${headerLayout}">
+                            ${isSideBySide ? `
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <!-- Left: Logo -->
+                                    <td class="mobile-stack" width="38%" valign="middle" align="left" style="vertical-align: middle; text-align: left; padding-right: 16px;">
+                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="left" style="margin: 0;">
+                                            <tr>
+                                                <td align="left" valign="middle">
+                                                    <a href="{{app_url}}" target="_blank" style="text-decoration: none; display: inline-block;">
+                                                        ${(f.brandLogoDarkUrl || f.brandLogoUrl) ? `
+                                                        <img src="${escapeHtml(cleanUrl(f.brandLogoDarkUrl || f.brandLogoUrl))}" alt="${escapeHtml(f.brandName || 'Loops Integrated')}" height="${logoHeight}" style="height: ${logoHeight}px; max-height: ${logoHeight}px; width: auto; max-width: ${Math.min(logoMaxWidth, 240)}px; display: block; margin: 0; border: 0;" />
+                                                        ` : `
+                                                        <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">
+                                                            ${escapeHtml(f.brandName || 'Loops Integrated')}
+                                                        </span>
+                                                        `}
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <!-- Right: Edition & Heading & Subtitle -->
+                                    <td class="mobile-stack mobile-stack-right" width="62%" valign="middle" align="right" style="vertical-align: middle; text-align: right; padding-left: 16px;">
+                                        ${f.edition ? `
+                                        <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #2fd0ca; text-transform: uppercase; letter-spacing: 2px;">
+                                            ${escapeHtml(f.edition)}
+                                        </p>` : ''}
+                                        ${f.headerTitle ? `
+                                        <h1 class="mobile-headline" style="margin: 6px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; color: #ffffff; line-height: 1.25; letter-spacing: -0.3px;">
+                                            ${escapeHtml(f.headerTitle)}
+                                        </h1>` : ''}
+                                        ${f.headerSubtitle ? `
+                                        <p style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #cbd5e1; line-height: 1.5;">
+                                            ${escapeHtml(f.headerSubtitle)}
+                                        </p>` : ''}
+                                        ${f.headerButtonText ? `
+                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="right" style="margin: 12px 0 0 auto;">
+                                            <tr>
+                                                <td align="center" style="border-radius: 9999px; background-color: ${escapeHtml(f.headerButtonColor || '#ff0878')};">
+                                                    <a href="${escapeHtml(cleanUrl(f.headerButtonUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12.5px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 9px 22px; border-radius: 9999px; display: inline-block; border: 1px solid ${escapeHtml(f.headerButtonColor || '#ff0878')}; box-shadow: 0 4px 12px rgba(255, 8, 120, 0.25);">
+                                                        ${escapeHtml(f.headerButtonText)}
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>` : ''}
+                                    </td>
+                                </tr>
+                            </table>` : `
                             <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="${align}" style="margin: ${margin};">
                                 <tr>
                                     <td align="${align}" valign="middle">
@@ -255,28 +322,34 @@ const compileHtml = (f) => {
                                         </a>
                                     </td>
                                 </tr>
-                            </table>
+                            </table>`}
                         </td>
                     </tr>
 
-                    <!-- Hero Section -->
+                    <!-- Hero Section (banner image for side-by-side, or full hero when stacked) -->
+                    ${isSideBySide ? (f.headerImage ? `
                     <tr>
-                        <td align="center" style="padding: 36px 36px 32px 36px; text-align: center;" class="mobile-padding">
+                        <td style="padding: 24px 36px 12px 36px;" class="mobile-padding">
+                            <img class="mobile-img" src="${escapeHtml(cleanUrl(f.headerImage))}" alt="Hero Banner" width="${maxWidth - 72}" style="width: 100%; max-width: ${maxWidth - 72}px; height: auto; display: block; border-radius: 14px; border: 0;" />
+                        </td>
+                    </tr>` : '') : `
+                    <tr>
+                        <td align="${heroAlign}" style="padding: 36px 36px 32px 36px; text-align: ${heroAlign};" class="mobile-padding">
                             ${f.edition ? `
-                            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: ${brandColor}; text-transform: uppercase; letter-spacing: 2.2px;">
+                            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: ${brandColor}; text-transform: uppercase; letter-spacing: 2.2px; text-align: ${heroAlign};">
                                 ${escapeHtml(f.edition)}
                             </p>` : ''}
                             ${f.headerTitle ? `
-                            <h1 class="mobile-headline" style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 40px; font-weight: 700; color: #151a29; line-height: 1.2; letter-spacing: -0.5px;">
+                            <h1 class="mobile-headline" style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 40px; font-weight: 700; color: #151a29; line-height: 1.2; letter-spacing: -0.5px; text-align: ${heroAlign};">
                                 ${escapeHtml(f.headerTitle)}
                             </h1>` : ''}
                             ${f.headerSubtitle ? `
-                            <p style="margin: 14px auto 0 auto; max-width: 480px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #636978; line-height: 1.6;">
+                            <p style="margin: ${heroAlign === 'center' ? '14px auto 0 auto' : '14px 0 0 0'}; max-width: ${heroAlign === 'center' ? '480px' : '580px'}; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #636978; line-height: 1.6; text-align: ${heroAlign};">
                                 ${escapeHtml(f.headerSubtitle)}
                             </p>` : ''}
                             
                             ${f.headerButtonText ? `
-                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="margin: 24px auto 0 auto;">
+                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="${heroAlign}" style="margin: ${heroBtnMargin};">
                                 <tr>
                                     <td align="center" style="border-radius: 9999px; background-color: ${escapeHtml(f.headerButtonColor || '#ff0878')};">
                                         <a href="${escapeHtml(cleanUrl(f.headerButtonUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 13px 32px; border-radius: 9999px; display: inline-block; border: 1px solid ${escapeHtml(f.headerButtonColor || '#ff0878')}; box-shadow: 0 4px 12px rgba(255, 8, 120, 0.25);">
@@ -291,7 +364,7 @@ const compileHtml = (f) => {
                                 <img class="mobile-img" src="${escapeHtml(cleanUrl(f.headerImage))}" alt="Hero Banner" width="${maxWidth - 72}" style="width: 100%; max-width: ${maxWidth - 72}px; height: auto; display: block; border-radius: 16px; border: 0;" />
                             </div>` : ''}
                         </td>
-                    </tr>
+                    </tr>`}
 
                     <!-- Intro Section -->
                     ${(f.introGreeting || f.introText) ? `
@@ -326,22 +399,22 @@ const compileHtml = (f) => {
                                 };
 
                                 const renderColumnCard = (item, idx) => {
-                                    const cardHeightVal = (f.featuredCardHeight && f.featuredCardHeight !== 'auto')
-                                        ? `${parseInt(f.featuredCardHeight, 10)}px`
-                                        : '560px';
-                                    const cardHeightStyle = `min-height: ${cardHeightVal};`;
+                                    const cardHeightValNum = (f.featuredCardHeight && f.featuredCardHeight !== 'auto')
+                                        ? parseInt(f.featuredCardHeight, 10)
+                                        : 560;
+                                    const cardHeightStyle = `min-height: ${cardHeightValNum}px;`;
 
                                     return `
-                            <table class="featured-card" data-featured-card="true" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; border-collapse: separate; height: 100%; ${cardHeightStyle} box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+                            <table class="featured-card" data-featured-card="true" role="presentation" width="100%" height="${cardHeightValNum}" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; border-collapse: separate; height: 100%; ${cardHeightStyle} box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
                                 <tbody>
                                     ${item.image ? `
-                                    <tr class="featured-card-img-tr">
-                                        <td class="featured-card-img-td" style="padding: 0; margin: 0; line-height: 0; font-size: 0; background-color: #f1f3f7;" align="center">
-                                            <img class="mobile-img featured-col-img" src="${escapeHtml(cleanUrl(item.image))}" alt="${escapeHtml(item.title || 'Featured Image')}" width="${Math.floor((maxWidth - 72 - 24) / 2)}" style="width: 100%; max-width: 100%; height: 210px; max-height: 210px; object-fit: cover; display: block; border: 0;" />
+                                    <tr class="featured-card-img-tr" height="210">
+                                        <td class="featured-card-img-td" height="210" style="padding: 0; margin: 0; line-height: 0; font-size: 0; background-color: #f1f3f7; height: 210px;" align="center">
+                                            <img class="mobile-img featured-col-img" src="${escapeHtml(cleanUrl(item.image))}" alt="${escapeHtml(item.title || 'Featured Image')}" width="${Math.floor((maxWidth - 72 - 24) / 2)}" height="210" style="width: 100%; max-width: 100%; height: 210px; max-height: 210px; object-fit: cover; display: block; border: 0;" />
                                         </td>
                                     </tr>` : ''}
                                     <tr class="featured-card-body-tr">
-                                        <td valign="top" style="padding: 24px 22px 26px 22px; vertical-align: top;" class="mobile-padding featured-card-body-td">
+                                        <td valign="top" style="padding: 24px 22px 14px 22px; vertical-align: top;" class="mobile-padding featured-card-body-td">
                                             <div class="featured-card-content">
                                                 ${renderBadge(item, idx)}
                                                 ${item.title ? `
@@ -353,14 +426,21 @@ const compileHtml = (f) => {
                                                     ${escapeHtml(item.text)}
                                                 </p>` : ''}
                                             </div>
-                                            ${item.linkText ? `
-                                            <div class="featured-card-action" style="margin-top: 18px; padding-top: 4px;">
+                                        </td>
+                                    </tr>
+                                    ${item.linkText ? `
+                                    <tr class="featured-card-action-tr" height="42">
+                                        <td valign="bottom" height="42" style="padding: 0 22px 26px 22px; vertical-align: bottom; height: 42px;" class="featured-card-action-td">
+                                            <div class="featured-card-action">
                                                 <a href="${escapeHtml(cleanUrl(item.linkUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: ${brandColor}; text-decoration: none; display: inline-block;">
                                                     ${escapeHtml(item.linkText)}
                                                 </a>
-                                            </div>` : ''}
+                                            </div>
                                         </td>
-                                    </tr>
+                                    </tr>` : `
+                                    <tr height="20">
+                                        <td height="20" style="height: 20px; padding: 0;">&nbsp;</td>
+                                    </tr>`}
                                 </tbody>
                             </table>`;
                                 };
@@ -407,25 +487,25 @@ const compileHtml = (f) => {
                                 return pairs.map((pair, pIdx) => {
                                     if (pair.length === 2) {
                                         return `
-                            <table class="featured-grid-table" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="${pIdx > 0 ? 'margin-top: 24px;' : ''}">
-                                <tr>
-                                    <td class="mobile-stack col-left" width="50%" valign="top" style="width: 50%; padding-right: 12px; padding-bottom: 0; vertical-align: top;">
+                            <table class="featured-grid-table" role="presentation" width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" style="${pIdx > 0 ? 'margin-top: 24px;' : ''} height: 100%;">
+                                <tr class="featured-grid-row" style="height: 100%;">
+                                    <td class="mobile-stack col-left" width="50%" height="100%" valign="top" style="width: 50%; height: 100%; padding-right: 12px; padding-bottom: 0; vertical-align: top;">
                                         ${renderColumnCard(pair[0], pIdx * 2)}
                                     </td>
-                                    <td class="mobile-stack col-right" width="50%" valign="top" style="width: 50%; padding-left: 12px; padding-bottom: 0; vertical-align: top;">
+                                    <td class="mobile-stack col-right" width="50%" height="100%" valign="top" style="width: 50%; height: 100%; padding-left: 12px; padding-bottom: 0; vertical-align: top;">
                                         ${renderColumnCard(pair[1], pIdx * 2 + 1)}
                                     </td>
                                 </tr>
                             </table>`;
                                     } else {
                                         return `
-                            <table class="featured-grid-table" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="${pIdx > 0 ? 'margin-top: 24px;' : ''}">
-                                <tr>
-                                    <td class="mobile-stack col-left" width="${items.length === 1 ? '100%' : '50%'}" valign="top" style="${items.length === 1 ? 'width: 100%;' : 'width: 50%; padding-right: 12px;'} vertical-align: top;">
+                            <table class="featured-grid-table" role="presentation" width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" style="${pIdx > 0 ? 'margin-top: 24px;' : ''} height: 100%;">
+                                <tr class="featured-grid-row" style="height: 100%;">
+                                    <td class="mobile-stack col-left" width="${items.length === 1 ? '100%' : '50%'}" height="100%" valign="top" style="${items.length === 1 ? 'width: 100%;' : 'width: 50%; padding-right: 12px;'} height: 100%; vertical-align: top;">
                                         ${renderColumnCard(pair[0], pIdx * 2)}
                                     </td>
                                     ${items.length > 1 ? `
-                                    <td class="mobile-stack col-right" width="50%" valign="top" style="width: 50%; padding-left: 12px; vertical-align: top;">
+                                    <td class="mobile-stack col-right" width="50%" height="100%" valign="top" style="width: 50%; height: 100%; padding-left: 12px; vertical-align: top;">
                                     </td>` : ''}
                                 </tr>
                             </table>`;
@@ -435,8 +515,9 @@ const compileHtml = (f) => {
                         </td>
                     </tr>` : ''}
 
-                    <!-- Call To Action (Gradient Banner) -->
-                    ${(f.showCta !== false && (f.ctaTitle || f.ctaSubtitle || f.ctaButtonText || (f.showCtaSecondaryButton && f.ctaSecondaryButtonText))) ? `
+                    <!-- Call To Action Section -->
+                    ${(f.showCta !== false && (f.ctaTitle || f.ctaSubtitle || f.ctaButtonText || (f.showCtaSecondaryButton && f.ctaSecondaryButtonText))) ? (
+                        (f.ctaStyle === 'gradient') ? `
                     <tr>
                         <td style="padding: 20px 36px 32px 36px;" class="mobile-padding">
                             <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background: linear-gradient(135deg, #0057c5 0%, #8035d1 50%, #ff0878 100%); background-color: #0057c5; border-radius: 16px; text-align: center;">
@@ -465,7 +546,37 @@ const compileHtml = (f) => {
                                 </tr>
                             </table>
                         </td>
-                    </tr>` : ''}
+                    </tr>` : `
+                    <tr>
+                        <td style="padding: 28px 36px 36px 36px;" class="mobile-padding" data-cta-style="clean">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="left" style="text-align: left;">
+                                        ${f.ctaTitle ? `<h3 style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: #151a29; letter-spacing: -0.4px; line-height: 1.3;">${escapeHtml(f.ctaTitle)}</h3>` : ''}
+                                        ${f.ctaSubtitle ? `<p style="margin: 10px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #636978; line-height: 1.6; max-width: 600px;">${escapeHtml(f.ctaSubtitle)}</p>` : ''}
+                                        ${(f.ctaButtonText || (f.showCtaSecondaryButton && f.ctaSecondaryButtonText)) ? `
+                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="left" style="margin: 20px 0 0 0;">
+                                            <tr>
+                                                ${f.ctaButtonText ? `
+                                                <td align="center" style="border-radius: 8px; background-color: ${f.ctaButtonColor || '#0b0f19'};">
+                                                    <a href="${escapeHtml(cleanUrl(f.ctaButtonUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 800; color: #ffffff; text-decoration: none; padding: 13px 26px; border-radius: 8px; display: inline-block; background-color: ${f.ctaButtonColor || '#0b0f19'}; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2;">
+                                                        ${escapeHtml(f.ctaButtonText)}
+                                                    </a>
+                                                </td>` : ''}
+                                                ${(f.showCtaSecondaryButton && f.ctaSecondaryButtonText) ? `
+                                                <td align="center" style="border-radius: 8px; padding-left: 12px;">
+                                                    <a href="${escapeHtml(cleanUrl(f.ctaSecondaryButtonUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; color: #151a29; text-decoration: none; padding: 12px 24px; border-radius: 8px; display: inline-block; background-color: #f1f5f9; border: 1px solid #cbd5e1; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2;">
+                                                        ${escapeHtml(f.ctaSecondaryButtonText)}
+                                                    </a>
+                                                </td>` : ''}
+                                            </tr>
+                                        </table>` : ''}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>`
+                    ) : ''}
 
 
                     <!-- Footer Section -->
@@ -555,7 +666,7 @@ const extractFieldsFromHtml = (htmlStr) => {
             }
         }
         const headerLogoTd = doc.querySelector('tr:first-child td.mobile-padding');
-        const logoAlign = headerLogoTd?.getAttribute('align') || (headerLogoTd?.style?.textAlign) || 'center';
+        const logoAlign = headerLogoTd?.getAttribute('align') || (headerLogoTd?.style?.textAlign) || 'left';
 
         // Edition
         const editionP = doc.querySelector('p[style*="letter-spacing: 2"], p[style*="letter-spacing: 2.2px"], p[style*="uppercase"]');
@@ -572,6 +683,9 @@ const extractFieldsFromHtml = (htmlStr) => {
             while (next && next.tagName !== 'P') next = next.nextElementSibling;
             if (next) headerSubtitle = next.textContent.trim();
         }
+
+        const heroTd = h1?.closest('td');
+        const heroAlign = heroTd?.getAttribute('align') || (heroTd?.style?.textAlign) || 'left';
 
         // Hero Button
         const heroBtn = doc.querySelector('table[style*="margin: 24px auto"] a, a[style*="Explore More"], td[align="center"] table a');
@@ -705,8 +819,28 @@ const extractFieldsFromHtml = (htmlStr) => {
             });
         }
 
-        // CTA Banner
-        const h3 = doc.querySelector('td.mobile-cta-box h3, h3');
+        // CTA Section (Clean vs Gradient)
+        const gradientCtaTable = doc.querySelector('table[style*="linear-gradient"], td.mobile-cta-box');
+        let ctaStyle = 'clean';
+        let h3 = null;
+        let ctaBtns = [];
+
+        if (gradientCtaTable) {
+            ctaStyle = 'gradient';
+            h3 = doc.querySelector('td.mobile-cta-box h3, table[style*="linear-gradient"] h3');
+            ctaBtns = Array.from(doc.querySelectorAll('td.mobile-cta-box a, table[style*="linear-gradient"] a'));
+        } else {
+            const cleanCtaTd = doc.querySelector('[data-cta-style="clean"]') ||
+                               Array.from(doc.querySelectorAll('td.mobile-padding')).find((td) => td.querySelector('h3') && !td.querySelector('table[style*="linear-gradient"]'));
+            h3 = cleanCtaTd ? cleanCtaTd.querySelector('h3') : doc.querySelector('h3');
+            if (cleanCtaTd) {
+                ctaBtns = Array.from(cleanCtaTd.querySelectorAll('a'));
+            } else if (h3) {
+                const parentTd = h3.closest('td');
+                ctaBtns = parentTd ? Array.from(parentTd.querySelectorAll('a')) : [];
+            }
+        }
+
         const ctaTitle = h3 ? h3.textContent.trim() : '';
         let ctaSubtitle = '';
         if (h3) {
@@ -714,15 +848,21 @@ const extractFieldsFromHtml = (htmlStr) => {
             while (next && next.tagName !== 'P') next = next.nextElementSibling;
             if (next) ctaSubtitle = next.textContent.trim();
         }
-        const ctaBtns = Array.from(doc.querySelectorAll('td.mobile-cta-box a, table[style*="linear-gradient"] a'));
         const ctaBtn1 = ctaBtns[0];
         const ctaBtn2 = ctaBtns[1];
         const ctaButtonText = ctaBtn1 ? ctaBtn1.textContent.trim() : '';
-        const ctaButtonUrl = ctaBtn1 ? ctaBtn1.getAttribute('href') || '' : '';
+        const ctaButtonUrl = ctaBtn1 ? cleanExtract(ctaBtn1.getAttribute('href') || '') : '';
         const ctaSecondaryButtonText = ctaBtn2 ? ctaBtn2.textContent.trim() : '';
-        const ctaSecondaryButtonUrl = ctaBtn2 ? ctaBtn2.getAttribute('href') || '' : '';
+        const ctaSecondaryButtonUrl = ctaBtn2 ? cleanExtract(ctaBtn2.getAttribute('href') || '') : '';
         const showCtaSecondaryButton = !!ctaSecondaryButtonText;
         const showCta = !!(ctaTitle || ctaSubtitle || ctaButtonText || ctaSecondaryButtonText);
+
+        let ctaButtonColor = '#0b0f19';
+        if (ctaBtn1) {
+            const btnBg = ctaBtn1.getAttribute('style')?.match(/background-color:\s*(#[0-9a-fA-F]{3,6})/i) ||
+                          ctaBtn1.parentElement?.getAttribute('style')?.match(/background-color:\s*(#[0-9a-fA-F]{3,6})/i);
+            if (btnBg && btnBg[1]) ctaButtonColor = btnBg[1];
+        }
 
         // CEO Note
         const ceoAvatarDiv = doc.querySelector('div[style*="border-radius: 50%"]');
@@ -767,10 +907,16 @@ const extractFieldsFromHtml = (htmlStr) => {
             if (match && match[1]) templateWidth = match[1];
         }
 
+        const headerLayoutAttr = doc.querySelector('[data-header-layout]')?.getAttribute('data-header-layout');
+        const hasSideBySideHeader = doc.querySelector('td.mobile-stack-right') !== null;
+        let detectedHeaderLayout = headerLayoutAttr || (hasSideBySideHeader ? 'side-by-side' : 'side-by-side');
+
         return {
             templateWidth: templateWidth || defaultFields.templateWidth,
             preheader: preheader || defaultFields.preheader,
-            logoAlign: logoAlign || defaultFields.logoAlign,
+            headerLayout: detectedHeaderLayout || 'side-by-side',
+            logoAlign: logoAlign || defaultFields.logoAlign || 'left',
+            heroAlign: heroAlign || defaultFields.heroAlign || 'left',
             brandName: brandName || defaultFields.brandName,
             brandLogoUrl: brandLogoUrl || defaultFields.brandLogoUrl,
             brandLogoDarkUrl: brandLogoDarkUrl || defaultFields.brandLogoDarkUrl,
@@ -797,10 +943,12 @@ const extractFieldsFromHtml = (htmlStr) => {
             featuredImage: featuredItems[0]?.image || defaultFields.featuredImage,
             cards: cards.length > 0 ? cards : [],
             showCta: showCta,
+            ctaStyle: ctaStyle || 'clean',
             ctaTitle: ctaTitle || defaultFields.ctaTitle,
             ctaSubtitle: ctaSubtitle || defaultFields.ctaSubtitle,
             ctaButtonText: ctaButtonText || defaultFields.ctaButtonText,
             ctaButtonUrl: ctaButtonUrl || defaultFields.ctaButtonUrl,
+            ctaButtonColor: ctaButtonColor || defaultFields.ctaButtonColor || '#0b0f19',
             showCtaSecondaryButton: showCtaSecondaryButton,
             ctaSecondaryButtonText: ctaSecondaryButtonText || defaultFields.ctaSecondaryButtonText,
             ctaSecondaryButtonUrl: ctaSecondaryButtonUrl || defaultFields.ctaSecondaryButtonUrl,
@@ -1166,6 +1314,30 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                     </span>
                                 </div>
 
+                                {/* Header Style Layout */}
+                                <div>
+                                    <label className="block text-[10px] text-slate-400 mb-1.5 font-semibold">Header Layout Style</label>
+                                    <div className="grid grid-cols-2 gap-1 bg-slate-800 p-1 rounded-xl">
+                                        {[
+                                            { id: 'side-by-side', label: 'Side-by-Side (Logo + Title)' },
+                                            { id: 'stacked', label: 'Stacked (Logo Above)' },
+                                        ].map(({ id, label }) => (
+                                            <button
+                                                key={id}
+                                                type="button"
+                                                onClick={() => updateField('headerLayout', id)}
+                                                className={`py-1 text-[11px] font-bold rounded-lg transition flex items-center justify-center ${
+                                                    (fields.headerLayout || 'side-by-side') === id
+                                                        ? 'bg-indigo-600 text-white shadow-sm'
+                                                        : 'text-slate-400 hover:text-white'
+                                                }`}
+                                            >
+                                                {label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 {/* Logo Alignment */}
                                 <div>
                                     <label className="block text-[10px] text-slate-400 mb-1.5 font-semibold">Header Logo Alignment</label>
@@ -1180,7 +1352,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                                 type="button"
                                                 onClick={() => updateField('logoAlign', id)}
                                                 className={`py-1 text-xs font-bold rounded-lg transition flex items-center justify-center gap-1 ${
-                                                    (fields.logoAlign || 'center') === id
+                                                    (fields.logoAlign || 'left') === id
                                                         ? 'bg-indigo-600 text-white shadow-sm'
                                                         : 'text-slate-400 hover:text-white'
                                                 }`}
@@ -1327,6 +1499,30 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                     <ImageIcon className="h-3.5 w-3.5 mr-1.5 text-sky-400" /> Hero Headline & Banner
                                 </h4>
                                 <div className="space-y-2.5">
+                                    {/* Headline & Description Alignment */}
+                                    <div>
+                                        <label className="block text-[10px] text-slate-400 mb-1.5 font-semibold">Headline & Description Alignment</label>
+                                        <div className="grid grid-cols-3 gap-1 bg-slate-800 p-1 rounded-xl">
+                                            {[
+                                                { id: 'left', label: 'Left', icon: AlignLeft },
+                                                { id: 'center', label: 'Center', icon: AlignCenter },
+                                                { id: 'right', label: 'Right', icon: AlignRight },
+                                            ].map(({ id, label, icon: Icon }) => (
+                                                <button
+                                                    key={id}
+                                                    type="button"
+                                                    onClick={() => updateField('heroAlign', id)}
+                                                    className={`py-1 text-xs font-bold rounded-lg transition flex items-center justify-center gap-1 ${
+                                                        (fields.heroAlign || 'left') === id
+                                                            ? 'bg-indigo-600 text-white shadow-sm'
+                                                            : 'text-slate-400 hover:text-white'
+                                                    }`}
+                                                >
+                                                    <Icon className="h-3 w-3" /> {label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
                                     <div>
                                         <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Main Headline (H1 Serif)</label>
                                         <input
@@ -1655,7 +1851,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                             <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
                                 <div className="flex items-center justify-between border-b border-slate-800 pb-2">
                                     <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center">
-                                        <Sparkles className="h-3.5 w-3.5 mr-1.5 text-indigo-400" /> Gradient CTA Banner
+                                        <Sparkles className="h-3.5 w-3.5 mr-1.5 text-indigo-400" /> Call To Action (CTA)
                                     </h4>
                                     <button
                                         type="button"
@@ -1671,36 +1867,68 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                 {fields.showCta !== false && (
                                     <div className="space-y-2.5">
                                         <div>
+                                            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">CTA Style</label>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateField('ctaStyle', 'clean')}
+                                                    className={`py-1.5 px-3 rounded-xl text-xs font-semibold border flex items-center justify-center space-x-1.5 transition ${
+                                                        (fields.ctaStyle || 'clean') === 'clean'
+                                                            ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
+                                                            : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                                                    }`}
+                                                >
+                                                    <AlignLeft className="h-3.5 w-3.5" />
+                                                    <span>Clean / Minimal</span>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateField('ctaStyle', 'gradient')}
+                                                    className={`py-1.5 px-3 rounded-xl text-xs font-semibold border flex items-center justify-center space-x-1.5 transition ${
+                                                        fields.ctaStyle === 'gradient'
+                                                            ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
+                                                            : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                                                    }`}
+                                                >
+                                                    <Sparkles className="h-3.5 w-3.5" />
+                                                    <span>Gradient Box</span>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div>
                                             <label className="block text-[10px] text-slate-400 mb-1 font-semibold">CTA Headline</label>
                                             <input
                                                 type="text"
                                                 value={fields.ctaTitle || ''}
                                                 onChange={(e) => updateField('ctaTitle', e.target.value)}
-                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-serif font-bold"
+                                                placeholder="See Our Latest Work"
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-bold"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">CTA Subtitle</label>
-                                            <input
-                                                type="text"
+                                            <label className="block text-[10px] text-slate-400 mb-1 font-semibold">CTA Subtitle / Description</label>
+                                            <textarea
+                                                rows={2}
                                                 value={fields.ctaSubtitle || ''}
                                                 onChange={(e) => updateField('ctaSubtitle', e.target.value)}
-                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white"
+                                                placeholder="From award-winning campaigns to new productions..."
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-xs text-white"
                                             />
                                         </div>
                                         <div className="grid grid-cols-2 gap-2">
                                             <div>
-                                                <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Primary Button</label>
+                                                <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Button Label</label>
                                                 <input
                                                     type="text"
                                                     value={fields.ctaButtonText || ''}
                                                     onChange={(e) => updateField('ctaButtonText', e.target.value)}
-                                                    placeholder="Explore Now"
+                                                    placeholder="VISIT OUR WEBSITE"
                                                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-bold"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Primary Target URL</label>
+                                                <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Button Target URL</label>
                                                 <input
                                                     type="text"
                                                     value={fields.ctaButtonUrl || ''}
@@ -1711,11 +1939,39 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                             </div>
                                         </div>
 
+                                        {(fields.ctaStyle || 'clean') === 'clean' && (
+                                            <div>
+                                                <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Button Background Color</label>
+                                                <div className="flex items-center space-x-2">
+                                                    <input
+                                                        type="color"
+                                                        value={fields.ctaButtonColor || '#0b0f19'}
+                                                        onChange={(e) => updateField('ctaButtonColor', e.target.value)}
+                                                        className="h-8 w-8 rounded-lg bg-slate-800 border border-slate-700 cursor-pointer p-0.5"
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        value={fields.ctaButtonColor || '#0b0f19'}
+                                                        onChange={(e) => updateField('ctaButtonColor', e.target.value)}
+                                                        className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => updateField('ctaButtonColor', '#0b0f19')}
+                                                        className="text-[10px] text-slate-400 hover:text-white px-2 py-1 bg-slate-800 border border-slate-700 rounded-lg"
+                                                        title="Reset to dark navy"
+                                                    >
+                                                        Default
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+
                                         {/* Option to Add New Button Next to it */}
                                         <div className="pt-2.5 border-t border-slate-800/80">
                                             <div className="flex items-center justify-between mb-2">
                                                 <label className="text-[10px] text-slate-300 font-semibold flex items-center">
-                                                    Second Button (Next to Button)
+                                                    Second Button (Optional)
                                                 </label>
                                                 <button
                                                     type="button"

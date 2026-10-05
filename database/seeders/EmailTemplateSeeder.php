@@ -40,6 +40,7 @@ class EmailTemplateSeeder extends Seeder
             .container-table { width: 100% !important; max-width: 100% !important; }
             .mobile-padding { padding-left: 20px !important; padding-right: 20px !important; }
             .mobile-stack { display: block !important; width: 100% !important; max-width: 100% !important; }
+            .mobile-stack-right { padding-top: 16px !important; padding-left: 0 !important; text-align: left !important; }
             .mobile-img { width: 100% !important; height: auto !important; min-height: auto !important; }
             .mobile-headline { font-size: 30px !important; line-height: 1.25 !important; }
             .mobile-cta-box { padding: 36px 16px !important; }
@@ -63,49 +64,44 @@ class EmailTemplateSeeder extends Seeder
                 <!-- Inner Container Card -->
                 <table role="presentation" class="container-table" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 760px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px -15px rgba(43, 42, 142, 0.08); border: 1px solid #e2e4ea;">
                     
-                    <!-- Header / Company Logo (Black Header Bar) -->
+                    <!-- Header / Company Logo (Black Header Bar with Side-by-Side Logo & Heading) -->
                     <tr>
-                        <td align="center" style="background-color: #0b0f19; padding: 26px 36px; text-align: center; border-radius: 15px 15px 0 0;" class="mobile-padding">
-                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto;">
+                        <td style="background-color: #0b0f19; padding: 28px 36px; border-radius: 15px 15px 0 0;" class="mobile-padding" data-header-layout="side-by-side">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
-                                    <td align="center" valign="middle">
-                                        <a href="{{app_url}}" target="_blank" style="text-decoration: none; display: inline-block;">
-                                            <img src="/images/loops-logo-white.png" alt="Loops Integrated" height="64" style="height: 64px; max-height: 64px; width: auto; max-width: 320px; display: block; margin: 0 auto; border: 0;" />
-                                        </a>
+                                    <!-- Left: Logo -->
+                                    <td class="mobile-stack" width="38%" valign="middle" align="left" style="vertical-align: middle; text-align: left; padding-right: 16px;">
+                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="left" style="margin: 0;">
+                                            <tr>
+                                                <td align="left" valign="middle">
+                                                    <a href="{{app_url}}" target="_blank" style="text-decoration: none; display: inline-block;">
+                                                        <img src="/images/loops-logo-white.png" alt="Loops Integrated" height="64" style="height: 64px; max-height: 64px; width: auto; max-width: 240px; display: block; margin: 0; border: 0;" />
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <!-- Right: Edition & Heading & Subtitle -->
+                                    <td class="mobile-stack mobile-stack-right" width="62%" valign="middle" align="right" style="vertical-align: middle; text-align: right; padding-left: 16px;">
+                                        <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #2fd0ca; text-transform: uppercase; letter-spacing: 2px;">
+                                            October Edition
+                                        </p>
+                                        <h1 class="mobile-headline" style="margin: 6px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; color: #ffffff; line-height: 1.25; letter-spacing: -0.3px;">
+                                            What's New This Month?
+                                        </h1>
+                                        <p style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #cbd5e1; line-height: 1.5;">
+                                            Discover our latest updates, products, news and special offers.
+                                        </p>
                                     </td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
 
-                    <!-- Hero Section -->
+                    <!-- Hero Banner Image -->
                     <tr>
-                        <td align="center" style="padding: 36px 36px 32px 36px; text-align: center;" class="mobile-padding">
-                            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #0057c5; text-transform: uppercase; letter-spacing: 2.2px;">
-                                October Edition
-                            </p>
-                            <h1 class="mobile-headline" style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 40px; font-weight: 700; color: #151a29; line-height: 1.2; letter-spacing: -0.5px;">
-                                What's New This Month?
-                            </h1>
-                            <p style="margin: 14px auto 0 auto; max-width: 520px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #636978; line-height: 1.6;">
-                                Discover our latest updates, products, news and special offers.
-                            </p>
-                            
-                            <!-- Hero CTA Button -->
-                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="margin: 24px auto 0 auto;">
-                                <tr>
-                                    <td align="center" style="border-radius: 9999px; background-color: #ff0878;">
-                                        <a href="https://example.com" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 13px 32px; border-radius: 9999px; display: inline-block; border: 1px solid #ff0878; box-shadow: 0 4px 12px rgba(255, 8, 120, 0.25);">
-                                            Explore More
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <!-- Hero Banner Image -->
-                            <div style="margin-top: 32px;">
-                                <img class="mobile-img" src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1280&h=720&fit=crop&q=80" alt="Bright modern office workspace" width="688" style="width: 100%; max-width: 688px; height: auto; display: block; border-radius: 16px; border: 0;" />
-                            </div>
+                        <td style="padding: 24px 36px 12px 36px;" class="mobile-padding">
+                            <img class="mobile-img" src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1280&h=720&fit=crop&q=80" alt="Hero Banner" width="688" style="width: 100%; max-width: 688px; height: auto; display: block; border-radius: 14px; border: 0;" />
                         </td>
                     </tr>
 
@@ -152,28 +148,23 @@ class EmailTemplateSeeder extends Seeder
                         </td>
                     </tr>
 
-                    <!-- Call To Action (Gradient Banner) -->
+                    <!-- Call To Action Section (Clean / Minimal) -->
                     <tr>
-                        <td style="padding: 20px 36px 32px 36px;" class="mobile-padding">
-                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background: linear-gradient(135deg, #0057c5 0%, #8035d1 50%, #ff0878 100%); background-color: #0057c5; border-radius: 16px; text-align: center;">
+                        <td style="padding: 28px 36px 36px 36px;" class="mobile-padding" data-cta-style="clean">
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
-                                    <td style="padding: 48px 32px;" class="mobile-cta-box">
-                                        <h3 style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px;">
-                                            Ready to Discover More?
+                                    <td align="left" style="text-align: left;">
+                                        <h3 style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: #151a29; letter-spacing: -0.4px; line-height: 1.3;">
+                                            See Our Latest Work
                                         </h3>
-                                        <p style="margin: 12px auto 0 auto; max-width: 380px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #ffffff; opacity: 0.88; line-height: 1.5;">
-                                            Explore our latest updates and find something you'll love.
+                                        <p style="margin: 10px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #636978; line-height: 1.6; max-width: 600px;">
+                                            From award-winning campaigns to new productions, take a look at what we've been creating recently.
                                         </p>
-                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 22px auto 0 auto;">
+                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="left" style="margin: 20px 0 0 0;">
                                             <tr>
-                                                <td class="mobile-cta-cell" align="center" style="padding: 4px 6px;">
-                                                    <a href="https://example.com" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: #0057c5; text-decoration: none; padding: 11px 24px; border-radius: 9999px; display: inline-block; background-color: #ffffff; border: 1.5px solid #ffffff; white-space: nowrap; line-height: 1.2; box-shadow: 0 4px 12px rgba(0,0,0,0.12);">
-                                                        Explore Now
-                                                    </a>
-                                                </td>
-                                                <td class="mobile-cta-cell" align="center" style="padding: 4px 6px;">
-                                                    <a href="https://example.com/contact" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 11px 24px; border-radius: 9999px; display: inline-block; border: 1.5px solid rgba(255,255,255,0.85); background-color: rgba(255,255,255,0.15); white-space: nowrap; line-height: 1.2;">
-                                                        Contact Us
+                                                <td align="center" style="border-radius: 8px; background-color: #0b0f19;">
+                                                    <a href="https://example.com" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 800; color: #ffffff; text-decoration: none; padding: 13px 26px; border-radius: 8px; display: inline-block; background-color: #0b0f19; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2;">
+                                                        VISIT OUR WEBSITE
                                                     </a>
                                                 </td>
                                             </tr>
