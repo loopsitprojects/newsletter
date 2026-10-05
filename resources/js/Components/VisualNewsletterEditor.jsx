@@ -61,7 +61,7 @@ const defaultFields = {
     showFeatured: true,
     featuredLayout: 'columns',
     featuredCardHeight: '460',
-    featuredLinkAlign: 'bottom',
+    featuredLinkAlign: 'flow',
     featuredItems: [
         {
             badge: 'Featured',
@@ -203,8 +203,8 @@ const compileHtml = (f) => {
         .featured-col-img {
             width: 100% !important;
             max-width: 100% !important;
-            height: 210px !important;
-            max-height: 210px !important;
+            height: 175px !important;
+            max-height: 175px !important;
             object-fit: cover !important;
             display: block !important;
             border: 0 !important;
@@ -239,7 +239,7 @@ const compileHtml = (f) => {
             .col-left, .col-right { padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 20px !important; width: 100% !important; height: auto !important; display: block !important; }
             .featured-grid-table, .featured-grid-row { height: auto !important; }
             .featured-card { height: auto !important; min-height: 0 !important; }
-            .featured-col-img { width: 100% !important; height: 210px !important; object-fit: cover !important; }
+            .featured-col-img { width: 100% !important; height: 175px !important; object-fit: cover !important; }
         }
     </style>
 </head>
@@ -751,7 +751,7 @@ const extractFieldsFromHtml = (htmlStr) => {
         }
 
         const linkAlignAttr = doc.querySelector('[data-featured-link-align]')?.getAttribute('data-featured-link-align');
-        let detectedFeaturedLinkAlign = linkAlignAttr || 'bottom';
+        let detectedFeaturedLinkAlign = linkAlignAttr || 'flow';
 
         let featuredItems = [];
         if (featuredTables.length > 0) {
@@ -946,7 +946,7 @@ const extractFieldsFromHtml = (htmlStr) => {
             showFeatured: showFeatured,
             featuredLayout: detectedFeaturedLayout || 'columns',
             featuredCardHeight: detectedFeaturedCardHeight || defaultFields.featuredCardHeight || '460',
-            featuredLinkAlign: detectedFeaturedLinkAlign || defaultFields.featuredLinkAlign || 'bottom',
+            featuredLinkAlign: detectedFeaturedLinkAlign || defaultFields.featuredLinkAlign || 'flow',
             featuredItems: featuredItems.length > 0 ? featuredItems : defaultFields.featuredItems,
             featuredBadge: featuredItems[0]?.badge || defaultFields.featuredBadge,
             featuredTitle: featuredItems[0]?.title || defaultFields.featuredTitle,
@@ -995,7 +995,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
     const [isSavingTemplate, setIsSavingTemplate] = useState(false);
     const [saveSuccessMessage, setSaveSuccessMessage] = useState('');
     const [saveErrorMessage, setSaveErrorMessage] = useState('');
-    const lastCompiledRef = useRef(value || '');
+    const lastCompiledRef = useRef('');
 
     // Initialize fields by parsing incoming value, or fallback to default
     const [fields, setFields] = useState(() => {
@@ -1175,6 +1175,16 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
             const parsed = extractFieldsFromHtml(value);
             if (parsed) {
                 setFields(parsed);
+
+                // Rebuild newsletter-structured HTML so stored templates pick up the latest layout.
+                const isNewsletterLayout = /data-featured-layout|class="featured-card"/.test(value);
+                if (editorMode === 'visual' && isNewsletterLayout) {
+                    const compiled = compileHtml(parsed);
+                    if (compiled !== value) {
+                        lastCompiledRef.current = compiled;
+                        onChange(compiled);
+                    }
+                }
             }
         }
     }, [value]);
@@ -1767,7 +1777,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                                                 type="button"
                                                                 onClick={() => updateField('featuredLinkAlign', 'bottom')}
                                                                 className={`py-1.5 px-2 text-[11px] font-bold rounded-lg transition ${
-                                                                    (fields.featuredLinkAlign || 'bottom') === 'bottom'
+                                                                    (fields.featuredLinkAlign || 'flow') === 'bottom'
                                                                         ? 'bg-indigo-600 text-white shadow-sm'
                                                                         : 'bg-slate-800 text-slate-400 hover:text-white'
                                                                 }`}
@@ -1778,7 +1788,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                                                 type="button"
                                                                 onClick={() => updateField('featuredLinkAlign', 'flow')}
                                                                 className={`py-1.5 px-2 text-[11px] font-bold rounded-lg transition ${
-                                                                    fields.featuredLinkAlign === 'flow'
+                                                                    (fields.featuredLinkAlign || 'flow') === 'flow'
                                                                         ? 'bg-indigo-600 text-white shadow-sm'
                                                                         : 'bg-slate-800 text-slate-400 hover:text-white'
                                                                 }`}
@@ -1787,7 +1797,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                                             </button>
                                                         </div>
                                                         <p className="text-[10px] text-slate-500 mt-1">
-                                                            {(fields.featuredLinkAlign || 'bottom') === 'bottom'
+                                                            {(fields.featuredLinkAlign || 'flow') === 'bottom'
                                                                 ? 'Both cards remain locked to identical equal height with reduced spacing.'
                                                                 : 'Eliminates all empty white space between description and Read More link.'}
                                                         </p>

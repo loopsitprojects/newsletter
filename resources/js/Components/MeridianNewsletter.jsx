@@ -81,7 +81,7 @@ export default function MeridianNewsletter({
     featuredItems = null,
     featuredLayout = 'columns',
     featuredCardHeight = '460',
-    featuredLinkAlign = 'bottom',
+    featuredLinkAlign = 'flow',
     featuredImage = 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&h=750&fit=crop&q=80',
     ctaStyle = 'clean',
     ctaTitle = 'See Our Latest Work',
