@@ -70,7 +70,7 @@ $htmlContent = <<<'HTML'
                                 <tr>
                                     <td align="center" valign="middle">
                                         <a href="{{app_url}}" target="_blank" style="text-decoration: none; display: inline-block;">
-                                            <img src="/images/loops-logo-white.png" alt="Loops Integrated" height="42" style="height: 42px; max-height: 42px; width: auto; max-width: 220px; display: block; margin: 0 auto; border: 0;" />
+                                            <img src="/images/loops-logo-white.png" alt="Loops Integrated" height="64" style="height: 64px; max-height: 64px; width: auto; max-width: 320px; display: block; margin: 0 auto; border: 0;" />
                                         </a>
                                     </td>
                                 </tr>

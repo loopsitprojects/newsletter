@@ -10,6 +10,7 @@ const Logo = ({
     logoUrl = '/images/loops-logo-dark.png',
     logoDarkUrl = '/images/loops-logo-white.png',
     brandName = 'Loops Integrated',
+    logoHeight = 64,
 }) => {
     const isDark = light || darkMode;
     const activeSrc = isDark ? (logoDarkUrl || logoUrl) : (logoUrl || logoDarkUrl);
@@ -20,7 +21,8 @@ const Logo = ({
                 <img
                     src={activeSrc}
                     alt={brandName}
-                    className={cn('h-10 w-auto max-h-10 object-contain', isDark && !logoDarkUrl && 'brightness-0 invert')}
+                    style={{ height: `${logoHeight}px`, maxHeight: `${logoHeight}px` }}
+                    className={cn('w-auto max-w-[320px] object-contain', isDark && !logoDarkUrl && 'brightness-0 invert')}
                 />
             ) : (
                 <span
@@ -59,6 +61,7 @@ export default function MeridianNewsletter({
     darkMode = false,
     logoUrl = '/images/loops-logo-dark.png',
     logoDarkUrl = '/images/loops-logo-white.png',
+    logoHeight = 64,
     brandName = 'Loops Integrated',
     firstName = 'Sarah',
     edition = 'October Edition',
@@ -69,6 +72,7 @@ export default function MeridianNewsletter({
     heroButtonUrl = '#',
     heroButtonColor = '#ff0878',
     featuredItems = null,
+    featuredLayout = 'columns',
     featuredImage = 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&h=750&fit=crop&q=80',
     ctaTitle = 'Ready to Discover More?',
     ctaSubtitle = "Explore our latest updates and find something you'll love.",
@@ -101,7 +105,7 @@ export default function MeridianNewsletter({
         <div className="w-full max-w-[760px] mx-auto bg-white font-sans text-[#151a29] rounded-2xl shadow-xl overflow-hidden border border-[#e2e4ea]">
             {/* Top Brand Bar (Black Header Bar) */}
             <div className={cn(px, 'py-6 flex items-center justify-center bg-[#0b0f19] rounded-t-2xl')}>
-                <Logo light={true} logoUrl={logoUrl} logoDarkUrl={logoDarkUrl} brandName={brandName} />
+                <Logo light={true} logoUrl={logoUrl} logoDarkUrl={logoDarkUrl} logoHeight={logoHeight} brandName={brandName} />
             </div>
 
             {/* Hero */}
@@ -144,7 +148,11 @@ export default function MeridianNewsletter({
 
             {/* Featured */}
             <section className={cn('bg-[#f5f7fb] py-8', px)}>
-                <div className="space-y-6">
+                <div className={cn(
+                    featuredLayout === 'rows'
+                        ? 'space-y-6'
+                        : 'grid grid-cols-1 md:grid-cols-2 gap-6'
+                )}>
                     {items.map((item, idx) => {
                         const badgeStyles = [
                             'bg-[#e6f0fd] text-[#0057c5]',
@@ -154,46 +162,87 @@ export default function MeridianNewsletter({
                         ];
                         const styleClass = badgeStyles[idx % badgeStyles.length];
 
+                        if (featuredLayout === 'rows') {
+                            return (
+                                <div
+                                    key={idx}
+                                    className={cn(
+                                        'overflow-hidden rounded-2xl bg-white border border-[#e2e4ea]',
+                                        mobile ? 'space-y-0' : 'flex'
+                                    )}
+                                >
+                                    <img
+                                        src={item.image || featuredImage}
+                                        alt={item.title || "Featured"}
+                                        width={1024}
+                                        height={768}
+                                        loading="lazy"
+                                        className={cn(
+                                            'object-cover',
+                                            mobile ? 'h-52 w-full' : 'w-1/2 min-h-[260px]'
+                                        )}
+                                    />
+                                    <div
+                                        className={cn(
+                                            'flex flex-col justify-center',
+                                            mobile ? 'p-5' : 'w-1/2 p-7'
+                                        )}
+                                    >
+                                        <span className={cn('w-fit rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-widest', styleClass)}>
+                                            {item.badge || 'Featured'}
+                                        </span>
+                                        <h2 className="mt-3 font-serif text-2xl font-bold leading-snug text-[#151a29]">
+                                            {item.title}
+                                        </h2>
+                                        <p className="mt-2 text-sm leading-relaxed text-[#636978]">
+                                            {item.text}
+                                        </p>
+                                        <a
+                                            href={item.linkUrl || '#'}
+                                            className="mt-4 text-sm font-semibold text-[#0057c5] hover:underline"
+                                        >
+                                            {item.linkText || 'Read More →'}
+                                        </a>
+                                    </div>
+                                </div>
+                            );
+                        }
+
                         return (
                             <div
                                 key={idx}
-                                className={cn(
-                                    'overflow-hidden rounded-2xl bg-white border border-[#e2e4ea]',
-                                    mobile ? 'space-y-0' : 'flex'
-                                )}
+                                className="overflow-hidden rounded-2xl bg-white border border-[#e2e4ea] flex flex-col justify-between shadow-sm"
                             >
-                                <img
-                                    src={item.image || featuredImage}
-                                    alt={item.title || "Featured"}
-                                    width={1024}
-                                    height={768}
-                                    loading="lazy"
-                                    className={cn(
-                                        'object-cover',
-                                        mobile ? 'h-52 w-full' : 'w-1/2 min-h-[260px]'
-                                    )}
-                                />
-                                <div
-                                    className={cn(
-                                        'flex flex-col justify-center',
-                                        mobile ? 'p-5' : 'w-1/2 p-7'
-                                    )}
-                                >
-                                    <span className={cn('w-fit rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-widest', styleClass)}>
-                                        {item.badge || 'Featured'}
-                                    </span>
-                                    <h2 className="mt-3 font-serif text-2xl font-bold leading-snug text-[#151a29]">
-                                        {item.title}
-                                    </h2>
-                                    <p className="mt-2 text-sm leading-relaxed text-[#636978]">
-                                        {item.text}
-                                    </p>
-                                    <a
-                                        href={item.linkUrl || '#'}
-                                        className="mt-4 text-sm font-semibold text-[#0057c5] hover:underline"
-                                    >
-                                        {item.linkText || 'Read More →'}
-                                    </a>
+                                {item.image && (
+                                    <img
+                                        src={item.image || featuredImage}
+                                        alt={item.title || "Featured"}
+                                        width={640}
+                                        height={400}
+                                        loading="lazy"
+                                        className="h-52 w-full object-cover"
+                                    />
+                                )}
+                                <div className="p-6 flex flex-col flex-1 justify-between">
+                                    <div>
+                                        <span className={cn('w-fit rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-widest', styleClass)}>
+                                            {item.badge || 'Featured'}
+                                        </span>
+                                        <h2 className="mt-3 font-serif text-xl font-bold leading-snug text-[#151a29]">
+                                            {item.title}
+                                        </h2>
+                                        <p className="mt-2 text-sm leading-relaxed text-[#636978]">
+                                            {item.text}
+                                        </p>
+                                    </div>
+                                    <div className="mt-5 pt-2">
+                                        <a
+                                            href={item.linkUrl || '#'}
+                                            className="text-sm font-semibold text-[#0057c5] hover:underline inline-flex items-center"
+                                        >
+                                            {item.linkText || 'Read More →'}
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         );

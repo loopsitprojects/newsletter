@@ -27,6 +27,8 @@ import {
     Palette,
     BookmarkPlus,
     Save,
+    Columns,
+    Rows,
 } from 'lucide-react';
 
 export const LOOPS_LOGO_PALETTE = [
@@ -43,6 +45,7 @@ const defaultFields = {
     brandName: 'Loops Integrated',
     brandLogoUrl: '/images/loops-logo-white.png',
     brandLogoDarkUrl: '/images/loops-logo-white.png',
+    logoHeight: '64',
     brandColor: '#0057c5',
     edition: 'October Edition',
     headerTitle: "What's New This Month?",
@@ -54,6 +57,7 @@ const defaultFields = {
     introGreeting: 'Hello {{first_name}},',
     introText: "Here are the latest updates, highlights and news from our team. It's been a busy month — we hope you enjoy what we've been working on.",
     showFeatured: true,
+    featuredLayout: 'columns',
     featuredItems: [
         {
             badge: 'Featured',
@@ -133,6 +137,8 @@ const compileHtml = (f) => {
     const brandColor = f.brandColor || '#0057c5';
     const align = f.logoAlign || 'center';
     const margin = align === 'center' ? '0 auto' : align === 'right' ? '0 0 0 auto' : '0 auto 0 0';
+    const logoHeight = parseInt(f.logoHeight) || 64;
+    const logoMaxWidth = Math.max(Math.round(logoHeight * 5), 280);
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -170,6 +176,8 @@ const compileHtml = (f) => {
             .mobile-cta-cell { display: inline-block !important; padding: 4px !important; }
             .card-spacer { display: none !important; }
             .card-item { margin-bottom: 16px !important; }
+            .col-left, .col-right { padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 20px !important; }
+            .featured-col-img { width: 100% !important; height: 210px !important; object-fit: cover !important; }
         }
     </style>
 </head>
@@ -196,7 +204,7 @@ const compileHtml = (f) => {
                                     <td align="${align}" valign="middle">
                                         <a href="{{app_url}}" target="_blank" style="text-decoration: none; display: inline-block;">
                                             ${(f.brandLogoDarkUrl || f.brandLogoUrl) ? `
-                                            <img src="${escapeHtml(cleanUrl(f.brandLogoDarkUrl || f.brandLogoUrl))}" alt="${escapeHtml(f.brandName || 'Loops Integrated')}" height="42" style="height: 42px; max-height: 42px; width: auto; max-width: 220px; display: block; margin: ${margin}; border: 0;" />
+                                            <img src="${escapeHtml(cleanUrl(f.brandLogoDarkUrl || f.brandLogoUrl))}" alt="${escapeHtml(f.brandName || 'Loops Integrated')}" height="${logoHeight}" style="height: ${logoHeight}px; max-height: ${logoHeight}px; width: auto; max-width: ${logoMaxWidth}px; display: block; margin: ${margin}; border: 0;" />
                                             ` : `
                                             <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">
                                                 ${escapeHtml(f.brandName || 'Loops Integrated')}
@@ -255,27 +263,67 @@ const compileHtml = (f) => {
                     <!-- Featured Section -->
                     ${(f.showFeatured !== false && getFeaturedItems(f).length > 0) ? `
                     <tr>
-                        <td style="background-color: #f5f7fb; padding: 32px 36px;" class="mobile-padding">
-                            ${getFeaturedItems(f).map((item, idx) => {
-                                const badgeColors = [
-                                    { color: brandColor, bg: '#e6f0fd' },
-                                    { color: '#ff0878', bg: '#ffe6f0' },
-                                    { color: '#8035d1', bg: '#f3eafd' },
-                                    { color: '#09908a', bg: '#e2faf8' },
-                                ];
-                                const bStyle = badgeColors[idx % badgeColors.length];
-                                return `
-                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; ${idx > 0 ? 'margin-top: 24px;' : ''}">
+                        <td style="background-color: #f5f7fb; padding: 32px 36px;" class="mobile-padding" data-featured-layout="${(f.featuredLayout || 'columns') !== 'rows' ? 'columns' : 'rows'}">
+                            ${(() => {
+                                const items = getFeaturedItems(f);
+                                const isColumns = (f.featuredLayout || 'columns') !== 'rows';
+
+                                const renderBadge = (item, idx) => {
+                                    if (!item.badge) return '';
+                                    const badgeColors = [
+                                        { color: brandColor, bg: '#e6f0fd' },
+                                        { color: '#ff0878', bg: '#ffe6f0' },
+                                        { color: '#8035d1', bg: '#f3eafd' },
+                                        { color: '#09908a', bg: '#e2faf8' },
+                                    ];
+                                    const bStyle = badgeColors[idx % badgeColors.length];
+                                    return `
+                                    <span style="display: inline-block; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: ${bStyle.color}; background-color: ${bStyle.bg}; padding: 4px 12px; border-radius: 9999px;">
+                                        ${escapeHtml(item.badge)}
+                                    </span>`;
+                                };
+
+                                const renderColumnCard = (item, idx) => {
+                                    return `
+                            <table class="featured-card" data-featured-card="true" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; height: 100%; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+                                ${item.image ? `
+                                <tr>
+                                    <td style="padding: 0; line-height: 0; background-color: #f1f3f7;">
+                                        <img class="mobile-img featured-col-img" src="${escapeHtml(cleanUrl(item.image))}" alt="${escapeHtml(item.title || 'Featured Image')}" width="${Math.floor((maxWidth - 72 - 24) / 2)}" style="width: 100%; height: 210px; object-fit: cover; display: block; border: 0;" />
+                                    </td>
+                                </tr>` : ''}
+                                <tr>
+                                    <td valign="top" style="padding: 24px 22px 26px 22px;" class="mobile-padding">
+                                        ${renderBadge(item, idx)}
+                                        ${item.title ? `
+                                        <h2 style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 20px; font-weight: 700; color: #151a29; line-height: 1.35;">
+                                            ${escapeHtml(item.title)}
+                                        </h2>` : ''}
+                                        ${item.text ? `
+                                        <p style="margin: 10px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.6;">
+                                            ${escapeHtml(item.text)}
+                                        </p>` : ''}
+                                        ${item.linkText ? `
+                                        <div style="margin-top: 18px;">
+                                            <a href="${escapeHtml(cleanUrl(item.linkUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: ${brandColor}; text-decoration: none; display: inline-block;">
+                                                ${escapeHtml(item.linkText)}
+                                            </a>
+                                        </div>` : ''}
+                                    </td>
+                                </tr>
+                            </table>`;
+                                };
+
+                                const renderRowCard = (item, idx) => {
+                                    return `
+                            <table class="featured-card" data-featured-card="true" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; ${idx > 0 ? 'margin-top: 24px;' : ''}">
                                 <tr>
                                     ${item.image ? `
                                     <td class="mobile-stack" width="50%" valign="top" style="padding: 0;">
                                         <img class="mobile-img" src="${escapeHtml(cleanUrl(item.image))}" alt="${escapeHtml(item.title || 'Featured Image')}" width="${Math.floor((maxWidth - 72) / 2)}" style="width: 100%; height: 100%; min-height: 250px; object-fit: cover; display: block; border: 0;" />
                                     </td>` : ''}
                                     <td class="mobile-stack" width="${item.image ? '50%' : '100%'}" valign="middle" style="padding: 30px 26px;" class="mobile-padding">
-                                        ${item.badge ? `
-                                        <span style="display: inline-block; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: ${bStyle.color}; background-color: ${bStyle.bg}; padding: 4px 12px; border-radius: 9999px;">
-                                            ${escapeHtml(item.badge)}
-                                        </span>` : ''}
+                                        ${renderBadge(item, idx)}
                                         ${item.title ? `
                                         <h2 style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 22px; font-weight: 700; color: #151a29; line-height: 1.3;">
                                             ${escapeHtml(item.title)}
@@ -292,9 +340,47 @@ const compileHtml = (f) => {
                                         </div>` : ''}
                                     </td>
                                 </tr>
-                            </table>
-                            `;
-                            }).join('')}
+                            </table>`;
+                                };
+
+                                if (!isColumns) {
+                                    return items.map((item, idx) => renderRowCard(item, idx)).join('');
+                                }
+
+                                // 2-Column Grid Layout
+                                const pairs = [];
+                                for (let i = 0; i < items.length; i += 2) {
+                                    pairs.push(items.slice(i, i + 2));
+                                }
+
+                                return pairs.map((pair, pIdx) => {
+                                    if (pair.length === 2) {
+                                        return `
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="${pIdx > 0 ? 'margin-top: 24px;' : ''}">
+                                <tr>
+                                    <td class="mobile-stack col-left" width="50%" valign="top" style="padding-right: 12px; padding-bottom: 0;">
+                                        ${renderColumnCard(pair[0], pIdx * 2)}
+                                    </td>
+                                    <td class="mobile-stack col-right" width="50%" valign="top" style="padding-left: 12px; padding-bottom: 0;">
+                                        ${renderColumnCard(pair[1], pIdx * 2 + 1)}
+                                    </td>
+                                </tr>
+                            </table>`;
+                                    } else {
+                                        return `
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="${pIdx > 0 ? 'margin-top: 24px;' : ''}">
+                                <tr>
+                                    <td class="mobile-stack col-left" width="${items.length === 1 ? '100%' : '50%'}" valign="top" style="${items.length === 1 ? '' : 'padding-right: 12px;'}">
+                                        ${renderColumnCard(pair[0], pIdx * 2)}
+                                    </td>
+                                    ${items.length > 1 ? `
+                                    <td class="mobile-stack col-right" width="50%" valign="top" style="padding-left: 12px;">
+                                    </td>` : ''}
+                                </tr>
+                            </table>`;
+                                    }
+                                }).join('');
+                            })()}
                         </td>
                     </tr>` : ''}
 
@@ -397,11 +483,19 @@ const extractFieldsFromHtml = (htmlStr) => {
         let brandLogoUrl = '';
         let brandLogoDarkUrl = '';
         let brandName = '';
+        let logoHeight = '64';
         const headerLogoImg = doc.querySelector('tr:first-child img, td[style*="background-color: #0b0f19"] img, td[style*="background-color:#0b0f19"] img, img.light-logo, img.dark-logo');
         if (headerLogoImg) {
             brandLogoUrl = cleanExtract(headerLogoImg.getAttribute('src') || '');
             brandLogoDarkUrl = brandLogoUrl;
             brandName = headerLogoImg.getAttribute('alt') || '';
+            const hAttr = headerLogoImg.getAttribute('height');
+            const hStyle = headerLogoImg.getAttribute('style')?.match(/(?:max-)?height:\s*(\d+)px/i);
+            if (hAttr && parseInt(hAttr) >= 30) {
+                logoHeight = hAttr;
+            } else if (hStyle && parseInt(hStyle[1]) >= 30) {
+                logoHeight = hStyle[1];
+            }
         }
         if (!brandName) {
             const brandTd = doc.querySelector('table table td[style*="font-weight: 800"], table table td[style*="letter-spacing: -0.5px"], table table td[style*="letter-spacing: -0.4px"]');
@@ -456,10 +550,20 @@ const extractFieldsFromHtml = (htmlStr) => {
         }
 
         // Featured Section
-        let featuredTables = Array.from(doc.querySelectorAll('td[style*="#f5f7fb"] table, td[style*="rgb(245, 247, 251)"] table'))
-            .filter((tbl) => tbl.querySelector('h2'));
+        let featuredTables = Array.from(doc.querySelectorAll('table.featured-card, table[data-featured-card="true"]'));
         if (featuredTables.length === 0) {
-            featuredTables = Array.from(doc.querySelectorAll('table')).filter((tbl) => tbl.querySelector('h2'));
+            featuredTables = Array.from(doc.querySelectorAll('td[style*="#f5f7fb"] table, td[style*="rgb(245, 247, 251)"] table'))
+                .filter((tbl) => tbl.querySelector('h2') && !tbl.querySelector('table'));
+        }
+        if (featuredTables.length === 0) {
+            featuredTables = Array.from(doc.querySelectorAll('table')).filter((tbl) => tbl.querySelector('h2') && !tbl.querySelector('table'));
+        }
+
+        const layoutAttr = doc.querySelector('[data-featured-layout]')?.getAttribute('data-featured-layout');
+        const hasColClasses = doc.querySelector('td.col-left, td.col-right') !== null;
+        let detectedFeaturedLayout = 'columns';
+        if (layoutAttr === 'rows' || (layoutAttr !== 'columns' && !hasColClasses && featuredTables.length > 1 && !doc.querySelector('table.featured-card'))) {
+            detectedFeaturedLayout = 'rows';
         }
 
         let featuredItems = [];
@@ -609,6 +713,7 @@ const extractFieldsFromHtml = (htmlStr) => {
             brandName: brandName || defaultFields.brandName,
             brandLogoUrl: brandLogoUrl || defaultFields.brandLogoUrl,
             brandLogoDarkUrl: brandLogoDarkUrl || defaultFields.brandLogoDarkUrl,
+            logoHeight: logoHeight || defaultFields.logoHeight,
             brandColor: brandColor || '#0057c5',
             edition: edition || defaultFields.edition,
             headerTitle: headerTitle || defaultFields.headerTitle,
@@ -620,6 +725,7 @@ const extractFieldsFromHtml = (htmlStr) => {
             introGreeting: introGreeting || defaultFields.introGreeting,
             introText: introText || defaultFields.introText,
             showFeatured: showFeatured,
+            featuredLayout: detectedFeaturedLayout || 'columns',
             featuredItems: featuredItems.length > 0 ? featuredItems : defaultFields.featuredItems,
             featuredBadge: featuredItems[0]?.badge || defaultFields.featuredBadge,
             featuredTitle: featuredItems[0]?.title || defaultFields.featuredTitle,
@@ -1034,6 +1140,52 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                     placeholder="/images/loops-logo-white.png"
                                 />
 
+                                {/* Header Logo Size Controls */}
+                                <div>
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <label className="text-[10px] text-slate-400 font-semibold flex items-center">
+                                            Header Logo Size
+                                        </label>
+                                        <span className="text-[10px] font-mono text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">
+                                            {fields.logoHeight || '64'}px height
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        {[
+                                            { label: 'Medium', val: '50' },
+                                            { label: 'Large (Default)', val: '64' },
+                                            { label: 'Extra Large', val: '78' },
+                                            { label: 'Jumbo', val: '92' },
+                                        ].map(({ label, val }) => (
+                                            <button
+                                                key={val}
+                                                type="button"
+                                                onClick={() => updateField('logoHeight', val)}
+                                                className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition ${
+                                                    (fields.logoHeight || '64') === val
+                                                        ? 'bg-indigo-600 text-white shadow-sm'
+                                                        : 'bg-slate-800 text-slate-400 hover:text-white'
+                                                }`}
+                                            >
+                                                {label}
+                                            </button>
+                                        ))}
+                                        <div className="flex items-center pl-1 border-l border-slate-800">
+                                            <input
+                                                type="number"
+                                                min="30"
+                                                max="140"
+                                                step="2"
+                                                value={fields.logoHeight || '64'}
+                                                onChange={(e) => updateField('logoHeight', e.target.value)}
+                                                className="w-14 bg-slate-800 border border-slate-700 rounded-lg px-1.5 py-1 text-xs text-white text-center font-mono font-bold"
+                                                title="Custom Logo Height (px)"
+                                            />
+                                            <span className="text-[10px] text-slate-400 ml-1 font-semibold">px</span>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
                                         <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Company / Brand Name</label>
@@ -1253,6 +1405,37 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
 
                                 {fields.showFeatured !== false && (
                                     <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-[10px] text-slate-400 mb-1.5 font-semibold">
+                                                Card Grid Layout
+                                            </label>
+                                            <div className="grid grid-cols-2 gap-1.5 bg-slate-800 p-1 rounded-xl">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateField('featuredLayout', 'columns')}
+                                                    className={`py-1.5 px-2 text-xs font-bold rounded-lg transition flex items-center justify-center space-x-1.5 ${
+                                                        (fields.featuredLayout || 'columns') !== 'rows'
+                                                            ? 'bg-indigo-600 text-white shadow-sm'
+                                                            : 'text-slate-400 hover:text-white'
+                                                    }`}
+                                                >
+                                                    <Columns className="h-3.5 w-3.5" />
+                                                    <span>2 Columns (Side-by-Side)</span>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateField('featuredLayout', 'rows')}
+                                                    className={`py-1.5 px-2 text-xs font-bold rounded-lg transition flex items-center justify-center space-x-1.5 ${
+                                                        fields.featuredLayout === 'rows'
+                                                            ? 'bg-indigo-600 text-white shadow-sm'
+                                                            : 'text-slate-400 hover:text-white'
+                                                    }`}
+                                                >
+                                                    <Rows className="h-3.5 w-3.5" />
+                                                    <span>1 Column (Full Width Rows)</span>
+                                                </button>
+                                            </div>
+                                        </div>
                                         {featuredItemsList.map((item, idx) => (
                                             <div key={idx} className="bg-slate-800/40 border border-slate-700/60 rounded-xl p-3 space-y-2.5">
                                                 <div className="flex items-center justify-between border-b border-slate-700/50 pb-1.5">
