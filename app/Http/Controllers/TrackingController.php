@@ -12,7 +12,7 @@ class TrackingController extends Controller
         $log = CampaignLog::where('tracking_token', $token)->first();
 
         if ($log) {
-            if (!$log->opened_at) {
+            if (! $log->opened_at) {
                 $log->update([
                     'opened_at' => now(),
                     'ip_address' => request()->ip(),
@@ -40,7 +40,7 @@ class TrackingController extends Controller
         $targetUrl = $request->query('url', config('app.url'));
 
         if ($log) {
-            if (!$log->clicked_at) {
+            if (! $log->clicked_at) {
                 $log->update([
                     'clicked_at' => now(),
                     'ip_address' => request()->ip(),

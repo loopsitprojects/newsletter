@@ -1,14 +1,17 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
+use App\Mail\NewsletterMailable;
 use App\Models\Campaign;
 use App\Models\Subscriber;
 use App\Models\SubscriberGroup;
-use App\Mail\NewsletterMailable;
+use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 $email = 'madara@loopsintegrated.com';
 
@@ -30,7 +33,7 @@ $subscriber->update(['status' => 'active', 'verified_at' => now()]);
 
 $groups = SubscriberGroup::all();
 foreach ($groups as $group) {
-    if (!$subscriber->groups->contains($group->id)) {
+    if (! $subscriber->groups->contains($group->id)) {
         $subscriber->groups()->attach($group->id);
     }
 }
@@ -38,7 +41,7 @@ foreach ($groups as $group) {
 // Fetch latest campaign or create a test campaign
 $campaign = Campaign::latest()->first();
 
-if (!$campaign) {
+if (! $campaign) {
     $campaign = Campaign::create([
         'title' => 'Test Campaign Email',
         'subject' => '⚡ Test Email from Email Marketing Hub',
@@ -59,10 +62,10 @@ if (!$campaign) {
 
 try {
     echo "Sending campaign '{$campaign->title}' to {$subscriber->email}...\n";
-    \Illuminate\Support\Facades\Mail::to($subscriber->email)->send(
-        new NewsletterMailable($campaign, $subscriber, \Illuminate\Support\Str::random(40))
+    Mail::to($subscriber->email)->send(
+        new NewsletterMailable($campaign, $subscriber, Str::random(40))
     );
     echo "SUCCESS: Test email sent to {$subscriber->email} via SMTP!\n";
-} catch (\Throwable $e) {
-    echo "FAILED: " . $e->getMessage() . "\n";
+} catch (Throwable $e) {
+    echo 'FAILED: '.$e->getMessage()."\n";
 }

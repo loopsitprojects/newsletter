@@ -52,7 +52,7 @@ class SubscriberGroupController extends Controller
     public function update(Request $request, SubscriberGroup $group): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:100|unique:subscriber_groups,name,' . $group->id,
+            'name' => 'required|string|max:100|unique:subscriber_groups,name,'.$group->id,
             'description' => 'nullable|string|max:500',
             'color' => 'required|string|max:30',
         ]);

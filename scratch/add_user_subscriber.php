@@ -1,12 +1,13 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
 use App\Models\Subscriber;
 use App\Models\SubscriberGroup;
+use Illuminate\Contracts\Console\Kernel;
 
 $email = 'aspect@loops.lk';
 
@@ -25,9 +26,9 @@ $subscriber = Subscriber::firstOrCreate(
 
 $groups = SubscriberGroup::all();
 foreach ($groups as $group) {
-    if (!$subscriber->groups->contains($group->id)) {
+    if (! $subscriber->groups->contains($group->id)) {
         $subscriber->groups()->attach($group->id);
     }
 }
 
-echo "Subscriber {$email} (ID: {$subscriber->id}) added and attached to all " . count($groups) . " groups!\n";
+echo "Subscriber {$email} (ID: {$subscriber->id}) added and attached to all ".count($groups)." groups!\n";

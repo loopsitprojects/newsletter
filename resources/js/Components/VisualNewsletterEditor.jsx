@@ -60,7 +60,8 @@ const defaultFields = {
     introText: "Here are the latest updates, highlights and news from our team. It's been a busy month — we hope you enjoy what we've been working on.",
     showFeatured: true,
     featuredLayout: 'columns',
-    featuredCardHeight: '400',
+    featuredImageHeight: '240',
+    featuredCardHeight: '440',
     featuredLinkAlign: 'flow',
     featuredItems: [
         {
@@ -145,6 +146,7 @@ const compileHtml = (f) => {
     const margin = align === 'center' ? '0 auto' : align === 'right' ? '0 0 0 auto' : '0';
     const logoHeight = parseInt(f.logoHeight) || 64;
     const logoMaxWidth = Math.max(Math.round(logoHeight * 5), 280);
+    const featImgHeight = parseInt(f.featuredImageHeight) || 240;
 
     const headerLayout = f.headerLayout || 'side-by-side';
     const isSideBySide = headerLayout === 'side-by-side';
@@ -200,8 +202,8 @@ const compileHtml = (f) => {
         .featured-col-img {
             width: 100% !important;
             max-width: 100% !important;
-            height: 175px !important;
-            max-height: 175px !important;
+            height: ${featImgHeight}px !important;
+            max-height: ${featImgHeight}px !important;
             object-fit: cover !important;
             display: block !important;
             border: 0 !important;
@@ -380,7 +382,7 @@ const compileHtml = (f) => {
             }
             .featured-grid-table, .featured-grid-row { height: auto !important; }
             .featured-card { height: auto !important; min-height: 0 !important; }
-            .featured-col-img { width: 100% !important; height: 175px !important; object-fit: cover !important; }
+            .featured-col-img { width: 100% !important; height: ${featImgHeight}px !important; object-fit: cover !important; }
         }
     </style>
 </head>
@@ -520,7 +522,7 @@ const compileHtml = (f) => {
                     <!-- Featured Section -->
                     ${(f.showFeatured !== false && getFeaturedItems(f).length > 0) ? `
                     <tr>
-                        <td style="background-color: #f5f7fb; padding: 28px 32px;" class="mobile-padding dark-bg-featured" data-featured-layout="${(f.featuredLayout || 'columns') !== 'rows' ? 'columns' : 'rows'}" data-featured-card-height="${f.featuredCardHeight || '400'}" data-featured-link-align="${f.featuredLinkAlign || 'flow'}">
+                        <td style="background-color: #f5f7fb; padding: 28px 32px;" class="mobile-padding dark-bg-featured" data-featured-layout="${(f.featuredLayout || 'columns') !== 'rows' ? 'columns' : 'rows'}" data-featured-img-height="${featImgHeight}" data-featured-card-height="${f.featuredCardHeight || '440'}" data-featured-link-align="${f.featuredLinkAlign || 'flow'}">
                             ${(() => {
                                 const items = getFeaturedItems(f);
                                 const isColumns = (f.featuredLayout || 'columns') !== 'rows';
@@ -544,7 +546,7 @@ const compileHtml = (f) => {
                                     const isFlowLink = (f.featuredLinkAlign !== 'bottom');
                                     const cardHeightValNum = (f.featuredCardHeight && f.featuredCardHeight !== 'auto')
                                         ? parseInt(f.featuredCardHeight, 10)
-                                        : 400;
+                                        : 440;
                                     const cardHeightAttr = (!isFlowLink && cardHeightValNum) ? `height="${cardHeightValNum}"` : '';
                                     const cardHeightStyle = (!isFlowLink && cardHeightValNum) ? `height: 100%; min-height: ${cardHeightValNum}px;` : '';
 
@@ -552,9 +554,9 @@ const compileHtml = (f) => {
                             <table class="featured-card" data-featured-card="true" role="presentation" width="100%" ${cardHeightAttr} border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; border-collapse: separate; ${cardHeightStyle} box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
                                 <tbody>
                                     ${item.image ? `
-                                    <tr class="featured-card-img-tr" height="175">
-                                        <td class="featured-card-img-td" height="175" style="padding: 0; margin: 0; line-height: 0; font-size: 0; background-color: #f1f3f7; height: 175px;" align="center">
-                                            <img class="mobile-img featured-col-img" src="${escapeHtml(cleanUrl(item.image))}" alt="${escapeHtml(item.title || 'Featured Image')}" width="${Math.floor((maxWidth - 72 - 24) / 2)}" height="175" style="width: 100%; max-width: 100%; height: 175px; max-height: 175px; object-fit: cover; display: block; border: 0;" />
+                                    <tr class="featured-card-img-tr" height="${featImgHeight}">
+                                        <td class="featured-card-img-td" height="${featImgHeight}" style="padding: 0; margin: 0; line-height: 0; font-size: 0; background-color: #f1f3f7; height: ${featImgHeight}px;" align="center">
+                                            <img class="mobile-img featured-col-img" src="${escapeHtml(cleanUrl(item.image))}" alt="${escapeHtml(item.title || 'Featured Image')}" width="${Math.floor((maxWidth - 72 - 24) / 2)}" height="${featImgHeight}" style="width: 100%; max-width: 100%; height: ${featImgHeight}px; max-height: ${featImgHeight}px; object-fit: cover; display: block; border: 0;" />
                                         </td>
                                     </tr>` : ''}
                                     <tr class="featured-card-body-tr">
@@ -895,6 +897,18 @@ const extractFieldsFromHtml = (htmlStr) => {
         const linkAlignAttr = doc.querySelector('[data-featured-link-align]')?.getAttribute('data-featured-link-align');
         let detectedFeaturedLinkAlign = linkAlignAttr || 'flow';
 
+        const imgHeightAttr = doc.querySelector('[data-featured-img-height]')?.getAttribute('data-featured-img-height');
+        let detectedFeaturedImgHeight = imgHeightAttr || '240';
+        if (!imgHeightAttr) {
+            const imgWithHeight = doc.querySelector('.featured-col-img, .featured-card-img-td, tr.featured-card-img-tr');
+            if (imgWithHeight) {
+                const matchH = imgWithHeight.getAttribute('height') || imgWithHeight.getAttribute('style')?.match(/(?:max-)?height:\s*(\d+)px/i)?.[1];
+                if (matchH && parseInt(matchH) >= 140) {
+                    detectedFeaturedImgHeight = matchH;
+                }
+            }
+        }
+
         let featuredItems = [];
         if (featuredTables.length > 0) {
             featuredItems = featuredTables.map((tbl, i) => {
@@ -1087,7 +1101,8 @@ const extractFieldsFromHtml = (htmlStr) => {
             introText: introText || defaultFields.introText,
             showFeatured: showFeatured,
             featuredLayout: detectedFeaturedLayout || 'columns',
-            featuredCardHeight: detectedFeaturedCardHeight || defaultFields.featuredCardHeight || '400',
+            featuredImageHeight: detectedFeaturedImgHeight || defaultFields.featuredImageHeight || '240',
+            featuredCardHeight: detectedFeaturedCardHeight || defaultFields.featuredCardHeight || '440',
             featuredLinkAlign: detectedFeaturedLinkAlign || defaultFields.featuredLinkAlign || 'flow',
             featuredItems: featuredItems.length > 0 ? featuredItems : defaultFields.featuredItems,
             featuredBadge: featuredItems[0]?.badge || defaultFields.featuredBadge,
@@ -1950,93 +1965,157 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                                 </button>
                                             </div>
 
-                                            {/* Box / Card Fixed Height Controls */}
-                                            {(fields.featuredLayout || 'columns') !== 'rows' && (
-                                                <div className="mt-3 pt-3 border-t border-slate-800 space-y-3">
-                                                    <div>
-                                                        <div className="flex items-center justify-between mb-1.5">
-                                                            <label className="text-[10px] text-slate-400 font-semibold flex items-center">
-                                                                Card Box Height (Fixed Size)
-                                                            </label>
-                                                            <span className="text-[10px] font-mono text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">
-                                                                {`${fields.featuredCardHeight || '400'}px fixed`}
-                                                            </span>
+                                            {/* Image Height & Box Height Controls */}
+                                            <div className="mt-3 pt-3 border-t border-slate-800 space-y-3">
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-1.5">
+                                                        <label className="text-[10px] text-slate-400 font-semibold flex items-center">
+                                                            <ImageIcon className="h-3 w-3 mr-1 text-sky-400" /> Image Height (Photo Display)
+                                                        </label>
+                                                        <span className="text-[10px] font-mono text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">
+                                                            {`${fields.featuredImageHeight || '240'}px`}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        {[
+                                                            { label: 'Compact', val: '190' },
+                                                            { label: 'Medium', val: '220' },
+                                                            { label: 'Standard', val: '240' },
+                                                            { label: 'Tall', val: '280' },
+                                                            { label: 'Large', val: '340' },
+                                                        ].map(({ label, val }) => (
+                                                            <button
+                                                                key={val}
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    updateField('featuredImageHeight', val);
+                                                                    const currentCardH = parseInt(fields.featuredCardHeight) || 440;
+                                                                    const neededCardH = parseInt(val) + 200;
+                                                                    if (currentCardH < neededCardH) {
+                                                                        updateField('featuredCardHeight', String(neededCardH));
+                                                                    }
+                                                                }}
+                                                                className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition ${
+                                                                    (fields.featuredImageHeight || '240') === val
+                                                                        ? 'bg-indigo-600 text-white shadow-sm'
+                                                                        : 'bg-slate-800 text-slate-400 hover:text-white'
+                                                                }`}
+                                                            >
+                                                                {label}
+                                                            </button>
+                                                        ))}
+                                                        <div className="flex items-center pl-1 border-l border-slate-800">
+                                                            <input
+                                                                type="number"
+                                                                min="120"
+                                                                max="600"
+                                                                step="10"
+                                                                value={fields.featuredImageHeight || '240'}
+                                                                placeholder="px"
+                                                                onChange={(e) => {
+                                                                    const val = e.target.value;
+                                                                    updateField('featuredImageHeight', val);
+                                                                    const currentCardH = parseInt(fields.featuredCardHeight) || 440;
+                                                                    const neededCardH = (parseInt(val) || 240) + 200;
+                                                                    if (currentCardH < neededCardH) {
+                                                                        updateField('featuredCardHeight', String(neededCardH));
+                                                                    }
+                                                                }}
+                                                                className="w-14 bg-slate-800 border border-slate-700 rounded-lg px-1.5 py-1 text-xs text-white text-center font-mono font-bold"
+                                                                title="Custom Image Height (px)"
+                                                            />
+                                                            <span className="text-[10px] text-slate-400 ml-1 font-semibold">px</span>
                                                         </div>
-                                                        <div className="flex items-center gap-1.5">
-                                                            {[
-                                                                { label: 'Compact', val: '400' },
-                                                                { label: 'Standard', val: '440' },
-                                                                { label: 'Medium', val: '480' },
-                                                                { label: 'Tall', val: '520' },
-                                                            ].map(({ label, val }) => (
+                                                    </div>
+                                                </div>
+
+                                                {(fields.featuredLayout || 'columns') !== 'rows' && (
+                                                    <div className="space-y-3">
+                                                        <div>
+                                                            <div className="flex items-center justify-between mb-1.5">
+                                                                <label className="text-[10px] text-slate-400 font-semibold flex items-center">
+                                                                    Card Box Height (Fixed Size)
+                                                                </label>
+                                                                <span className="text-[10px] font-mono text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">
+                                                                    {`${fields.featuredCardHeight || '440'}px fixed`}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex items-center gap-1.5">
+                                                                {[
+                                                                    { label: 'Compact', val: '400' },
+                                                                    { label: 'Standard', val: '440' },
+                                                                    { label: 'Medium', val: '480' },
+                                                                    { label: 'Tall', val: '520' },
+                                                                ].map(({ label, val }) => (
+                                                                    <button
+                                                                        key={val}
+                                                                        type="button"
+                                                                        onClick={() => updateField('featuredCardHeight', val)}
+                                                                        className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition ${
+                                                                            (fields.featuredCardHeight || '400') === val
+                                                                                ? 'bg-indigo-600 text-white shadow-sm'
+                                                                                : 'bg-slate-800 text-slate-400 hover:text-white'
+                                                                        }`}
+                                                                    >
+                                                                        {label}
+                                                                    </button>
+                                                                ))}
+                                                                <div className="flex items-center pl-1 border-l border-slate-800">
+                                                                    <input
+                                                                        type="number"
+                                                                        min="340"
+                                                                        max="900"
+                                                                        step="10"
+                                                                        value={fields.featuredCardHeight || '400'}
+                                                                        placeholder="px"
+                                                                        onChange={(e) => updateField('featuredCardHeight', e.target.value)}
+                                                                        className="w-14 bg-slate-800 border border-slate-700 rounded-lg px-1.5 py-1 text-xs text-white text-center font-mono font-bold"
+                                                                        title="Custom Box Height (px)"
+                                                                    />
+                                                                    <span className="text-[10px] text-slate-400 ml-1 font-semibold">px</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <div className="flex items-center justify-between mb-1.5">
+                                                                <label className="text-[10px] text-slate-400 font-semibold">
+                                                                    Read More Link Position
+                                                                </label>
+                                                            </div>
+                                                            <div className="grid grid-cols-2 gap-1.5">
                                                                 <button
-                                                                    key={val}
                                                                     type="button"
-                                                                    onClick={() => updateField('featuredCardHeight', val)}
-                                                                    className={`flex-1 py-1.5 text-[11px] font-bold rounded-lg transition ${
-                                                                        (fields.featuredCardHeight || '400') === val
+                                                                    onClick={() => updateField('featuredLinkAlign', 'bottom')}
+                                                                    className={`py-1.5 px-2 text-[11px] font-bold rounded-lg transition ${
+                                                                        (fields.featuredLinkAlign || 'flow') === 'bottom'
+                                                                            ? 'bg-indigo-600 text-white shadow-sm'
+                                                                                : 'bg-slate-800 text-slate-400 hover:text-white'
+                                                                    }`}
+                                                                >
+                                                                    Bottom Aligned
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => updateField('featuredLinkAlign', 'flow')}
+                                                                    className={`py-1.5 px-2 text-[11px] font-bold rounded-lg transition ${
+                                                                        (fields.featuredLinkAlign || 'flow') === 'flow'
                                                                             ? 'bg-indigo-600 text-white shadow-sm'
                                                                             : 'bg-slate-800 text-slate-400 hover:text-white'
                                                                     }`}
                                                                 >
-                                                                    {label}
+                                                                    Directly Under Text
                                                                 </button>
-                                                            ))}
-                                                            <div className="flex items-center pl-1 border-l border-slate-800">
-                                                                <input
-                                                                    type="number"
-                                                                    min="340"
-                                                                    max="900"
-                                                                    step="10"
-                                                                    value={fields.featuredCardHeight || '400'}
-                                                                    placeholder="px"
-                                                                    onChange={(e) => updateField('featuredCardHeight', e.target.value)}
-                                                                    className="w-14 bg-slate-800 border border-slate-700 rounded-lg px-1.5 py-1 text-xs text-white text-center font-mono font-bold"
-                                                                    title="Custom Box Height (px)"
-                                                                />
-                                                                <span className="text-[10px] text-slate-400 ml-1 font-semibold">px</span>
                                                             </div>
+                                                            <p className="text-[10px] text-slate-500 mt-1">
+                                                                {(fields.featuredLinkAlign || 'flow') === 'bottom'
+                                                                    ? 'Both cards remain locked to identical equal height with reduced spacing.'
+                                                                    : 'Eliminates all empty white space between description and Read More link.'}
+                                                            </p>
                                                         </div>
                                                     </div>
-
-                                                    <div>
-                                                        <div className="flex items-center justify-between mb-1.5">
-                                                            <label className="text-[10px] text-slate-400 font-semibold">
-                                                                Read More Link Position
-                                                            </label>
-                                                        </div>
-                                                        <div className="grid grid-cols-2 gap-1.5">
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => updateField('featuredLinkAlign', 'bottom')}
-                                                                className={`py-1.5 px-2 text-[11px] font-bold rounded-lg transition ${
-                                                                    (fields.featuredLinkAlign || 'flow') === 'bottom'
-                                                                        ? 'bg-indigo-600 text-white shadow-sm'
-                                                                        : 'bg-slate-800 text-slate-400 hover:text-white'
-                                                                }`}
-                                                            >
-                                                                Bottom Aligned
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => updateField('featuredLinkAlign', 'flow')}
-                                                                className={`py-1.5 px-2 text-[11px] font-bold rounded-lg transition ${
-                                                                    (fields.featuredLinkAlign || 'flow') === 'flow'
-                                                                        ? 'bg-indigo-600 text-white shadow-sm'
-                                                                        : 'bg-slate-800 text-slate-400 hover:text-white'
-                                                                }`}
-                                                            >
-                                                                Directly Under Text
-                                                            </button>
-                                                        </div>
-                                                        <p className="text-[10px] text-slate-500 mt-1">
-                                                            {(fields.featuredLinkAlign || 'flow') === 'bottom'
-                                                                ? 'Both cards remain locked to identical equal height with reduced spacing.'
-                                                                : 'Eliminates all empty white space between description and Read More link.'}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            )}
+                                                )}
+                                            </div>
                                         </div>
                                         {featuredItemsList.map((item, idx) => (
                                             <div key={idx} className="bg-slate-800/40 border border-slate-700/60 rounded-xl p-3 space-y-2.5">

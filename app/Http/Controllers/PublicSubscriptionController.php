@@ -56,7 +56,7 @@ class PublicSubscriptionController extends Controller
             ]);
 
             // Assign default groups or selected groups
-            if (!empty($validated['group_ids'])) {
+            if (! empty($validated['group_ids'])) {
                 $subscriber->groups()->sync($validated['group_ids']);
             } else {
                 $defaultGroup = SubscriberGroup::where('is_default', true)->first();
@@ -92,7 +92,7 @@ class PublicSubscriptionController extends Controller
     {
         $subscriber = Subscriber::where('verification_token', $token)->first();
 
-        if (!$subscriber) {
+        if (! $subscriber) {
             return Inertia::render('Public/VerificationResult', [
                 'status' => 'error',
                 'message' => 'Invalid or expired verification link.',

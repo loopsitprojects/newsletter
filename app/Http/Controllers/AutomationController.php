@@ -85,7 +85,7 @@ class AutomationController extends Controller
 
     public function toggle(Automation $automation, Request $request): RedirectResponse
     {
-        $automation->update(['is_active' => !$automation->is_active]);
+        $automation->update(['is_active' => ! $automation->is_active]);
 
         $status = $automation->is_active ? 'enabled' : 'disabled';
         ActivityLog::create([

@@ -1,19 +1,20 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
 use App\Models\Campaign;
 use App\Models\CampaignLog;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 
 echo "=== LATEST CAMPAIGN INSPECTION ===\n";
 
 $latestCampaign = Campaign::latest()->first();
 
-if (!$latestCampaign) {
+if (! $latestCampaign) {
     echo "No campaigns found!\n";
     exit(0);
 }
@@ -39,7 +40,7 @@ $jobsCount = DB::table('jobs')->count();
 echo "Jobs pending in queue: {$jobsCount}\n";
 $jobs = DB::table('jobs')->get();
 foreach ($jobs as $job) {
-    echo "Job ID: {$job->id} | Queue: {$job->queue} | Payload: " . substr($job->payload, 0, 100) . "...\n";
+    echo "Job ID: {$job->id} | Queue: {$job->queue} | Payload: ".substr($job->payload, 0, 100)."...\n";
 }
 
 echo "---------------------------------\n";
@@ -48,5 +49,5 @@ $failedJobsCount = DB::table('failed_jobs')->count();
 echo "Failed jobs count: {$failedJobsCount}\n";
 $failedJobs = DB::table('failed_jobs')->get();
 foreach ($failedJobs as $fj) {
-    echo "Failed Job ID: {$fj->id} | Exception: " . substr($fj->exception, 0, 200) . "...\n";
+    echo "Failed Job ID: {$fj->id} | Exception: ".substr($fj->exception, 0, 200)."...\n";
 }

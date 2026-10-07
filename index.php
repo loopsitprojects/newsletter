@@ -1,9 +1,10 @@
 <?php
 
+use Illuminate\Http\Request;
+
 /**
  * Laravel - Web Entry Point for cPanel root public_html deployment
  */
-
 define('LARAVEL_START', microtime(true));
 
 // Determine if the application is under maintenance...
@@ -16,4 +17,4 @@ require __DIR__.'/vendor/autoload.php';
 
 // Bootstrap Laravel and handle the request...
 (require_once __DIR__.'/bootstrap/app.php')
-    ->handleRequest(Illuminate\Http\Request::capture());
+    ->handleRequest(Request::capture());

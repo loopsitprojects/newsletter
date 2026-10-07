@@ -1,12 +1,13 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
-use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Illuminate\Contracts\Console\Kernel;
 use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mime\Email;
 
 $host = 'rs3-va.serverhostgroup.com';
@@ -24,7 +25,7 @@ try {
 
     $mailer = new Mailer($transport);
 
-    $email = (new Email())
+    $email = (new Email)
         ->from($username)
         ->to($to)
         ->subject('Important: Test Campaign Email from Newsletter Hub')
@@ -33,6 +34,6 @@ try {
 
     $mailer->send($email);
     echo "SUCCESS: Email sent via Port 465 SSL to {$to}!\n";
-} catch (\Throwable $e) {
-    echo "ERROR: " . $e->getMessage() . "\n";
+} catch (Throwable $e) {
+    echo 'ERROR: '.$e->getMessage()."\n";
 }

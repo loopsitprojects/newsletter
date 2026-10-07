@@ -1,18 +1,21 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Kernel::class);
 $kernel->bootstrap();
 
+use App\Mail\NewsletterMailable;
 use App\Models\Campaign;
 use App\Models\EmailTemplate;
 use App\Models\Subscriber;
-use App\Mail\NewsletterMailable;
+use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 $template = EmailTemplate::where('name', 'Standard Master Newsletter Template')->first();
 
-if (!$template) {
+if (! $template) {
     echo "Template not found!\n";
     exit(1);
 }
@@ -35,11 +38,11 @@ $subscribers = Subscriber::whereIn('email', ['madara@loopsintegrated.com', 'aspe
 foreach ($subscribers as $sub) {
     try {
         echo "Sending Master Newsletter Template to {$sub->email}...\n";
-        \Illuminate\Support\Facades\Mail::to($sub->email)->send(
-            new NewsletterMailable($campaign, $sub, \Illuminate\Support\Str::random(40))
+        Mail::to($sub->email)->send(
+            new NewsletterMailable($campaign, $sub, Str::random(40))
         );
         echo "SUCCESS: Sent to {$sub->email}!\n";
-    } catch (\Throwable $e) {
-        echo "ERROR for {$sub->email}: " . $e->getMessage() . "\n";
+    } catch (Throwable $e) {
+        echo "ERROR for {$sub->email}: ".$e->getMessage()."\n";
     }
 }

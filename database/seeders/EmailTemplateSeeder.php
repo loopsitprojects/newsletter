@@ -59,8 +59,8 @@ class EmailTemplateSeeder extends Seeder
         .featured-col-img {
             width: 100% !important;
             max-width: 100% !important;
-            height: 175px !important;
-            max-height: 175px !important;
+            height: 240px !important;
+            max-height: 240px !important;
             object-fit: cover !important;
             display: block !important;
             border: 0 !important;
@@ -236,7 +236,7 @@ class EmailTemplateSeeder extends Seeder
             }
             .featured-grid-table, .featured-grid-row { height: auto !important; }
             .featured-card { height: auto !important; min-height: 0 !important; }
-            .featured-col-img { width: 100% !important; height: 175px !important; object-fit: cover !important; }
+            .featured-col-img { width: 100% !important; height: 240px !important; object-fit: cover !important; }
         }
     </style>
 </head>
@@ -309,15 +309,15 @@ class EmailTemplateSeeder extends Seeder
 
                     <!-- Featured Section -->
                     <tr>
-                        <td style="background-color: #f5f7fb; padding: 28px 32px;" class="mobile-padding dark-bg-featured" data-featured-layout="columns" data-featured-card-height="400" data-featured-link-align="flow">
+                        <td style="background-color: #f5f7fb; padding: 28px 32px;" class="mobile-padding dark-bg-featured" data-featured-layout="columns" data-featured-card-height="440" data-featured-img-height="240" data-featured-link-align="flow">
                             <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" class="featured-grid-table">
                                 <tr>
                                     <td class="mobile-stack col-left" width="50%" valign="top" style="padding: 0 10px 0 0; vertical-align: top;">
                                         <table class="featured-card" data-featured-card="true" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; border-collapse: separate; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
                                             <tbody>
-                                                <tr class="featured-card-img-tr" height="175">
-                                                    <td class="featured-card-img-td" height="175" style="padding: 0; margin: 0; line-height: 0; font-size: 0; background-color: #f1f3f7; height: 175px;" align="center">
-                                                        <img class="mobile-img featured-col-img" src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&amp;h=750&amp;fit=crop&amp;q=80" alt="Discover What's New" width="332" height="175" style="width: 100%; max-width: 100%; height: 175px; max-height: 175px; object-fit: cover; display: block; border: 0;" />
+                                                <tr class="featured-card-img-tr" height="240">
+                                                    <td class="featured-card-img-td" height="240" style="padding: 0; margin: 0; line-height: 0; font-size: 0; background-color: #f1f3f7; height: 240px;" align="center">
+                                                        <img class="mobile-img featured-col-img" src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&amp;h=750&amp;fit=crop&amp;q=80" alt="Discover What's New" width="332" height="240" style="width: 100%; max-width: 100%; height: 240px; max-height: 240px; object-fit: cover; display: block; border: 0;" />
                                                     </td>
                                                 </tr>
                                                 <tr class="featured-card-body-tr">
@@ -346,9 +346,9 @@ class EmailTemplateSeeder extends Seeder
                                     <td class="mobile-stack col-right" width="50%" valign="top" style="padding: 0 0 0 10px; vertical-align: top;">
                                         <table class="featured-card" data-featured-card="true" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e4ea; border-collapse: separate; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
                                             <tbody>
-                                                <tr class="featured-card-img-tr" height="175">
-                                                    <td class="featured-card-img-td" height="175" style="padding: 0; margin: 0; line-height: 0; font-size: 0; background-color: #f1f3f7; height: 175px;" align="center">
-                                                        <img class="mobile-img featured-col-img" src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=900&amp;h=750&amp;fit=crop&amp;q=80" alt="Creative Spotlight" width="332" height="175" style="width: 100%; max-width: 100%; height: 175px; max-height: 175px; object-fit: cover; display: block; border: 0;" />
+                                                <tr class="featured-card-img-tr" height="240">
+                                                    <td class="featured-card-img-td" height="240" style="padding: 0; margin: 0; line-height: 0; font-size: 0; background-color: #f1f3f7; height: 240px;" align="center">
+                                                        <img class="mobile-img featured-col-img" src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=900&amp;h=750&amp;fit=crop&amp;q=80" alt="Creative Spotlight" width="332" height="240" style="width: 100%; max-width: 100%; height: 240px; max-height: 240px; object-fit: cover; display: block; border: 0;" />
                                                     </td>
                                                 </tr>
                                                 <tr class="featured-card-body-tr">

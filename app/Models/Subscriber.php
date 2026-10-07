@@ -58,6 +58,6 @@ class Subscriber extends Model
 
     public function getFullNameAttribute(): string
     {
-        return trim(($this->first_name ?? '') . ' ' . ($this->last_name ?? '')) ?: $this->email;
+        return trim(($this->first_name ?? '').' '.($this->last_name ?? '')) ?: $this->email;
     }
 }

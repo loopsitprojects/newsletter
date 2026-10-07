@@ -6,7 +6,6 @@ use App\Models\ActivityLog;
 use App\Models\Campaign;
 use App\Models\Subscriber;
 use App\Models\SubscriberGroup;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
