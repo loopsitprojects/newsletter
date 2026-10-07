@@ -1,0 +1,1 @@
+import{t as e}from"./app-DS90sZEf.js";var t=e();function n({className:e=`h-9 w-auto`,variant:n=`white`,...r}){return(0,t.jsx)(`img`,{src:n===`dark`?`/images/loops-logo-dark.png`:`/images/loops-logo-white.png`,alt:`Loops Integrated`,className:`object-contain ${e}`,...r})}export{n as t};

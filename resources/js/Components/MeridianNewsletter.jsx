@@ -118,9 +118,13 @@ export default function MeridianNewsletter({
         ];
 
     return (
-        <div className="w-full max-w-[760px] mx-auto bg-white font-sans text-[#151a29] rounded-2xl shadow-xl overflow-hidden border border-[#e2e4ea]">
+        <div className={cn(
+            'w-full max-w-[760px] mx-auto font-sans shadow-xl overflow-hidden transition-colors',
+            darkMode ? 'bg-[#0f172a] text-slate-100 border-slate-800' : 'bg-white text-[#151a29] border-[#e2e4ea]',
+            mobile ? 'rounded-none border-x-0' : 'rounded-2xl border'
+        )}>
             {/* Top Brand Bar (Black Header Bar) */}
-            <div className={cn(px, 'py-6 flex items-center justify-center bg-[#0b0f19] rounded-t-2xl')}>
+            <div className={cn(px, 'py-6 flex items-center justify-center bg-[#0b0f19] border-b border-white/10', mobile ? 'rounded-none' : 'rounded-t-2xl')}>
                 <Logo light={true} logoUrl={logoUrl} logoDarkUrl={logoDarkUrl} logoHeight={logoHeight} brandName={brandName} />
             </div>
 
@@ -318,18 +322,26 @@ export default function MeridianNewsletter({
                         <p className="mt-2.5 max-w-xl text-[15px] text-[#636978] leading-relaxed">
                             {ctaSubtitle}
                         </p>
-                        <div className="mt-5 flex flex-wrap items-center gap-3">
+                        <div className={cn('mt-5 flex items-center gap-3', mobile ? 'flex-col w-full' : 'flex-wrap')}>
                             <a
                                 href={ctaButtonUrl || '#'}
-                                className="inline-block rounded-lg px-6 py-3 text-xs font-extrabold uppercase tracking-wider text-white shadow-sm transition hover:opacity-90 active:scale-95"
-                                style={{ backgroundColor: ctaButtonColor || '#0b0f19' }}
+                                className={cn(
+                                    'rounded-xl px-6 py-3.5 text-xs font-extrabold uppercase tracking-wider text-white shadow-md transition hover:opacity-90 active:scale-95',
+                                    mobile ? 'w-full text-center block' : 'inline-block',
+                                    darkMode ? 'border border-sky-400/80 shadow-sky-500/20' : 'border border-white/20'
+                                )}
+                                style={{ backgroundColor: darkMode ? (ctaButtonColor === '#0b0f19' ? '#0057c5' : (ctaButtonColor || '#0057c5')) : (ctaButtonColor || '#0b0f19') }}
                             >
                                 {ctaButtonText || 'VISIT OUR WEBSITE'}
                             </a>
                             {(showCtaSecondaryButton !== false && ctaSecondaryButtonText) && (
                                 <a
                                     href={ctaSecondaryButtonUrl || '#'}
-                                    className="inline-block rounded-lg px-6 py-3 text-xs font-bold uppercase tracking-wider text-[#151a29] bg-[#f1f5f9] border border-[#cbd5e1] shadow-sm transition hover:bg-[#e2e8f0] active:scale-95"
+                                    className={cn(
+                                        'rounded-xl px-6 py-3.5 text-xs font-bold uppercase tracking-wider shadow-sm transition active:scale-95',
+                                        mobile ? 'w-full text-center block' : 'inline-block',
+                                        darkMode ? 'text-slate-200 bg-slate-800 border border-slate-700 hover:bg-slate-700' : 'text-[#151a29] bg-[#f1f5f9] border border-[#cbd5e1] hover:bg-[#e2e8f0]'
+                                    )}
                                 >
                                     {ctaSecondaryButtonText}
                                 </a>

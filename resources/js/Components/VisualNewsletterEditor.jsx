@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import ImageUploaderField from './ImageUploaderField';
 import {
     Sparkles,
@@ -222,18 +222,162 @@ const compileHtml = (f) => {
             border: 0 !important;
         }
 
+        /* Dark Mode Enhancements (Apple Mail, Outlook, iOS Mail) */
+        @media (prefers-color-scheme: dark) {
+            body, .outer-table {
+                background-color: #060913 !important;
+                background-image: linear-gradient(to bottom, #060913 0%, #060913 100%) !important;
+            }
+            .container-table {
+                background-color: #0f172a !important;
+                border-color: #1e293b !important;
+                box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6) !important;
+            }
+            .header-cell, .dark-header {
+                background-color: #0b0f19 !important;
+                background-image: linear-gradient(to bottom, #0b0f19 0%, #0b0f19 100%) !important;
+            }
+            .dark-text-main {
+                color: #f8fafc !important;
+            }
+            .dark-text-muted {
+                color: #94a3b8 !important;
+            }
+            .dark-bg-featured {
+                background-color: #090d16 !important;
+            }
+            .featured-card {
+                background-color: #131c2e !important;
+                border-color: #1e293b !important;
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+            }
+            .featured-card-img-td {
+                background-color: #0c1424 !important;
+            }
+            .clean-cta-box {
+                background-color: #0f172a !important;
+            }
+            .clean-cta-title {
+                color: #f8fafc !important;
+            }
+            .clean-cta-subtitle {
+                color: #94a3b8 !important;
+            }
+            .clean-cta-btn {
+                background-color: #0057c5 !important;
+                background-image: linear-gradient(135deg, #0057c5 0%, #004bb0 100%) !important;
+                color: #ffffff !important;
+                border: 1.5px solid #38bdf8 !important;
+                box-shadow: 0 4px 18px rgba(0, 87, 197, 0.45) !important;
+            }
+            .clean-cta-sec-btn {
+                background-color: rgba(255, 255, 255, 0.08) !important;
+                color: #f1f5f9 !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            }
+            .footer-cell {
+                background-color: #090d16 !important;
+                border-top-color: #1e293b !important;
+            }
+            .footer-company {
+                color: #f8fafc !important;
+            }
+            .footer-text {
+                color: #94a3b8 !important;
+            }
+            .footer-logo {
+                filter: brightness(0) invert(1) !important;
+            }
+            .social-icon-btn {
+                background-color: #131c2e !important;
+                border-color: #1e293b !important;
+            }
+            .footer-hr {
+                border-top-color: #1e293b !important;
+            }
+        }
+
+        /* Mobile Viewport Optimizations (max-width: 620px) */
         @media only screen and (max-width: 620px) {
-            .container-table { width: 100% !important; max-width: 100% !important; }
-            .mobile-padding { padding-left: 20px !important; padding-right: 20px !important; }
-            .mobile-stack { display: block !important; width: 100% !important; max-width: 100% !important; }
-            .mobile-stack-right { padding-top: 16px !important; padding-left: 0 !important; text-align: left !important; }
-            .mobile-img { width: 100% !important; height: auto !important; min-height: auto !important; }
-            .mobile-headline { font-size: 30px !important; line-height: 1.25 !important; }
-            .mobile-cta-box { padding: 36px 16px !important; }
-            .mobile-cta-cell { display: inline-block !important; padding: 4px !important; }
+            .outer-table {
+                padding: 0 !important;
+                width: 100% !important;
+            }
+            .outer-td {
+                padding: 0 !important;
+            }
+            .container-table {
+                width: 100% !important;
+                max-width: 100% !important;
+                border-radius: 0 !important;
+                border-left: 0 !important;
+                border-right: 0 !important;
+            }
+            .header-cell {
+                border-radius: 0 !important;
+                padding: 24px 20px !important;
+            }
+            .mobile-padding {
+                padding-left: 20px !important;
+                padding-right: 20px !important;
+            }
+            .mobile-stack {
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding-right: 0 !important;
+                padding-left: 0 !important;
+            }
+            .mobile-stack-right {
+                padding-top: 18px !important;
+                padding-left: 0 !important;
+                text-align: left !important;
+            }
+            .mobile-img {
+                width: 100% !important;
+                height: auto !important;
+                min-height: auto !important;
+            }
+            .mobile-headline {
+                font-size: 28px !important;
+                line-height: 1.25 !important;
+            }
+            .mobile-cta-box {
+                padding: 32px 18px !important;
+            }
+            .clean-cta-box {
+                padding: 24px 20px 32px 20px !important;
+            }
+            .mobile-cta-table {
+                width: 100% !important;
+                margin: 20px auto 0 auto !important;
+            }
+            .mobile-cta-cell {
+                display: block !important;
+                width: 100% !important;
+                text-align: center !important;
+                padding: 0 !important;
+                margin-bottom: 12px !important;
+            }
+            .mobile-cta-btn {
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 14px 20px !important;
+                text-align: center !important;
+                font-size: 13.5px !important;
+                box-sizing: border-box !important;
+            }
             .card-spacer { display: none !important; }
             .card-item { margin-bottom: 16px !important; }
-            .col-left, .col-right { padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 20px !important; width: 100% !important; height: auto !important; display: block !important; }
+            .col-left, .col-right {
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                padding-bottom: 20px !important;
+                width: 100% !important;
+                height: auto !important;
+                display: block !important;
+            }
             .featured-grid-table, .featured-grid-row { height: auto !important; }
             .featured-card { height: auto !important; min-height: 0 !important; }
             .featured-col-img { width: 100% !important; height: 175px !important; object-fit: cover !important; }
@@ -249,15 +393,15 @@ const compileHtml = (f) => {
     </div>` : ''}
 
     <!-- Outer Wrapper -->
-    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #eef0f6; padding: 36px 12px;">
+    <table role="presentation" class="outer-table" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #eef0f6; padding: 36px 12px;">
         <tr>
-            <td align="center">
+            <td align="center" class="outer-td">
                 <!-- Inner Container Card -->
                 <table role="presentation" class="container-table" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: ${maxWidth}px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px -15px rgba(43, 42, 142, 0.08); border: 1px solid #e2e4ea;">
                     
                     <!-- Header / Company Logo (Black Header Bar) -->
                     <tr>
-                        <td align="${isSideBySide ? 'left' : align}" style="background-color: #0b0f19; padding: 28px 36px; text-align: ${isSideBySide ? 'left' : align}; border-radius: 15px 15px 0 0;" class="mobile-padding" data-header-layout="${headerLayout}">
+                        <td align="${isSideBySide ? 'left' : align}" style="background-color: #0b0f19; background-image: linear-gradient(to bottom, #0b0f19 0%, #0b0f19 100%); padding: 28px 36px; text-align: ${isSideBySide ? 'left' : align}; border-radius: 15px 15px 0 0;" class="mobile-padding header-cell dark-header" data-header-layout="${headerLayout}">
                             ${isSideBySide ? `
                             <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
@@ -368,15 +512,15 @@ const compileHtml = (f) => {
                     ${(f.introGreeting || f.introText) ? `
                     <tr>
                         <td style="padding: 24px 36px 28px 36px;" class="mobile-padding">
-                            ${f.introGreeting ? `<p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #151a29;">${escapeHtml(f.introGreeting)}</p>` : ''}
-                            ${f.introText ? `<p style="margin: 8px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #636978; line-height: 1.65;">${escapeHtml(f.introText)}</p>` : ''}
+                            ${f.introGreeting ? `<p class="dark-text-main" style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #151a29;">${escapeHtml(f.introGreeting)}</p>` : ''}
+                            ${f.introText ? `<p class="dark-text-muted" style="margin: 8px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #636978; line-height: 1.65;">${escapeHtml(f.introText)}</p>` : ''}
                         </td>
                     </tr>` : ''}
 
                     <!-- Featured Section -->
                     ${(f.showFeatured !== false && getFeaturedItems(f).length > 0) ? `
                     <tr>
-                        <td style="background-color: #f5f7fb; padding: 28px 32px;" class="mobile-padding" data-featured-layout="${(f.featuredLayout || 'columns') !== 'rows' ? 'columns' : 'rows'}" data-featured-card-height="${f.featuredCardHeight || '400'}" data-featured-link-align="${f.featuredLinkAlign || 'flow'}">
+                        <td style="background-color: #f5f7fb; padding: 28px 32px;" class="mobile-padding dark-bg-featured" data-featured-layout="${(f.featuredLayout || 'columns') !== 'rows' ? 'columns' : 'rows'}" data-featured-card-height="${f.featuredCardHeight || '400'}" data-featured-link-align="${f.featuredLinkAlign || 'flow'}">
                             ${(() => {
                                 const items = getFeaturedItems(f);
                                 const isColumns = (f.featuredLayout || 'columns') !== 'rows';
@@ -418,11 +562,11 @@ const compileHtml = (f) => {
                                             <div class="featured-card-content">
                                                 ${renderBadge(item, idx)}
                                                 ${item.title ? `
-                                                <h2 style="margin: 8px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700; color: #151a29; line-height: 1.35;">
+                                                <h2 class="dark-text-main" style="margin: 8px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700; color: #151a29; line-height: 1.35;">
                                                     ${escapeHtml(item.title)}
                                                 </h2>` : ''}
                                                 ${item.text ? `
-                                                <p style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.55;">
+                                                <p class="dark-text-muted" style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.55;">
                                                     ${escapeHtml(item.text)}
                                                 </p>` : ''}
                                                 ${(item.linkText && isFlowLink) ? `
@@ -462,11 +606,11 @@ const compileHtml = (f) => {
                                     <td class="mobile-stack" width="${item.image ? '50%' : '100%'}" valign="middle" style="padding: 30px 26px;" class="mobile-padding">
                                         ${renderBadge(item, idx)}
                                         ${item.title ? `
-                                        <h2 style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 22px; font-weight: 700; color: #151a29; line-height: 1.3;">
+                                        <h2 class="dark-text-main" style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 22px; font-weight: 700; color: #151a29; line-height: 1.3;">
                                             ${escapeHtml(item.title)}
                                         </h2>` : ''}
                                         ${item.text ? `
-                                        <p style="margin: 10px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.6;">
+                                        <p class="dark-text-muted" style="margin: 10px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.6;">
                                             ${escapeHtml(item.text)}
                                         </p>` : ''}
                                         ${item.linkText ? `
@@ -554,24 +698,24 @@ const compileHtml = (f) => {
                         </td>
                     </tr>` : `
                     <tr>
-                        <td style="padding: 28px 36px 36px 36px;" class="mobile-padding" data-cta-style="clean">
+                        <td style="padding: 28px 36px 36px 36px;" class="mobile-padding clean-cta-box" data-cta-style="clean">
                             <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
-                                    <td align="left" style="text-align: left;">
-                                        ${f.ctaTitle ? `<h3 style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: #151a29; letter-spacing: -0.4px; line-height: 1.3;">${escapeHtml(f.ctaTitle)}</h3>` : ''}
-                                        ${f.ctaSubtitle ? `<p style="margin: 10px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #636978; line-height: 1.6; max-width: 600px;">${escapeHtml(f.ctaSubtitle)}</p>` : ''}
+                                    <td align="left" style="text-align: left;" class="clean-cta-text-cell">
+                                        ${f.ctaTitle ? `<h3 class="clean-cta-title" style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: #151a29; letter-spacing: -0.4px; line-height: 1.3;">${escapeHtml(f.ctaTitle)}</h3>` : ''}
+                                        ${f.ctaSubtitle ? `<p class="clean-cta-subtitle" style="margin: 10px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #636978; line-height: 1.6; max-width: 600px;">${escapeHtml(f.ctaSubtitle)}</p>` : ''}
                                         ${(f.ctaButtonText || (f.showCtaSecondaryButton && f.ctaSecondaryButtonText)) ? `
-                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="left" style="margin: 20px 0 0 0;">
+                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="left" class="clean-cta-btn-table mobile-cta-table" style="margin: 20px 0 0 0;">
                                             <tr>
                                                 ${f.ctaButtonText ? `
-                                                <td align="center" style="border-radius: 8px; background-color: ${f.ctaButtonColor || '#0b0f19'};">
-                                                    <a href="${escapeHtml(cleanUrl(f.ctaButtonUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 800; color: #ffffff; text-decoration: none; padding: 13px 26px; border-radius: 8px; display: inline-block; background-color: ${f.ctaButtonColor || '#0b0f19'}; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2;">
+                                                <td align="center" class="mobile-cta-cell" style="border-radius: 10px; background-color: ${f.ctaButtonColor || '#0b0f19'}; background-image: linear-gradient(to bottom, ${f.ctaButtonColor || '#0b0f19'} 0%, ${f.ctaButtonColor || '#0b0f19'} 100%);">
+                                                    <a href="${escapeHtml(cleanUrl(f.ctaButtonUrl || '#'))}" target="_blank" class="clean-cta-btn mobile-cta-btn" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 800; color: #ffffff; text-decoration: none; padding: 13px 28px; border-radius: 10px; display: inline-block; background-color: ${f.ctaButtonColor || '#0b0f19'}; background-image: linear-gradient(to bottom, ${f.ctaButtonColor || '#0b0f19'} 0%, ${f.ctaButtonColor || '#0b0f19'} 100%); text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2; border: 1.5px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);">
                                                         ${escapeHtml(f.ctaButtonText)}
                                                     </a>
                                                 </td>` : ''}
                                                 ${(f.showCtaSecondaryButton && f.ctaSecondaryButtonText) ? `
-                                                <td align="center" style="border-radius: 8px; padding-left: 12px;">
-                                                    <a href="${escapeHtml(cleanUrl(f.ctaSecondaryButtonUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; color: #151a29; text-decoration: none; padding: 12px 24px; border-radius: 8px; display: inline-block; background-color: #f1f5f9; border: 1px solid #cbd5e1; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2;">
+                                                <td align="center" class="mobile-cta-cell" style="border-radius: 10px; padding-left: 12px;">
+                                                    <a href="${escapeHtml(cleanUrl(f.ctaSecondaryButtonUrl || '#'))}" target="_blank" class="clean-cta-sec-btn mobile-cta-btn" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; color: #151a29; text-decoration: none; padding: 12px 24px; border-radius: 10px; display: inline-block; background-color: #f1f5f9; border: 1px solid #cbd5e1; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2;">
                                                         ${escapeHtml(f.ctaSecondaryButtonText)}
                                                     </a>
                                                 </td>` : ''}
@@ -587,23 +731,23 @@ const compileHtml = (f) => {
 
                     <!-- Footer Section -->
                     <tr>
-                        <td style="background-color: #f5f7fb; border-top: 1px solid #e2e4ea; padding: 36px 32px 32px 32px; text-align: center;" class="mobile-padding">
+                        <td style="background-color: #f5f7fb; border-top: 1px solid #e2e4ea; padding: 36px 32px 32px 32px; text-align: center;" class="mobile-padding footer-cell">
                             <!-- Footer Logo -->
                             <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto 16px auto;">
                                 <tr>
                                     <td align="center" valign="middle">
                                         <a href="{{app_url}}" target="_blank" style="text-decoration: none; display: inline-block;">
-                                            <img src="/images/loops-logo-dark.png" alt="${escapeHtml(f.companyName || f.brandName || 'Loops Integrated')}" height="32" style="height: 32px; max-height: 32px; width: auto; max-width: 160px; display: block; margin: 0 auto; border: 0;" />
+                                            <img class="footer-logo" src="/images/loops-logo-dark.png" alt="${escapeHtml(f.companyName || f.brandName || 'Loops Integrated')}" height="32" style="height: 32px; max-height: 32px; width: auto; max-width: 160px; display: block; margin: 0 auto; border: 0;" />
                                         </a>
                                     </td>
                                 </tr>
                             </table>
 
-                            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; color: #151a29;">
+                            <p class="footer-company" style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; color: #151a29;">
                                 ${escapeHtml(f.companyName || f.brandName || 'Loops Integrated')}
                             </p>
-                            ${f.companyAddress ? `<p style="margin: 4px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; color: #636978;">${escapeHtml(f.companyAddress)}</p>` : ''}
-                            ${f.companyContact ? `<p style="margin: 4px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; color: #636978;">${escapeHtml(f.companyContact)}</p>` : ''}
+                            ${f.companyAddress ? `<p class="footer-text" style="margin: 4px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; color: #636978;">${escapeHtml(f.companyAddress)}</p>` : ''}
+                            ${f.companyContact ? `<p class="footer-text" style="margin: 4px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; color: #636978;">${escapeHtml(f.companyContact)}</p>` : ''}
 
                             <!-- Social Links -->
                             <div style="margin: 18px 0 16px 0;">
@@ -615,7 +759,7 @@ const compileHtml = (f) => {
                             </div>
 
 
-                            <hr style="border: 0; border-top: 1px solid #e2e4ea; margin: 16px 0;" />
+                            <hr class="footer-hr" style="border: 0; border-top: 1px solid #e2e4ea; margin: 16px 0;" />
 
                             <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; color: #8e95a5; line-height: 1.5;">
                                 You're receiving this email because you subscribed to our newsletter.
@@ -985,6 +1129,7 @@ const extractFieldsFromHtml = (htmlStr) => {
 export default function VisualNewsletterEditor({ value, onChange, templates = [], onSelectTemplate, onTemplateSaved }) {
     const [editorMode, setEditorMode] = useState('visual'); // 'visual' | 'code'
     const [previewDevice, setPreviewDevice] = useState('desktop');
+    const [previewTheme, setPreviewTheme] = useState('light'); // 'light' | 'dark'
     const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
     const [saveTemplateName, setSaveTemplateName] = useState('');
@@ -1187,6 +1332,68 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
         }
     }, [value]);
 
+    const previewHtml = useMemo(() => {
+        let raw = (value || compileHtml(fields))
+            .replace(/\{\{first_name\}\}/g, 'Sarah')
+            .replace(/\{\{email\}\}/g, 'sarah.dev@example.com')
+            .replace(/\{\{company_name\}\}/g, fields.companyName || 'Loops Integrated')
+            .replace(/\{\{unsubscribe_url\}\}/g, '#')
+            .replace(
+                /<a([^>]*href="[^"]*instagram[^"]*"[^>]*)>ig<\/a>/gi,
+                `<a$1><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg></a>`
+            )
+            .replace(
+                /<a([^>]*href="[^"]*facebook[^"]*"[^>]*)>f<\/a>/gi,
+                `<a$1><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>`
+            )
+            .replace(
+                /<a([^>]*href="[^"]*linkedin[^"]*"[^>]*)>in<\/a>/gi,
+                `<a$1><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>`
+            )
+            .replace(
+                /<a([^>]*href="[^"]*tiktok[^"]*"[^>]*)>tt<\/a>/gi,
+                `<a$1><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg></a>`
+            )
+            .replace(
+                /<a([^>]*href="[^"]*youtube[^"]*"[^>]*)>(?:&#9654;|▶)<\/a>/gi,
+                `<a$1><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path><polygon points="10 15 15 12 10 9" fill="currentColor"></polygon></svg></a>`
+            );
+
+        if (previewTheme === 'dark') {
+            const darkSimStyle = `
+            <style id="preview-dark-mode-simulation">
+                :root { color-scheme: dark !important; }
+                html, body { background-color: #060913 !important; color: #f8fafc !important; }
+                .outer-table { background-color: #060913 !important; background-image: linear-gradient(to bottom, #060913 0%, #060913 100%) !important; }
+                .container-table { background-color: #0f172a !important; border-color: #1e293b !important; box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6) !important; }
+                .header-cell, .dark-header { background-color: #0b0f19 !important; background-image: linear-gradient(to bottom, #0b0f19 0%, #0b0f19 100%) !important; border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important; }
+                .dark-text-main { color: #f8fafc !important; }
+                .dark-text-muted { color: #94a3b8 !important; }
+                .dark-bg-featured { background-color: #090d16 !important; }
+                .featured-card { background-color: #131c2e !important; border-color: #1e293b !important; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important; }
+                .featured-card-img-td { background-color: #0c1424 !important; }
+                .clean-cta-box { background-color: #0f172a !important; }
+                .clean-cta-title { color: #f8fafc !important; }
+                .clean-cta-subtitle { color: #94a3b8 !important; }
+                .clean-cta-btn { background-color: #0057c5 !important; background-image: linear-gradient(135deg, #0057c5 0%, #004bb0 100%) !important; color: #ffffff !important; border: 1.5px solid #38bdf8 !important; box-shadow: 0 4px 18px rgba(0, 87, 197, 0.45) !important; }
+                .clean-cta-sec-btn { background-color: rgba(255, 255, 255, 0.08) !important; color: #f1f5f9 !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; }
+                .footer-cell { background-color: #090d16 !important; border-top-color: #1e293b !important; }
+                .footer-company { color: #f8fafc !important; }
+                .footer-text { color: #94a3b8 !important; }
+                .footer-logo { filter: brightness(0) invert(1) !important; }
+                .social-icon-btn { background-color: #131c2e !important; border-color: #1e293b !important; }
+                .footer-hr { border-top-color: #1e293b !important; }
+            </style>
+            `;
+            if (raw.includes('</head>')) {
+                raw = raw.replace('</head>', `${darkSimStyle}</head>`);
+            } else {
+                raw = `${darkSimStyle}${raw}`;
+            }
+        }
+        return raw;
+    }, [value, fields, previewTheme]);
+
     return (
         <div className="space-y-4">
             {/* Top Toolbar: Switcher & Device Controls */}
@@ -1299,6 +1506,34 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                             title="Mobile Preview"
                         >
                             <Smartphone className="h-4 w-4" />
+                        </button>
+                    </div>
+
+                    <div className="flex items-center space-x-1 pl-2 border-l border-slate-800">
+                        <span className="text-[11px] text-slate-400 font-semibold mr-1">Theme:</span>
+                        <button
+                            type="button"
+                            onClick={() => setPreviewTheme('light')}
+                            className={`p-1.5 rounded-lg transition ${
+                                previewTheme === 'light'
+                                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 shadow-sm'
+                                    : 'text-slate-500 hover:text-white'
+                            }`}
+                            title="Preview in Light Mode"
+                        >
+                            <Sun className="h-4 w-4" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setPreviewTheme('dark')}
+                            className={`p-1.5 rounded-lg transition ${
+                                previewTheme === 'dark'
+                                    ? 'bg-indigo-600/30 text-indigo-400 border border-indigo-500/40 shadow-sm'
+                                    : 'text-slate-500 hover:text-white'
+                            }`}
+                            title="Preview in Dark Mode (Email Clients)"
+                        >
+                            <Moon className="h-4 w-4" />
                         </button>
                     </div>
                 </div>
@@ -2168,53 +2403,70 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                 {/* Right Side: Instant Live Mobile / Desktop Email Preview */}
                 <div className="xl:col-span-7 2xl:col-span-8 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col items-center justify-start overflow-hidden min-h-[600px]">
                     <div className="w-full flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
-                        <span className="text-xs font-extrabold text-white flex items-center">
-                            <Eye className="h-4 w-4 mr-1.5 text-indigo-400" /> Real-Time Live Preview
-                        </span>
+                        <div className="flex items-center space-x-2">
+                            <span className="text-xs font-extrabold text-white flex items-center">
+                                <Eye className="h-4 w-4 mr-1.5 text-indigo-400" /> Real-Time Live Preview
+                            </span>
+                            <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center space-x-1 ${
+                                previewTheme === 'dark'
+                                    ? 'bg-indigo-950/80 text-indigo-300 border border-indigo-700/50'
+                                    : 'bg-amber-950/40 text-amber-300 border border-amber-700/40'
+                            }`}>
+                                {previewTheme === 'dark' ? (
+                                    <>
+                                        <Moon className="h-3 w-3 mr-1 inline" />
+                                        <span>Dark Mode</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Sun className="h-3 w-3 mr-1 inline" />
+                                        <span>Light Mode</span>
+                                    </>
+                                )}
+                            </span>
+                        </div>
                         <span className="text-[10px] text-slate-400 bg-slate-800 px-2.5 py-0.5 rounded-full font-semibold">
                             {previewDevice === 'mobile' ? 'Mobile View (375px)' : `Desktop View (${fields.templateWidth || '760'}px)`}
                         </span>
                     </div>
 
-                    <div className="w-full flex-1 flex justify-center overflow-x-auto overflow-y-auto p-2">
-                        <div
-                            className={`bg-white text-slate-900 rounded-xl shadow-2xl transition-all duration-300 overflow-hidden ${
-                                previewDevice === 'mobile' ? 'w-[375px] min-h-[550px] my-2 border-4 border-slate-800 shrink-0' : 'w-full shrink-0'
-                            }`}
-                            style={{
-                                maxWidth: previewDevice === 'mobile' ? '375px' : `${fields.templateWidth || '760'}px`,
-                            }}
-                        >
+                    <div className="w-full flex-1 flex justify-center items-start overflow-x-auto overflow-y-auto p-2">
+                        {previewDevice === 'mobile' ? (
+                            <div className="relative mx-auto my-2 shrink-0">
+                                {/* Smartphone Outer Mockup Frame */}
+                                <div className="w-[395px] rounded-[44px] p-2.5 bg-slate-950 border-4 border-slate-800 shadow-2xl ring-1 ring-slate-700/50">
+                                    {/* Top Notch Speaker Bar */}
+                                    <div className="w-28 h-3.5 bg-slate-800 rounded-full mx-auto mb-2 flex items-center justify-center">
+                                        <div className="w-10 h-1 bg-slate-700 rounded-full" />
+                                    </div>
+                                    <div className="rounded-[32px] overflow-hidden bg-white shadow-inner" style={{ height: '700px' }}>
+                                        <iframe
+                                            title="Email Mobile Preview"
+                                            srcDoc={previewHtml}
+                                            className="w-full h-full border-0"
+                                            sandbox="allow-same-origin"
+                                        />
+                                    </div>
+                                    {/* Bottom Home Indicator Bar */}
+                                    <div className="w-32 h-1 bg-slate-700 rounded-full mx-auto mt-2" />
+                                </div>
+                            </div>
+                        ) : (
                             <div
-                                dangerouslySetInnerHTML={{
-                                    __html: (value || compileHtml(fields))
-                                        .replace(/\{\{first_name\}\}/g, 'Sarah')
-                                        .replace(/\{\{email\}\}/g, 'sarah.dev@example.com')
-                                        .replace(/\{\{company_name\}\}/g, fields.companyName || 'Loops Integrated')
-                                        .replace(/\{\{unsubscribe_url\}\}/g, '#')
-                                        .replace(
-                                            /<a([^>]*href="[^"]*instagram[^"]*"[^>]*)>ig<\/a>/gi,
-                                            `<a$1><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg></a>`
-                                        )
-                                        .replace(
-                                            /<a([^>]*href="[^"]*facebook[^"]*"[^>]*)>f<\/a>/gi,
-                                            `<a$1><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></a>`
-                                        )
-                                        .replace(
-                                            /<a([^>]*href="[^"]*linkedin[^"]*"[^>]*)>in<\/a>/gi,
-                                            `<a$1><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>`
-                                        )
-                                        .replace(
-                                            /<a([^>]*href="[^"]*tiktok[^"]*"[^>]*)>tt<\/a>/gi,
-                                            `<a$1><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg></a>`
-                                        )
-                                        .replace(
-                                            /<a([^>]*href="[^"]*youtube[^"]*"[^>]*)>(?:&#9654;|▶)<\/a>/gi,
-                                            `<a$1><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block; margin-top: -2px;"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path><polygon points="10 15 15 12 10 9" fill="currentColor"></polygon></svg></a>`
-                                        ),
+                                className="w-full bg-slate-950/40 rounded-xl overflow-hidden shadow-2xl border border-slate-800/80 transition-all duration-300 shrink-0"
+                                style={{
+                                    maxWidth: `${fields.templateWidth || '760'}px`,
+                                    height: '760px',
                                 }}
-                            />
-                        </div>
+                            >
+                                <iframe
+                                    title="Email Desktop Preview"
+                                    srcDoc={previewHtml}
+                                    className="w-full h-full border-0 bg-white"
+                                    sandbox="allow-same-origin"
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
