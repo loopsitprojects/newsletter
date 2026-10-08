@@ -16,8 +16,8 @@ class EmailTemplateSeeder extends Seeder
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="color-scheme" content="light dark">
-    <meta name="supported-color-schemes" content="light dark">
+    <meta name="color-scheme" content="light only">
+    <meta name="supported-color-schemes" content="light">
     <title>What's New This Month? | Loops Integrated</title>
     <!--[if mso]>
     <noscript>
@@ -30,8 +30,8 @@ class EmailTemplateSeeder extends Seeder
     <![endif]-->
     <style>
         :root {
-            color-scheme: light dark;
-            supported-color-schemes: light dark;
+            color-scheme: light only;
+            supported-color-schemes: light;
         }
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -81,7 +81,19 @@ class EmailTemplateSeeder extends Seeder
             border: 0 !important;
         }
 
-        /* Dark Mode Enhancements (Apple Mail, Outlook, iOS Mail) */
+        /* Dark Mode & Inversion Protection (Apple Mail, Outlook, iOS Mail, Gmail) */
+        u + .body .dark-header,
+        u + .body .header-cell,
+        u + .body .header-logo-bg {
+            background-color: #0b0f19 !important;
+            background-image: linear-gradient(#0b0f19, #0b0f19) !important;
+        }
+        u + .body .header-title-white {
+            color: #ffffff !important;
+        }
+        u + .body .header-subtitle-white {
+            color: #cbd5e1 !important;
+        }
         @media (prefers-color-scheme: dark) {
             body, .outer-table {
                 background-color: #060913 !important;
@@ -92,9 +104,15 @@ class EmailTemplateSeeder extends Seeder
                 border-color: #1e293b !important;
                 box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6) !important;
             }
-            .header-cell, .dark-header {
+            .header-cell, .dark-header, .header-logo-bg {
                 background-color: #0b0f19 !important;
-                background-image: linear-gradient(to bottom, #0b0f19 0%, #0b0f19 100%) !important;
+                background-image: linear-gradient(#0b0f19, #0b0f19) !important;
+            }
+            .header-title-white {
+                color: #ffffff !important;
+            }
+            .header-subtitle-white {
+                color: #cbd5e1 !important;
             }
             .dark-text-main {
                 color: #f8fafc !important;
@@ -143,9 +161,6 @@ class EmailTemplateSeeder extends Seeder
             }
             .footer-text {
                 color: #94a3b8 !important;
-            }
-            .footer-logo {
-                filter: brightness(0) invert(1) !important;
             }
             .social-icon-btn {
                 background-color: #131c2e !important;
@@ -256,7 +271,7 @@ class EmailTemplateSeeder extends Seeder
                     
                     <!-- Header / Company Logo (Black Header Bar with Side-by-Side Logo & Heading) -->
                     <tr>
-                        <td style="background-color: #0b0f19; background-image: linear-gradient(to bottom, #0b0f19 0%, #0b0f19 100%); padding: 28px 36px; border-radius: 15px 15px 0 0;" class="mobile-padding header-cell dark-header" data-header-layout="side-by-side">
+                        <td style="background: #0b0f19; background-color: #0b0f19; background-image: linear-gradient(#0b0f19, #0b0f19); padding: 28px 36px; border-radius: 15px 15px 0 0;" class="mobile-padding header-cell dark-header" data-header-layout="side-by-side">
                             <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
                                     <!-- Left: Logo -->
@@ -265,7 +280,13 @@ class EmailTemplateSeeder extends Seeder
                                             <tr>
                                                 <td align="left" valign="middle">
                                                     <a href="{{app_url}}" target="_blank" style="text-decoration: none; display: inline-block;">
-                                                        <img src="/images/loops-logo-white.png" alt="Loops Integrated" height="64" style="height: 64px; max-height: 64px; width: auto; max-width: 240px; display: block; margin: 0; border: 0;" />
+                                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="margin: 0;">
+                                                            <tr>
+                                                                <td class="header-logo-bg" style="background: #0b0f19; background-color: #0b0f19; background-image: linear-gradient(#0b0f19, #0b0f19); border-radius: 10px; padding: 4px 6px;">
+                                                                    <img src="/images/loops-logo-white.png?v=3" alt="Loops Integrated" height="64" style="height: 64px; max-height: 64px; width: auto; max-width: 240px; display: block; margin: 0; border: 0;" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
                                                     </a>
                                                 </td>
                                             </tr>
@@ -276,10 +297,10 @@ class EmailTemplateSeeder extends Seeder
                                         <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #2fd0ca; text-transform: uppercase; letter-spacing: 2px;">
                                             October Edition
                                         </p>
-                                        <h1 class="mobile-headline" style="margin: 6px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; color: #ffffff; line-height: 1.25; letter-spacing: -0.3px;">
+                                        <h1 class="mobile-headline header-title-white" style="margin: 6px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; color: #ffffff !important; line-height: 1.25; letter-spacing: -0.3px;">
                                             What's New This Month?
                                         </h1>
-                                        <p style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #cbd5e1; line-height: 1.5;">
+                                        <p class="header-subtitle-white" style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #cbd5e1 !important; line-height: 1.5;">
                                             Discover our latest updates, products, news and special offers.
                                         </p>
                                     </td>

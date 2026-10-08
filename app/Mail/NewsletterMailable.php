@@ -31,7 +31,7 @@ class NewsletterMailable extends Mailable
 
         // Normalize media URLs: convert localhost/127.0.0.1 or relative storage paths to absolute production URL
         $storageBaseUrl = rtrim(config('app.url', url('/')), '/').'/storage/';
-        $rawHtml = $campaign->content_html ?? '';
+        $rawHtml = ! empty($campaign->content_html) ? $campaign->content_html : ($campaign->template?->content_html ?? '');
         $html = preg_replace(
             '#https?://(?:127\.0\.0\.1|localhost)(?::\d+)?/storage/#i',
             $storageBaseUrl,
@@ -39,7 +39,7 @@ class NewsletterMailable extends Mailable
         );
         $html = preg_replace('#(src|href)=[\'"]/storage/#i', '$1="'.$storageBaseUrl, $html);
         $appBaseUrl = rtrim(config('app.url', url('/')), '/');
-        $html = preg_replace('#(src|href)=[\'"]/(favicon\.png|(?:images/)?loops-logo-(?:white|dark)\.png)[\'"]#i', '$1="'.$appBaseUrl.'/$2"', $html);
+        $html = preg_replace('#(src|href)=[\'"]/(favicon\.png|(?:images/)?loops-logo-(?:white|dark)\.png)(\?[^\'"]*)?[\'"]#i', '$1="'.$appBaseUrl.'/$2$3"', $html);
 
         // Normalize social icons: convert local or legacy SVGs to email-safe CDN PNG images
         $socialCdnMap = [
@@ -69,6 +69,67 @@ class NewsletterMailable extends Mailable
                 $html
             );
         }
+
+        // Prevent dark mode inversion issues (e.g. Gmail iOS inverting dark headers into white boxes)
+        $html = preg_replace('~<meta\s+name=["\']color-scheme["\']\s+content=["\'][^"\']*["\']>~i', '<meta name="color-scheme" content="light only">', $html);
+        $html = preg_replace('~<meta\s+name=["\']supported-color-schemes["\']\s+content=["\'][^"\']*["\']>~i', '<meta name="supported-color-schemes" content="light">', $html);
+        if (! str_contains($html, '<meta name="color-scheme"')) {
+            $html = str_replace('<head>', "<head>\n    <meta name=\"color-scheme\" content=\"light only\">\n    <meta name=\"supported-color-schemes\" content=\"light\">", $html);
+        }
+        $html = preg_replace('~color-scheme:\s*light\s+dark;?~i', 'color-scheme: light only;', $html);
+        $html = preg_replace('~supported-color-schemes:\s*light\s+dark;?~i', 'supported-color-schemes: light;', $html);
+
+        // Replace complex gradient syntax on header cells that Gmail iOS strips
+        $html = preg_replace('~background-image:\s*linear-gradient\([^)]*#0b0f19[^)]*\);?~i', 'background-image: linear-gradient(#0b0f19, #0b0f19);', $html);
+
+        // Ensure header inversion protection styles exist in <style>
+        $inversionProtectionCss = '
+        /* Dark Mode & Inversion Protection (Apple Mail, Outlook, iOS Mail, Gmail) */
+        u + .body .dark-header,
+        u + .body .header-cell,
+        u + .body .header-logo-bg {
+            background-color: #0b0f19 !important;
+            background-image: linear-gradient(#0b0f19, #0b0f19) !important;
+        }
+        u + .body .header-title-white {
+            color: #ffffff !important;
+        }
+        u + .body .header-subtitle-white {
+            color: #cbd5e1 !important;
+        }
+        ';
+        if (! str_contains($html, '.header-logo-bg') && str_contains($html, '</style>')) {
+            $html = str_replace('</style>', $inversionProtectionCss."\n    </style>", $html);
+        }
+
+        // Ensure header logo has dark background wrapper if missing
+        if (! str_contains($html, 'header-logo-bg')) {
+            $html = preg_replace_callback(
+                '~(<img\b[^>]*?(?:loops-logo-white|favicon)[^>]*?>)~i',
+                function ($matches) {
+                    return '<table role="presentation" border="0" cellspacing="0" cellpadding="0" style="margin: 0;"><tr><td class="header-logo-bg" style="background: #0b0f19; background-color: #0b0f19; background-image: linear-gradient(#0b0f19, #0b0f19); border-radius: 10px; padding: 4px 6px;">'.$matches[1].'</td></tr></table>';
+                },
+                $html,
+                1
+            );
+        }
+
+        // Ensure header headline text remains crisp white in inverted clients
+        $html = preg_replace_callback(
+            '~<h1\b([^>]*class="[^"]*mobile-headline[^"]*"[^>]*)>~i',
+            function ($matches) {
+                $tag = $matches[0];
+                if (! str_contains($tag, 'header-title-white')) {
+                    $tag = str_replace('mobile-headline', 'mobile-headline header-title-white', $tag);
+                }
+                if (str_contains($tag, 'color: #ffffff') && ! str_contains($tag, 'color: #ffffff !important')) {
+                    $tag = str_replace('color: #ffffff', 'color: #ffffff !important', $tag);
+                }
+
+                return $tag;
+            },
+            $html
+        );
 
         // Clean legacy flexbox styles from table elements if present in older saved campaigns
         $html = preg_replace('#\.featured-grid-row\s*\{\s*display:\s*flex[^}]*\}#i', '', $html);

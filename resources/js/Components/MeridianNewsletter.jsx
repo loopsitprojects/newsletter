@@ -15,7 +15,7 @@ const Logo = ({
     light = false,
     darkMode = false,
     logoUrl = '/images/loops-logo-dark.png',
-    logoDarkUrl = '/images/loops-logo-white.png',
+    logoDarkUrl = '/images/loops-logo-white.png?v=3',
     brandName = 'Loops Integrated',
     logoHeight = 64,
 }) => {
@@ -67,7 +67,7 @@ export default function MeridianNewsletter({
     mobile = false,
     darkMode = false,
     logoUrl = '/images/loops-logo-dark.png',
-    logoDarkUrl = '/images/loops-logo-white.png',
+    logoDarkUrl = '/images/loops-logo-white.png?v=3',
     logoHeight = 64,
     brandName = 'Loops Integrated',
     firstName = 'Sarah',

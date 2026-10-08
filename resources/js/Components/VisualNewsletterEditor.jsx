@@ -45,8 +45,8 @@ const defaultFields = {
     logoAlign: 'left',
     heroAlign: 'left',
     brandName: 'Loops Integrated',
-    brandLogoUrl: '/images/loops-logo-white.png',
-    brandLogoDarkUrl: '/images/loops-logo-white.png',
+    brandLogoUrl: '/images/loops-logo-white.png?v=3',
+    brandLogoDarkUrl: '/images/loops-logo-white.png?v=3',
     logoHeight: '64',
     brandColor: '#0057c5',
     edition: 'October Edition',
@@ -158,9 +158,8 @@ const compileHtml = (f) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="color-scheme" content="light dark">
-    <meta name="supported-color-schemes" content="light dark">
+    <meta name="color-scheme" content="light only">
+    <meta name="supported-color-schemes" content="light only">
     <title>${escapeHtml(f.headerTitle || "What's New This Month?")} | ${escapeHtml(f.brandName || 'Loops Integrated')}</title>
     <!--[if mso]>
     <noscript>
@@ -173,8 +172,8 @@ const compileHtml = (f) => {
     <![endif]-->
     <style>
         :root {
-            color-scheme: light dark;
-            supported-color-schemes: light dark;
+            color-scheme: light only;
+            supported-color-schemes: light only;
         }
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -224,20 +223,38 @@ const compileHtml = (f) => {
             border: 0 !important;
         }
 
-        /* Dark Mode Enhancements (Apple Mail, Outlook, iOS Mail) */
+        /* Dark Mode & Inversion Protection (Apple Mail, Outlook, iOS Mail, Gmail) */
+        u + .body .dark-header,
+        u + .body .header-cell,
+        u + .body .header-logo-bg {
+            background-color: #0b0f19 !important;
+            background-image: linear-gradient(#0b0f19, #0b0f19) !important;
+        }
+        u + .body .header-title-white {
+            color: #ffffff !important;
+        }
+        u + .body .header-subtitle-white {
+            color: #cbd5e1 !important;
+        }
         @media (prefers-color-scheme: dark) {
             body, .outer-table {
                 background-color: #060913 !important;
-                background-image: linear-gradient(to bottom, #060913 0%, #060913 100%) !important;
+                background-image: linear-gradient(#060913, #060913) !important;
             }
             .container-table {
                 background-color: #0f172a !important;
                 border-color: #1e293b !important;
                 box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6) !important;
             }
-            .header-cell, .dark-header {
+            .header-cell, .dark-header, .header-logo-bg {
                 background-color: #0b0f19 !important;
-                background-image: linear-gradient(to bottom, #0b0f19 0%, #0b0f19 100%) !important;
+                background-image: linear-gradient(#0b0f19, #0b0f19) !important;
+            }
+            .header-title-white {
+                color: #ffffff !important;
+            }
+            .header-subtitle-white {
+                color: #cbd5e1 !important;
             }
             .dark-text-main {
                 color: #f8fafc !important;
@@ -286,9 +303,6 @@ const compileHtml = (f) => {
             }
             .footer-text {
                 color: #94a3b8 !important;
-            }
-            .footer-logo {
-                filter: brightness(0) invert(1) !important;
             }
             .social-icon-btn {
                 background-color: #131c2e !important;
@@ -403,7 +417,7 @@ const compileHtml = (f) => {
                     
                     <!-- Header / Company Logo (Black Header Bar) -->
                     <tr>
-                        <td align="${isSideBySide ? 'left' : align}" style="background-color: #0b0f19; background-image: linear-gradient(to bottom, #0b0f19 0%, #0b0f19 100%); padding: 28px 36px; text-align: ${isSideBySide ? 'left' : align}; border-radius: 15px 15px 0 0;" class="mobile-padding header-cell dark-header" data-header-layout="${headerLayout}">
+                        <td align="${isSideBySide ? 'left' : align}" style="background: #0b0f19; background-color: #0b0f19; background-image: linear-gradient(#0b0f19, #0b0f19); padding: 28px 36px; text-align: ${isSideBySide ? 'left' : align}; border-radius: 15px 15px 0 0;" class="mobile-padding header-cell dark-header" data-header-layout="${headerLayout}">
                             ${isSideBySide ? `
                             <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
@@ -414,7 +428,13 @@ const compileHtml = (f) => {
                                                 <td align="left" valign="middle">
                                                     <a href="{{app_url}}" target="_blank" style="text-decoration: none; display: inline-block;">
                                                         ${(f.brandLogoDarkUrl || f.brandLogoUrl) ? `
-                                                        <img src="${escapeHtml(cleanUrl(f.brandLogoDarkUrl || f.brandLogoUrl))}" alt="${escapeHtml(f.brandName || 'Loops Integrated')}" height="${logoHeight}" style="height: ${logoHeight}px; max-height: ${logoHeight}px; width: auto; max-width: ${Math.min(logoMaxWidth, 240)}px; display: block; margin: 0; border: 0;" />
+                                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="margin: 0;">
+                                                            <tr>
+                                                                <td class="header-logo-bg" style="background: #0b0f19; background-color: #0b0f19; background-image: linear-gradient(#0b0f19, #0b0f19); border-radius: 10px; padding: 4px 6px;">
+                                                                    <img src="${escapeHtml(cleanUrl(f.brandLogoDarkUrl || f.brandLogoUrl))}" alt="${escapeHtml(f.brandName || 'Loops Integrated')}" height="${logoHeight}" style="height: ${logoHeight}px; max-height: ${logoHeight}px; width: auto; max-width: ${Math.min(logoMaxWidth, 240)}px; display: block; margin: 0; border: 0;" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
                                                         ` : `
                                                         <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">
                                                             ${escapeHtml(f.brandName || 'Loops Integrated')}
@@ -432,11 +452,11 @@ const compileHtml = (f) => {
                                             ${escapeHtml(f.edition)}
                                         </p>` : ''}
                                         ${f.headerTitle ? `
-                                        <h1 class="mobile-headline" style="margin: 6px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; color: #ffffff; line-height: 1.25; letter-spacing: -0.3px;">
+                                        <h1 class="mobile-headline header-title-white" style="margin: 6px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; color: #ffffff !important; line-height: 1.25; letter-spacing: -0.3px;">
                                             ${escapeHtml(f.headerTitle)}
                                         </h1>` : ''}
                                         ${f.headerSubtitle ? `
-                                        <p style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #cbd5e1; line-height: 1.5;">
+                                        <p class="header-subtitle-white" style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #cbd5e1 !important; line-height: 1.5;">
                                             ${escapeHtml(f.headerSubtitle)}
                                         </p>` : ''}
                                         ${f.headerButtonText ? `
@@ -457,7 +477,13 @@ const compileHtml = (f) => {
                                     <td align="${align}" valign="middle">
                                         <a href="{{app_url}}" target="_blank" style="text-decoration: none; display: inline-block;">
                                             ${(f.brandLogoDarkUrl || f.brandLogoUrl) ? `
-                                            <img src="${escapeHtml(cleanUrl(f.brandLogoDarkUrl || f.brandLogoUrl))}" alt="${escapeHtml(f.brandName || 'Loops Integrated')}" height="${logoHeight}" style="height: ${logoHeight}px; max-height: ${logoHeight}px; width: auto; max-width: ${logoMaxWidth}px; display: block; margin: ${margin}; border: 0;" />
+                                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="${align}" style="margin: ${margin};">
+                                                <tr>
+                                                    <td class="header-logo-bg" align="${align}" style="background: #0b0f19; background-color: #0b0f19; background-image: linear-gradient(#0b0f19, #0b0f19); border-radius: 10px; padding: 4px 6px;">
+                                                        <img src="${escapeHtml(cleanUrl(f.brandLogoDarkUrl || f.brandLogoUrl))}" alt="${escapeHtml(f.brandName || 'Loops Integrated')}" height="${logoHeight}" style="height: ${logoHeight}px; max-height: ${logoHeight}px; width: auto; max-width: ${logoMaxWidth}px; display: block; margin: ${margin}; border: 0;" />
+                                                    </td>
+                                                </tr>
+                                            </table>
                                             ` : `
                                             <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">
                                                 ${escapeHtml(f.brandName || 'Loops Integrated')}
@@ -1395,7 +1421,6 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                 .footer-cell { background-color: #090d16 !important; border-top-color: #1e293b !important; }
                 .footer-company { color: #f8fafc !important; }
                 .footer-text { color: #94a3b8 !important; }
-                .footer-logo { filter: brightness(0) invert(1) !important; }
                 .social-icon-btn { background-color: #131c2e !important; border-color: #1e293b !important; }
                 .footer-hr { border-top-color: #1e293b !important; }
             </style>
