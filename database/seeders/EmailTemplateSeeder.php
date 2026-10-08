@@ -82,18 +82,19 @@ class EmailTemplateSeeder extends Seeder
         }
 
         /* Header Fluid Layout & Alignment */
+        .header-side-table {
+            width: 100% !important;
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+        }
         .header-col-left {
-            display: inline-block;
-            width: 100%;
-            max-width: 240px;
-            vertical-align: middle;
+            width: 220px;
+            max-width: 220px;
+            vertical-align: top;
             text-align: left;
         }
         .header-col-right {
-            display: inline-block;
-            width: 100%;
-            max-width: 448px;
-            vertical-align: middle;
+            vertical-align: top;
             text-align: right;
         }
         .header-edition-text {
@@ -217,40 +218,113 @@ class EmailTemplateSeeder extends Seeder
                 border-radius: 0 !important;
                 padding: 24px 20px !important;
             }
+            .header-cell {
+                border-radius: 0 !important;
+                padding: 22px 20px !important;
+            }
             .mobile-padding {
                 padding-left: 20px !important;
                 padding-right: 20px !important;
             }
-            .header-col-left {
-                display: block !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                text-align: left !important;
-                padding-bottom: 16px !important;
-            }
+            table.header-side-table,
+            .header-side-table,
+            .header-side-table tbody,
+            .header-side-table tr,
+            .header-side-row,
+            td.header-col-left,
+            td.header-col-right,
+            .header-col-left,
             .header-col-right {
                 display: block !important;
                 width: 100% !important;
                 max-width: 100% !important;
-                text-align: right !important;
-                padding-left: 0 !important;
+                min-width: 100% !important;
+                box-sizing: border-box !important;
+                float: none !important;
+                clear: both !important;
             }
-            .mobile-stack {
+            table.header-side-table,
+            .header-side-table {
+                border-collapse: separate !important;
+                border-spacing: 0 !important;
+            }
+            td.header-col-left,
+            .header-col-left {
+                text-align: center !important;
+                padding: 0 0 18px 0 !important;
+                float: none !important;
+                clear: both !important;
+            }
+            .header-col-left table {
+                float: none !important;
+                clear: both !important;
+                margin: 0 auto !important;
+                text-align: center !important;
+            }
+            .header-col-left td {
+                text-align: center !important;
+            }
+            .header-col-left a {
+                display: inline-block !important;
+                margin: 0 auto !important;
+                text-align: center !important;
+            }
+            .header-col-left img,
+            .header-logo-img {
+                height: 44px !important;
+                max-height: 44px !important;
+                width: auto !important;
+                max-width: 160px !important;
                 display: block !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                padding-right: 0 !important;
-                padding-left: 0 !important;
+                margin: 0 auto !important;
             }
-            .mobile-stack-right {
-                padding-top: 18px !important;
-                padding-left: 0 !important;
-                text-align: right !important;
+            td.header-col-right,
+            .header-col-right {
+                text-align: center !important;
+                padding: 0 !important;
+                float: none !important;
+                clear: both !important;
             }
-            .header-edition-text,
-            .header-title-white,
+            .header-edition-text {
+                font-size: 10px !important;
+                letter-spacing: 1.5px !important;
+                text-align: center !important;
+                display: block !important;
+                margin: 0 auto 6px auto !important;
+            }
+            h1.header-title-white,
+            .header-title-white {
+                font-size: 23px !important;
+                line-height: 1.25 !important;
+                text-align: center !important;
+                display: block !important;
+                margin: 0 auto 8px auto !important;
+            }
             .header-subtitle-white {
-                text-align: right !important;
+                font-size: 13.5px !important;
+                line-height: 1.5 !important;
+                text-align: center !important;
+                display: block !important;
+                margin: 0 auto 16px auto !important;
+                max-width: 100% !important;
+            }
+            table.header-btn-table,
+            .header-btn-table {
+                margin: 16px auto 0 auto !important;
+                width: auto !important;
+                float: none !important;
+                clear: both !important;
+                text-align: center !important;
+                display: table !important;
+            }
+            .header-btn-table td {
+                text-align: center !important;
+            }
+            .header-btn-link {
+                font-size: 13px !important;
+                padding: 10px 24px !important;
+                display: inline-block !important;
+                text-align: center !important;
             }
             .mobile-img {
                 width: 100% !important;
@@ -308,7 +382,7 @@ class EmailTemplateSeeder extends Seeder
     </div>
 
     <!-- Outer Wrapper -->
-    <table role="presentation" class="outer-table" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #eef0f6; padding: 36px 12px;">
+    <table role="presentation" class="outer-table" data-theme="dark" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #060913; padding: 36px 12px;">
         <tr>
             <td align="center" class="outer-td">
                 <!-- Inner Container Card -->
@@ -317,51 +391,44 @@ class EmailTemplateSeeder extends Seeder
                     <!-- Header / Company Logo (Black Header Bar with Side-by-Side Logo & Heading) -->
                     <tr>
                         <td style="background: #0b0f19; background-color: #0b0f19; background-image: linear-gradient(#0b0f19, #0b0f19); padding: 28px 36px; border-radius: 15px 15px 0 0;" class="mobile-padding header-cell dark-header" data-header-layout="side-by-side">
-                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
-                                <tr>
-                                    <td align="left" style="font-size: 0; text-align: left; padding: 0;" dir="ltr">
-                                        <!--[if mso]>
-                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%">
-                                        <tr>
-                                        <td width="240" valign="middle" align="left">
-                                        <![endif]-->
-                                        <div class="header-col-left mobile-stack" style="display: inline-block; width: 100%; max-width: 240px; vertical-align: middle; text-align: left;">
-                                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="left" style="margin: 0;">
-                                                <tr>
-                                                    <td align="left" valign="middle">
-                                                        <a href="{{app_url}}" target="_blank" style="text-decoration: none; display: inline-block;">
-                                                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="margin: 0;">
-                                                                <tr>
-                                                                    <td class="header-logo-bg" style="background: #0b0f19; background-color: #0b0f19; background-image: linear-gradient(#0b0f19, #0b0f19); border-radius: 10px; padding: 4px 6px;">
-                                                                        <img src="/images/loops-logo-white.png?v=3" alt="Loops Integrated" height="64" style="height: 64px; max-height: 64px; width: auto; max-width: 220px; display: block; margin: 0; border: 0;" />
-                                                                    </td>
-                                                                </tr>
-                                                            </table>
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                        <!--[if mso]>
-                                        </td>
-                                        <td width="448" valign="middle" align="right">
-                                        <![endif]-->
-                                        <div class="header-col-right mobile-stack mobile-stack-right" style="display: inline-block; width: 100%; max-width: 448px; vertical-align: middle; text-align: right;">
-                                            <p class="header-edition-text" style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #2fd0ca; text-transform: uppercase; letter-spacing: 2px; text-align: right; white-space: nowrap;">
-                                                October Edition
-                                            </p>
-                                            <h1 class="mobile-headline header-title-white" style="margin: 6px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; color: #ffffff !important; line-height: 1.25; letter-spacing: -0.3px; text-align: right;">
-                                                What's New This Month?
-                                            </h1>
-                                            <p class="header-subtitle-white" style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #cbd5e1 !important; line-height: 1.5; text-align: right;">
-                                                Discover our latest updates, products, news and special offers.
-                                            </p>
-                                        </div>
-                                        <!--[if mso]>
-                                        </td>
-                                        </tr>
+                            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" class="header-side-table" style="width: 100%; border-collapse: separate; border-spacing: 0;">
+                                <tr class="header-side-row">
+                                    <td class="header-col-left mobile-stack" width="220" valign="top" align="left" style="width: 220px; max-width: 220px; vertical-align: top; text-align: left; padding: 0 16px 0 0;">
+                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="margin: 0;">
+                                            <tr>
+                                                <td align="left" valign="top">
+                                                    <a href="{{app_url}}" target="_blank" style="text-decoration: none; display: inline-block;">
+                                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="margin: 0;">
+                                                            <tr>
+                                                                <td class="header-logo-bg" style="background: #0b0f19; background-color: #0b0f19; background-image: linear-gradient(#0b0f19, #0b0f19); border-radius: 10px; padding: 4px 6px;">
+                                                                    <img class="header-logo-img" src="/images/loops-logo-white.png?v=3" alt="Loops Integrated" height="64" style="height: 64px; max-height: 64px; width: auto; max-width: 200px; display: block; margin: 0; border: 0;" />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </a>
+                                                </td>
+                                            </tr>
                                         </table>
-                                        <![endif]-->
+                                    </td>
+                                    <td class="header-col-right mobile-stack mobile-stack-right" valign="top" align="right" style="vertical-align: top; text-align: right; padding: 0;">
+                                        <p class="header-edition-text" style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #2fd0ca; text-transform: uppercase; letter-spacing: 2px; text-align: right; white-space: nowrap;">
+                                            October Edition
+                                        </p>
+                                        <h1 class="header-title-white" style="margin: 6px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; color: #ffffff !important; line-height: 1.25; letter-spacing: -0.3px; text-align: right;">
+                                            What's New This Month?
+                                        </h1>
+                                        <p class="header-subtitle-white" style="margin: 8px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #cbd5e1 !important; line-height: 1.5; text-align: right; max-width: 440px; margin-left: auto;">
+                                            Discover our latest updates, products, news and special offers.
+                                        </p>
+                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="right" class="header-btn-table" style="margin: 14px 0 0 auto;">
+                                            <tr>
+                                                <td align="center" style="border-radius: 9999px; background-color: #ff0878;">
+                                                    <a class="header-btn-link" href="{{app_url}}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12.5px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 9px 22px; border-radius: 9999px; display: inline-block; border: 1px solid #ff0878; box-shadow: 0 4px 12px rgba(255, 8, 120, 0.25);">
+                                                        Explore More
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </td>
                                 </tr>
                             </table>

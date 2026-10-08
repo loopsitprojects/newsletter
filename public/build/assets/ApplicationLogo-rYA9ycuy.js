@@ -1,1 +1,0 @@
-import{t as e}from"./app-BCjGlf6x.js";var t=e();function n({className:e=`h-9 w-auto`,variant:n=`white`,...r}){return(0,t.jsx)(`img`,{src:n===`dark`?`/images/loops-logo-dark.png?v=3`:`/images/loops-logo-white.png?v=3`,alt:`Loops Integrated`,className:`object-contain ${e}`,...r})}export{n as t};
