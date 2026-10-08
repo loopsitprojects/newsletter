@@ -19,6 +19,9 @@ class EmailTemplateSeeder extends Seeder
     <meta name="color-scheme" content="light only">
     <meta name="supported-color-schemes" content="light">
     <title>What's New This Month? | Loops Integrated</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
     <!--[if mso]>
     <noscript>
         <xml>
@@ -27,11 +30,21 @@ class EmailTemplateSeeder extends Seeder
             </o:OfficeDocumentSettings>
         </xml>
     </noscript>
+    <style type="text/css">
+        body, table, td, h1, h2, h3, h4, p, a, span {
+            font-family: Arial, sans-serif !important;
+        }
+    </style>
     <![endif]-->
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
+
         :root {
             color-scheme: light only;
             supported-color-schemes: light;
+        }
+        body, table, td, a, p, h1, h2, h3, h4, span {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -374,7 +387,7 @@ class EmailTemplateSeeder extends Seeder
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #eef0f6; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #151a29; line-height: 1.6; -webkit-font-smoothing: antialiased;">
+<body style="margin: 0; padding: 0; background-color: #eef0f6; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #151a29; line-height: 1.6; -webkit-font-smoothing: antialiased;">
 
     <!-- Hidden Preheader Preview Text -->
     <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; line-height: 1px; color: #fff; opacity: 0;">
@@ -411,19 +424,19 @@ class EmailTemplateSeeder extends Seeder
                                         </table>
                                     </td>
                                     <td class="header-col-right mobile-stack mobile-stack-right" valign="top" align="right" style="vertical-align: top; text-align: right; padding: 0;">
-                                        <p class="header-edition-text" style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #2fd0ca; text-transform: uppercase; letter-spacing: 2px; text-align: right; white-space: nowrap;">
+                                        <p class="header-edition-text" style="margin: 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #2fd0ca; text-transform: uppercase; letter-spacing: 2px; text-align: right; white-space: nowrap;">
                                             October Edition
                                         </p>
-                                        <h1 class="header-title-white" style="margin: 6px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; color: #ffffff !important; line-height: 1.25; letter-spacing: -0.3px; text-align: right;">
+                                        <h1 class="header-title-white" style="margin: 6px 0 0 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 26px; font-weight: 700; color: #ffffff !important; line-height: 1.25; letter-spacing: -0.3px; text-align: right;">
                                             What's New This Month?
                                         </h1>
-                                        <p class="header-subtitle-white" style="margin: 8px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #cbd5e1 !important; line-height: 1.5; text-align: right; max-width: 440px; margin-left: auto;">
+                                        <p class="header-subtitle-white" style="margin: 8px 0 0 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13.5px; color: #cbd5e1 !important; line-height: 1.5; text-align: right; max-width: 440px; margin-left: auto;">
                                             Discover our latest updates, products, news and special offers.
                                         </p>
                                         <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="right" class="header-btn-table" style="margin: 14px 0 0 auto;">
                                             <tr>
                                                 <td align="center" style="border-radius: 9999px; background-color: #ff0878;">
-                                                    <a class="header-btn-link" href="{{app_url}}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12.5px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 9px 22px; border-radius: 9999px; display: inline-block; border: 1px solid #ff0878; box-shadow: 0 4px 12px rgba(255, 8, 120, 0.25);">
+                                                    <a class="header-btn-link" href="{{app_url}}" target="_blank" style="font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 12.5px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 9px 22px; border-radius: 9999px; display: inline-block; border: 1px solid #ff0878; box-shadow: 0 4px 12px rgba(255, 8, 120, 0.25);">
                                                         Explore More
                                                     </a>
                                                 </td>
@@ -445,10 +458,10 @@ class EmailTemplateSeeder extends Seeder
                     <!-- Intro Section -->
                     <tr>
                         <td style="padding: 24px 36px 28px 36px;" class="mobile-padding">
-                            <p class="dark-text-main" style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #151a29;">
+                            <p class="dark-text-main" style="margin: 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #151a29;">
                                 Hello {{first_name}},
                             </p>
-                            <p class="dark-text-muted" style="margin: 8px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #636978; line-height: 1.65;">
+                            <p class="dark-text-muted" style="margin: 8px 0 0 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; color: #636978; line-height: 1.65;">
                                 Here are the latest updates, highlights and news from our team. It's been a busy month &mdash; we hope you enjoy what we've been working on.
                             </p>
                         </td>
@@ -470,17 +483,17 @@ class EmailTemplateSeeder extends Seeder
                                                 <tr class="featured-card-body-tr">
                                                     <td valign="top" style="padding: 18px 18px 18px 18px; vertical-align: top;" class="mobile-padding featured-card-body-td">
                                                         <div class="featured-card-content">
-                                                            <span style="display: inline-block; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #0057c5; background-color: #e6f0fd; padding: 3px 10px; border-radius: 9999px;">
+                                                            <span style="display: inline-block; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #0057c5; background-color: #e6f0fd; padding: 3px 10px; border-radius: 9999px;">
                                                                 Featured
                                                             </span>
-                                                            <h2 class="dark-text-main" style="margin: 8px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700; color: #151a29; line-height: 1.35;">
+                                                            <h2 class="dark-text-main" style="margin: 8px 0 0 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #151a29; line-height: 1.35;">
                                                                 Discover What's New
                                                             </h2>
-                                                            <p class="dark-text-muted" style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.55;">
+                                                            <p class="dark-text-muted" style="margin: 6px 0 0 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.55;">
                                                                 Explore our latest products, services and updates &mdash; designed with feedback from customers like you.
                                                             </p>
                                                             <div style="margin-top: 10px; margin-bottom: 0;">
-                                                                <a href="https://example.com" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: #0057c5; text-decoration: none; display: inline-block;">
+                                                                <a href="https://example.com" target="_blank" style="font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: #0057c5; text-decoration: none; display: inline-block;">
                                                                     Read More &rarr;
                                                                 </a>
                                                             </div>
@@ -501,17 +514,17 @@ class EmailTemplateSeeder extends Seeder
                                                 <tr class="featured-card-body-tr">
                                                     <td valign="top" style="padding: 18px 18px 18px 18px; vertical-align: top;" class="mobile-padding featured-card-body-td">
                                                         <div class="featured-card-content">
-                                                            <span style="display: inline-block; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #ff0878; background-color: #ffe6f0; padding: 3px 10px; border-radius: 9999px;">
+                                                            <span style="display: inline-block; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #ff0878; background-color: #ffe6f0; padding: 3px 10px; border-radius: 9999px;">
                                                                 Spotlight
                                                             </span>
-                                                            <h2 class="dark-text-main" style="margin: 8px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700; color: #151a29; line-height: 1.35;">
+                                                            <h2 class="dark-text-main" style="margin: 8px 0 0 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: #151a29; line-height: 1.35;">
                                                                 Creative Spotlight
                                                             </h2>
-                                                            <p class="dark-text-muted" style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.55;">
+                                                            <p class="dark-text-muted" style="margin: 6px 0 0 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13.5px; color: #636978; line-height: 1.55;">
                                                                 Insights, workflow highlights, and behind-the-scenes stories from our creative productions.
                                                             </p>
                                                             <div style="margin-top: 10px; margin-bottom: 0;">
-                                                                <a href="https://example.com" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: #0057c5; text-decoration: none; display: inline-block;">
+                                                                <a href="https://example.com" target="_blank" style="font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: #0057c5; text-decoration: none; display: inline-block;">
                                                                     Read More &rarr;
                                                                 </a>
                                                             </div>
@@ -532,16 +545,16 @@ class EmailTemplateSeeder extends Seeder
                             <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
                                     <td align="left" style="text-align: left;" class="clean-cta-text-cell">
-                                        <h3 class="clean-cta-title" style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: #151a29; letter-spacing: -0.4px; line-height: 1.3;">
+                                        <h3 class="clean-cta-title" style="margin: 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: #151a29; letter-spacing: -0.4px; line-height: 1.3;">
                                             See Our Latest Work
                                         </h3>
-                                        <p class="clean-cta-subtitle" style="margin: 10px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #636978; line-height: 1.6; max-width: 600px;">
+                                        <p class="clean-cta-subtitle" style="margin: 10px 0 0 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; color: #636978; line-height: 1.6; max-width: 600px;">
                                             From award-winning campaigns to new productions, take a look at what we've been creating recently.
                                         </p>
                                         <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="left" class="clean-cta-btn-table mobile-cta-table" style="margin: 20px 0 0 0;">
                                             <tr>
                                                 <td align="center" class="mobile-cta-cell" style="border-radius: 10px; background-color: #0b0f19; background-image: linear-gradient(to bottom, #0b0f19 0%, #0b0f19 100%);">
-                                                    <a href="https://example.com" target="_blank" class="clean-cta-btn mobile-cta-btn" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 800; color: #ffffff; text-decoration: none; padding: 13px 28px; border-radius: 10px; display: inline-block; background-color: #0b0f19; background-image: linear-gradient(to bottom, #0b0f19 0%, #0b0f19 100%); text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2; border: 1.5px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);">
+                                                    <a href="https://example.com" target="_blank" class="clean-cta-btn mobile-cta-btn" style="font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 800; color: #ffffff; text-decoration: none; padding: 13px 28px; border-radius: 10px; display: inline-block; background-color: #0b0f19; background-image: linear-gradient(to bottom, #0b0f19 0%, #0b0f19 100%); text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2; border: 1.5px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);">
                                                         VISIT OUR WEBSITE
                                                     </a>
                                                 </td>
@@ -567,7 +580,7 @@ class EmailTemplateSeeder extends Seeder
                                 </tr>
                             </table>
 
-                            <p class="footer-company" style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; color: #151a29;">
+                            <p class="footer-company" style="margin: 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; color: #151a29;">
                                 Loops Integrated
                             </p>
 
@@ -582,10 +595,10 @@ class EmailTemplateSeeder extends Seeder
 
                             <hr class="footer-hr" style="border: 0; border-top: 1px solid #e2e4ea; margin: 16px 0;" />
 
-                            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; color: #8e95a5; line-height: 1.5;">
+                            <p style="margin: 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; color: #8e95a5; line-height: 1.5;">
                                 You're receiving this email because you subscribed to our newsletter.
                             </p>
-                            <p style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px;">
+                            <p style="margin: 6px 0 0 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px;">
                                 <a href="{{unsubscribe_url}}" style="color: #0057c5; text-decoration: underline; font-weight: 600;">Unsubscribe</a>
                             </p>
                         </td>

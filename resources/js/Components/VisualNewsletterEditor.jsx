@@ -143,6 +143,7 @@ const getFeaturedItems = (f) => {
 const compileHtml = (f) => {
     const theme = f.theme || 'dark';
     const isDark = theme === 'dark';
+    const fontStack = "'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
     const maxWidth = parseInt(f.templateWidth) || 760;
     const brandColor = f.brandColor || '#0057c5';
     const align = f.logoAlign || 'left';
@@ -209,6 +210,9 @@ const compileHtml = (f) => {
     <meta name="color-scheme" content="${isDark ? 'dark only' : 'light only'}">
     <meta name="supported-color-schemes" content="${isDark ? 'dark only' : 'light only'}">
     <title>${escapeHtml(f.headerTitle || "What's New This Month?")} | ${escapeHtml(f.brandName || 'Loops Integrated')}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
     <!--[if mso]>
     <noscript>
         <xml>
@@ -217,13 +221,24 @@ const compileHtml = (f) => {
             </o:OfficeDocumentSettings>
         </xml>
     </noscript>
+    <style type="text/css">
+        body, table, td, h1, h2, h3, h4, p, a, span {
+            font-family: Arial, sans-serif !important;
+        }
+    </style>
     <![endif]-->
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
+
         :root {
             color-scheme: ${isDark ? 'dark only' : 'light only'};
             supported-color-schemes: ${isDark ? 'dark only' : 'light only'};
         }
-        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        body, table, td, a, p, h1, h2, h3, h4, span {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
         img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
 
@@ -580,7 +595,7 @@ const compileHtml = (f) => {
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: ${outerBg}; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: ${isDark ? '#f8fafc' : '#151a29'}; line-height: 1.6; -webkit-font-smoothing: antialiased;">
+<body style="margin: 0; padding: 0; background-color: ${outerBg}; font-family: ${fontStack}; color: ${isDark ? '#f8fafc' : '#151a29'}; line-height: 1.6; -webkit-font-smoothing: antialiased;">
 
     <!-- Hidden Preheader Preview Text -->
     ${f.preheader ? `
@@ -615,7 +630,7 @@ const compileHtml = (f) => {
                                                             </tr>
                                                         </table>
                                                         ` : `
-                                                        <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: ${headerTitleColor}; letter-spacing: -0.5px;">
+                                                        <span style="font-family: ${fontStack}; font-size: 24px; font-weight: 800; color: ${headerTitleColor}; letter-spacing: -0.5px;">
                                                             ${escapeHtml(f.brandName || 'Loops Integrated')}
                                                         </span>
                                                         `}
@@ -626,22 +641,22 @@ const compileHtml = (f) => {
                                     </td>
                                     <td class="header-col-right mobile-stack mobile-stack-right" valign="top" align="right" style="vertical-align: top; text-align: right; padding: 0;">
                                         ${f.edition ? `
-                                        <p class="header-edition-text" style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: ${headerEditionColor}; text-transform: uppercase; letter-spacing: 2px; text-align: right; white-space: nowrap;">
+                                        <p class="header-edition-text" style="margin: 0; font-family: ${fontStack}; font-size: 11px; font-weight: 700; color: ${headerEditionColor}; text-transform: uppercase; letter-spacing: 2px; text-align: right; white-space: nowrap;">
                                             ${escapeHtml(f.edition)}
                                         </p>` : ''}
                                         ${f.headerTitle ? `
-                                        <h1 class="header-title-white" style="margin: 6px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; color: ${headerTitleColor} !important; line-height: 1.25; letter-spacing: -0.3px; text-align: right;">
+                                        <h1 class="header-title-white" style="margin: 6px 0 0 0; font-family: ${fontStack}; font-size: 26px; font-weight: 700; color: ${headerTitleColor} !important; line-height: 1.25; letter-spacing: -0.3px; text-align: right;">
                                             ${escapeHtml(f.headerTitle)}
                                         </h1>` : ''}
                                         ${f.headerSubtitle ? `
-                                        <p class="header-subtitle-white" style="margin: 8px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: ${headerSubtitleColor} !important; line-height: 1.5; text-align: right; max-width: 440px; margin-left: auto;">
+                                        <p class="header-subtitle-white" style="margin: 8px 0 0 0; font-family: ${fontStack}; font-size: 13.5px; color: ${headerSubtitleColor} !important; line-height: 1.5; text-align: right; max-width: 440px; margin-left: auto;">
                                             ${escapeHtml(f.headerSubtitle)}
                                         </p>` : ''}
                                         ${f.headerButtonText ? `
                                         <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="right" class="header-btn-table" style="margin: 14px 0 0 auto;">
                                             <tr>
                                                 <td align="center" style="border-radius: 9999px; background-color: ${escapeHtml(f.headerButtonColor || '#ff0878')};">
-                                                    <a class="header-btn-link" href="${escapeHtml(cleanUrl(f.headerButtonUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12.5px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 9px 22px; border-radius: 9999px; display: inline-block; border: 1px solid ${escapeHtml(f.headerButtonColor || '#ff0878')}; box-shadow: 0 4px 12px rgba(255, 8, 120, 0.25);">
+                                                    <a class="header-btn-link" href="${escapeHtml(cleanUrl(f.headerButtonUrl || '#'))}" target="_blank" style="font-family: ${fontStack}; font-size: 12.5px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 9px 22px; border-radius: 9999px; display: inline-block; border: 1px solid ${escapeHtml(f.headerButtonColor || '#ff0878')}; box-shadow: 0 4px 12px rgba(255, 8, 120, 0.25);">
                                                         ${escapeHtml(f.headerButtonText)}
                                                     </a>
                                                 </td>
@@ -663,7 +678,7 @@ const compileHtml = (f) => {
                                                 </tr>
                                             </table>
                                             ` : `
-                                            <span style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 22px; font-weight: 800; color: ${headerTitleColor}; letter-spacing: -0.5px;">
+                                            <span style="font-family: ${fontStack}; font-size: 22px; font-weight: 800; color: ${headerTitleColor}; letter-spacing: -0.5px;">
                                                 ${escapeHtml(f.brandName || 'Loops Integrated')}
                                             </span>
                                             `}
@@ -684,15 +699,15 @@ const compileHtml = (f) => {
                     <tr>
                         <td align="${heroAlign}" style="padding: 36px 36px 32px 36px; text-align: ${heroAlign};" class="mobile-padding">
                             ${f.edition ? `
-                            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: ${brandColor}; text-transform: uppercase; letter-spacing: 2.2px; text-align: ${heroAlign};">
+                            <p style="margin: 0; font-family: ${fontStack}; font-size: 11px; font-weight: 700; color: ${headerEditionColor}; text-transform: uppercase; letter-spacing: 2.2px; text-align: ${heroAlign};">
                                 ${escapeHtml(f.edition)}
                             </p>` : ''}
                             ${f.headerTitle ? `
-                            <h1 class="mobile-headline" style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 40px; font-weight: 700; color: #151a29; line-height: 1.2; letter-spacing: -0.5px; text-align: ${heroAlign};">
+                            <h1 class="mobile-headline" style="margin: 12px 0 0 0; font-family: ${fontStack}; font-size: 40px; font-weight: 700; color: ${headerTitleColor}; line-height: 1.2; letter-spacing: -0.5px; text-align: ${heroAlign};">
                                 ${escapeHtml(f.headerTitle)}
                             </h1>` : ''}
                             ${f.headerSubtitle ? `
-                            <p style="margin: ${heroAlign === 'center' ? '14px auto 0 auto' : '14px 0 0 0'}; max-width: ${heroAlign === 'center' ? '480px' : '580px'}; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #636978; line-height: 1.6; text-align: ${heroAlign};">
+                            <p style="margin: ${heroAlign === 'center' ? '14px auto 0 auto' : '14px 0 0 0'}; max-width: ${heroAlign === 'center' ? '480px' : '580px'}; font-family: ${fontStack}; font-size: 15px; color: ${headerSubtitleColor}; line-height: 1.6; text-align: ${heroAlign};">
                                 ${escapeHtml(f.headerSubtitle)}
                             </p>` : ''}
                             
@@ -700,7 +715,7 @@ const compileHtml = (f) => {
                             <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="${heroAlign}" style="margin: ${heroBtnMargin};">
                                 <tr>
                                     <td align="center" style="border-radius: 9999px; background-color: ${escapeHtml(f.headerButtonColor || '#ff0878')};">
-                                        <a href="${escapeHtml(cleanUrl(f.headerButtonUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 13px 32px; border-radius: 9999px; display: inline-block; border: 1px solid ${escapeHtml(f.headerButtonColor || '#ff0878')}; box-shadow: 0 4px 12px rgba(255, 8, 120, 0.25);">
+                                        <a href="${escapeHtml(cleanUrl(f.headerButtonUrl || '#'))}" target="_blank" style="font-family: ${fontStack}; font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 13px 32px; border-radius: 9999px; display: inline-block; border: 1px solid ${escapeHtml(f.headerButtonColor || '#ff0878')}; box-shadow: 0 4px 12px rgba(255, 8, 120, 0.25);">
                                             ${escapeHtml(f.headerButtonText)}
                                         </a>
                                     </td>
@@ -718,8 +733,8 @@ const compileHtml = (f) => {
                     ${(f.introGreeting || f.introText) ? `
                     <tr>
                         <td style="padding: 24px 36px 28px 36px;" class="mobile-padding">
-                            ${f.introGreeting ? `<p class="dark-text-main" style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; color: ${introTitleColor};">${escapeHtml(f.introGreeting)}</p>` : ''}
-                            ${f.introText ? `<p class="dark-text-muted" style="margin: 8px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: ${introTextColor}; line-height: 1.65;">${escapeHtml(f.introText)}</p>` : ''}
+                            ${f.introGreeting ? `<p class="dark-text-main" style="margin: 0; font-family: ${fontStack}; font-size: 18px; font-weight: 700; color: ${introTitleColor};">${escapeHtml(f.introGreeting)}</p>` : ''}
+                            ${f.introText ? `<p class="dark-text-muted" style="margin: 8px 0 0 0; font-family: ${fontStack}; font-size: 15px; color: ${introTextColor}; line-height: 1.65;">${escapeHtml(f.introText)}</p>` : ''}
                         </td>
                     </tr>` : ''}
 
@@ -741,7 +756,7 @@ const compileHtml = (f) => {
                                     ];
                                     const bStyle = badgeColors[idx % badgeColors.length];
                                     return `
-                                    <span style="display: inline-block; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: ${bStyle.color}; background-color: ${bStyle.bg}; padding: 3px 10px; border-radius: 9999px;">
+                                    <span style="display: inline-block; font-family: ${fontStack}; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: ${bStyle.color}; background-color: ${bStyle.bg}; padding: 3px 10px; border-radius: 9999px;">
                                         ${escapeHtml(item.badge)}
                                     </span>`;
                                 };
@@ -768,16 +783,16 @@ const compileHtml = (f) => {
                                             <div class="featured-card-content">
                                                 ${renderBadge(item, idx)}
                                                 ${item.title ? `
-                                                <h2 class="dark-text-main" style="margin: 8px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700; color: ${featuredTitleColor}; line-height: 1.35;">
+                                                <h2 class="dark-text-main" style="margin: 8px 0 0 0; font-family: ${fontStack}; font-size: 18px; font-weight: 700; color: ${featuredTitleColor}; line-height: 1.35;">
                                                     ${escapeHtml(item.title)}
                                                 </h2>` : ''}
                                                 ${item.text ? `
-                                                <p class="dark-text-muted" style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: ${featuredTextColor}; line-height: 1.55;">
+                                                <p class="dark-text-muted" style="margin: 6px 0 0 0; font-family: ${fontStack}; font-size: 13.5px; color: ${featuredTextColor}; line-height: 1.55;">
                                                     ${escapeHtml(item.text)}
                                                 </p>` : ''}
                                                 ${(item.linkText && isFlowLink) ? `
                                                 <div style="margin-top: 10px; margin-bottom: 0;">
-                                                    <a href="${escapeHtml(cleanUrl(item.linkUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: ${brandColor}; text-decoration: none; display: inline-block;">
+                                                    <a href="${escapeHtml(cleanUrl(item.linkUrl || '#'))}" target="_blank" style="font-family: ${fontStack}; font-size: 13.5px; font-weight: 700; color: ${brandColor}; text-decoration: none; display: inline-block;">
                                                         ${escapeHtml(item.linkText)}
                                                     </a>
                                                 </div>` : ''}
@@ -788,7 +803,7 @@ const compileHtml = (f) => {
                                     <tr class="featured-card-action-tr" height="32">
                                         <td valign="bottom" height="32" style="padding: 0 18px 14px 18px; vertical-align: bottom; height: 32px;" class="featured-card-action-td">
                                             <div class="featured-card-action">
-                                                <a href="${escapeHtml(cleanUrl(item.linkUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: ${brandColor}; text-decoration: none; display: inline-block;">
+                                                <a href="${escapeHtml(cleanUrl(item.linkUrl || '#'))}" target="_blank" style="font-family: ${fontStack}; font-size: 13.5px; font-weight: 700; color: ${brandColor}; text-decoration: none; display: inline-block;">
                                                     ${escapeHtml(item.linkText)}
                                                 </a>
                                             </div>
@@ -812,16 +827,16 @@ const compileHtml = (f) => {
                                     <td class="mobile-stack" width="${item.image ? '50%' : '100%'}" valign="middle" style="padding: 30px 26px;" class="mobile-padding">
                                         ${renderBadge(item, idx)}
                                         ${item.title ? `
-                                        <h2 class="dark-text-main" style="margin: 12px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 22px; font-weight: 700; color: ${featuredTitleColor}; line-height: 1.3;">
+                                        <h2 class="dark-text-main" style="margin: 12px 0 0 0; font-family: ${fontStack}; font-size: 22px; font-weight: 700; color: ${featuredTitleColor}; line-height: 1.3;">
                                             ${escapeHtml(item.title)}
                                         </h2>` : ''}
                                         ${item.text ? `
-                                        <p class="dark-text-muted" style="margin: 10px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: ${featuredTextColor}; line-height: 1.6;">
+                                        <p class="dark-text-muted" style="margin: 10px 0 0 0; font-family: ${fontStack}; font-size: 13.5px; color: ${featuredTextColor}; line-height: 1.6;">
                                             ${escapeHtml(item.text)}
                                         </p>` : ''}
                                         ${item.linkText ? `
                                         <div style="margin-top: 18px;">
-                                            <a href="${escapeHtml(cleanUrl(item.linkUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: ${brandColor}; text-decoration: none;">
+                                            <a href="${escapeHtml(cleanUrl(item.linkUrl || '#'))}" target="_blank" style="font-family: ${fontStack}; font-size: 13.5px; font-weight: 700; color: ${brandColor}; text-decoration: none;">
                                                 ${escapeHtml(item.linkText)}
                                             </a>
                                         </div>` : ''}
@@ -879,20 +894,20 @@ const compileHtml = (f) => {
                             <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background: linear-gradient(135deg, #0057c5 0%, #8035d1 50%, #ff0878 100%); background-color: #0057c5; border-radius: 16px; text-align: center;">
                                 <tr>
                                     <td style="padding: 48px 32px;" class="mobile-cta-box">
-                                        ${f.ctaTitle ? `<h3 style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px;">${escapeHtml(f.ctaTitle)}</h3>` : ''}
-                                        ${f.ctaSubtitle ? `<p style="margin: 12px auto 0 auto; max-width: 380px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #ffffff; opacity: 0.88; line-height: 1.5;">${escapeHtml(f.ctaSubtitle)}</p>` : ''}
+                                        ${f.ctaTitle ? `<h3 style="margin: 0; font-family: ${fontStack}; font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px;">${escapeHtml(f.ctaTitle)}</h3>` : ''}
+                                        ${f.ctaSubtitle ? `<p style="margin: 12px auto 0 auto; max-width: 380px; font-family: ${fontStack}; font-size: 15px; color: #ffffff; opacity: 0.88; line-height: 1.5;">${escapeHtml(f.ctaSubtitle)}</p>` : ''}
                                         ${(f.ctaButtonText || (f.showCtaSecondaryButton && f.ctaSecondaryButtonText)) ? `
                                         <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 22px auto 0 auto;">
                                             <tr>
                                                 ${f.ctaButtonText ? `
                                                 <td class="mobile-cta-cell" align="center" style="padding: 4px 6px;">
-                                                    <a href="${escapeHtml(cleanUrl(f.ctaButtonUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: #0057c5; text-decoration: none; padding: 11px 24px; border-radius: 9999px; display: inline-block; background-color: #ffffff; border: 1.5px solid #ffffff; white-space: nowrap; line-height: 1.2; box-shadow: 0 4px 12px rgba(0,0,0,0.12);">
+                                                    <a href="${escapeHtml(cleanUrl(f.ctaButtonUrl || '#'))}" target="_blank" style="font-family: ${fontStack}; font-size: 13.5px; font-weight: 700; color: #0057c5; text-decoration: none; padding: 11px 24px; border-radius: 9999px; display: inline-block; background-color: #ffffff; border: 1.5px solid #ffffff; white-space: nowrap; line-height: 1.2; box-shadow: 0 4px 12px rgba(0,0,0,0.12);">
                                                         ${escapeHtml(f.ctaButtonText)}
                                                     </a>
                                                 </td>` : ''}
                                                 ${(f.showCtaSecondaryButton && f.ctaSecondaryButtonText) ? `
                                                 <td class="mobile-cta-cell" align="center" style="padding: 4px 6px;">
-                                                    <a href="${escapeHtml(cleanUrl(f.ctaSecondaryButtonUrl || '#'))}" target="_blank" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 11px 24px; border-radius: 9999px; display: inline-block; border: 1.5px solid rgba(255,255,255,0.85); background-color: rgba(255,255,255,0.15); white-space: nowrap; line-height: 1.2;">
+                                                    <a href="${escapeHtml(cleanUrl(f.ctaSecondaryButtonUrl || '#'))}" target="_blank" style="font-family: ${fontStack}; font-size: 13.5px; font-weight: 700; color: #ffffff; text-decoration: none; padding: 11px 24px; border-radius: 9999px; display: inline-block; border: 1.5px solid rgba(255,255,255,0.85); background-color: rgba(255,255,255,0.15); white-space: nowrap; line-height: 1.2;">
                                                         ${escapeHtml(f.ctaSecondaryButtonText)}
                                                     </a>
                                                 </td>` : ''}
@@ -908,20 +923,20 @@ const compileHtml = (f) => {
                             <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
                                     <td align="left" style="text-align: left;" class="clean-cta-text-cell">
-                                        ${f.ctaTitle ? `<h3 class="clean-cta-title" style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: ${ctaCleanTitleColor}; letter-spacing: -0.4px; line-height: 1.3;">${escapeHtml(f.ctaTitle)}</h3>` : ''}
-                                        ${f.ctaSubtitle ? `<p class="clean-cta-subtitle" style="margin: 10px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: ${ctaCleanSubtitleColor}; line-height: 1.6; max-width: 600px;">${escapeHtml(f.ctaSubtitle)}</p>` : ''}
+                                        ${f.ctaTitle ? `<h3 class="clean-cta-title" style="margin: 0; font-family: ${fontStack}; font-size: 24px; font-weight: 800; color: ${ctaCleanTitleColor}; letter-spacing: -0.4px; line-height: 1.3;">${escapeHtml(f.ctaTitle)}</h3>` : ''}
+                                        ${f.ctaSubtitle ? `<p class="clean-cta-subtitle" style="margin: 10px 0 0 0; font-family: ${fontStack}; font-size: 15px; color: ${ctaCleanSubtitleColor}; line-height: 1.6; max-width: 600px;">${escapeHtml(f.ctaSubtitle)}</p>` : ''}
                                         ${(f.ctaButtonText || (f.showCtaSecondaryButton && f.ctaSecondaryButtonText)) ? `
                                         <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="left" class="clean-cta-btn-table mobile-cta-table" style="margin: 20px 0 0 0;">
                                             <tr>
                                                 ${f.ctaButtonText ? `
                                                 <td align="center" class="mobile-cta-cell" style="border-radius: 10px; background-color: ${f.ctaButtonColor || '#0b0f19'}; background-image: linear-gradient(to bottom, ${f.ctaButtonColor || '#0b0f19'} 0%, ${f.ctaButtonColor || '#0b0f19'} 100%);">
-                                                    <a href="${escapeHtml(cleanUrl(f.ctaButtonUrl || '#'))}" target="_blank" class="clean-cta-btn mobile-cta-btn" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 800; color: #ffffff; text-decoration: none; padding: 13px 28px; border-radius: 10px; display: inline-block; background-color: ${f.ctaButtonColor || '#0b0f19'}; background-image: linear-gradient(to bottom, ${f.ctaButtonColor || '#0b0f19'} 0%, ${f.ctaButtonColor || '#0b0f19'} 100%); text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2; border: 1.5px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);">
+                                                    <a href="${escapeHtml(cleanUrl(f.ctaButtonUrl || '#'))}" target="_blank" class="clean-cta-btn mobile-cta-btn" style="font-family: ${fontStack}; font-size: 13px; font-weight: 800; color: #ffffff; text-decoration: none; padding: 13px 28px; border-radius: 10px; display: inline-block; background-color: ${f.ctaButtonColor || '#0b0f19'}; background-image: linear-gradient(to bottom, ${f.ctaButtonColor || '#0b0f19'} 0%, ${f.ctaButtonColor || '#0b0f19'} 100%); text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2; border: 1.5px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);">
                                                         ${escapeHtml(f.ctaButtonText)}
                                                     </a>
                                                 </td>` : ''}
                                                 ${(f.showCtaSecondaryButton && f.ctaSecondaryButtonText) ? `
                                                 <td align="center" class="mobile-cta-cell" style="border-radius: 10px; padding-left: 12px;">
-                                                    <a href="${escapeHtml(cleanUrl(f.ctaSecondaryButtonUrl || '#'))}" target="_blank" class="clean-cta-sec-btn mobile-cta-btn" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; color: ${ctaCleanSecBtnColor}; text-decoration: none; padding: 12px 24px; border-radius: 10px; display: inline-block; background-color: ${ctaCleanSecBtnBg}; border: ${ctaCleanSecBtnBorder}; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2;">
+                                                    <a href="${escapeHtml(cleanUrl(f.ctaSecondaryButtonUrl || '#'))}" target="_blank" class="clean-cta-sec-btn mobile-cta-btn" style="font-family: ${fontStack}; font-size: 13px; font-weight: 700; color: ${ctaCleanSecBtnColor}; text-decoration: none; padding: 12px 24px; border-radius: 10px; display: inline-block; background-color: ${ctaCleanSecBtnBg}; border: ${ctaCleanSecBtnBorder}; text-transform: uppercase; letter-spacing: 0.8px; line-height: 1.2;">
                                                         ${escapeHtml(f.ctaSecondaryButtonText)}
                                                     </a>
                                                 </td>` : ''}
@@ -949,11 +964,11 @@ const compileHtml = (f) => {
                                 </tr>
                             </table>
 
-                            <p class="footer-company" style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; color: ${footerCompanyColor};">
+                            <p class="footer-company" style="margin: 0; font-family: ${fontStack}; font-size: 13px; font-weight: 700; color: ${footerCompanyColor};">
                                 ${escapeHtml(f.companyName || f.brandName || 'Loops Integrated')}
                             </p>
-                            ${f.companyAddress ? `<p class="footer-text" style="margin: 4px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; color: ${footerTextColor};">${escapeHtml(f.companyAddress)}</p>` : ''}
-                            ${f.companyContact ? `<p class="footer-text" style="margin: 4px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; color: ${footerTextColor};">${escapeHtml(f.companyContact)}</p>` : ''}
+                            ${f.companyAddress ? `<p class="footer-text" style="margin: 4px 0 0 0; font-family: ${fontStack}; font-size: 12px; color: ${footerTextColor};">${escapeHtml(f.companyAddress)}</p>` : ''}
+                            ${f.companyContact ? `<p class="footer-text" style="margin: 4px 0 0 0; font-family: ${fontStack}; font-size: 12px; color: ${footerTextColor};">${escapeHtml(f.companyContact)}</p>` : ''}
 
                             <!-- Social Links -->
                             <div style="margin: 18px 0 16px 0;">
@@ -967,10 +982,10 @@ const compileHtml = (f) => {
 
                             <hr class="footer-hr" style="border: 0; border-top: ${hrBorder}; margin: 16px 0;" />
 
-                            <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; color: #8e95a5; line-height: 1.5;">
+                            <p style="margin: 0; font-family: ${fontStack}; font-size: 11px; color: #8e95a5; line-height: 1.5;">
                                 You're receiving this email because you subscribed to our newsletter.
                             </p>
-                            <p style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px;">
+                            <p style="margin: 6px 0 0 0; font-family: ${fontStack}; font-size: 11px;">
                                 <a href="{{unsubscribe_url}}" style="color: ${brandColor}; text-decoration: underline; font-weight: 600;">Unsubscribe</a>
                             </p>
                         </td>
