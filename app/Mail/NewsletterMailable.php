@@ -114,7 +114,7 @@ class NewsletterMailable extends Mailable
             );
         }
 
-        // Ensure header headline text remains crisp white in inverted clients
+        // Ensure header headline text remains crisp white and right-aligned in inverted clients
         $html = preg_replace_callback(
             '~<h1\b([^>]*class="[^"]*mobile-headline[^"]*"[^>]*)>~i',
             function ($matches) {
@@ -124,6 +124,39 @@ class NewsletterMailable extends Mailable
                 }
                 if (str_contains($tag, 'color: #ffffff') && ! str_contains($tag, 'color: #ffffff !important')) {
                     $tag = str_replace('color: #ffffff', 'color: #ffffff !important', $tag);
+                }
+                if (! str_contains($tag, 'text-align: right')) {
+                    $tag = preg_replace('~style="([^"]*)"~i', 'style="$1 text-align: right;"', $tag);
+                }
+
+                return $tag;
+            },
+            $html
+        );
+
+        // Normalize header text alignment so edition and subtitle are strictly right-aligned
+        $html = preg_replace_callback(
+            '~<p\b([^>]*Edition[^<]*</p>)~i',
+            function ($matches) {
+                $tag = $matches[0];
+                if (! str_contains($tag, 'header-edition-text')) {
+                    $tag = preg_replace('~<p\b~i', '<p class="header-edition-text"', $tag);
+                }
+                if (! str_contains($tag, 'text-align: right')) {
+                    $tag = preg_replace('~style="([^"]*)"~i', 'style="$1 text-align: right; white-space: nowrap;"', $tag);
+                }
+
+                return $tag;
+            },
+            $html
+        );
+
+        $html = preg_replace_callback(
+            '~<p\b([^>]*header-subtitle-white[^>]*)>~i',
+            function ($matches) {
+                $tag = $matches[0];
+                if (! str_contains($tag, 'text-align: right')) {
+                    $tag = preg_replace('~style="([^"]*)"~i', 'style="$1 text-align: right;"', $tag);
                 }
 
                 return $tag;

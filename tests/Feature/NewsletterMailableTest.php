@@ -47,6 +47,7 @@ class NewsletterMailableTest extends TestCase
         $this->assertStringContainsString('header-logo-bg', $rendered);
         $this->assertStringContainsString('header-title-white', $rendered);
         $this->assertStringContainsString('color: #ffffff !important', $rendered);
+        $this->assertStringContainsString('text-align: right', $rendered);
     }
 
     public function test_mailable_falls_back_to_template_when_campaign_content_html_is_empty(): void

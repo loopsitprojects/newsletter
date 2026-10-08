@@ -81,6 +81,32 @@ class EmailTemplateSeeder extends Seeder
             border: 0 !important;
         }
 
+        /* Header Fluid Layout & Alignment */
+        .header-col-left {
+            display: inline-block;
+            width: 100%;
+            max-width: 240px;
+            vertical-align: middle;
+            text-align: left;
+        }
+        .header-col-right {
+            display: inline-block;
+            width: 100%;
+            max-width: 448px;
+            vertical-align: middle;
+            text-align: right;
+        }
+        .header-edition-text {
+            text-align: right !important;
+            white-space: nowrap !important;
+        }
+        .header-title-white {
+            text-align: right !important;
+        }
+        .header-subtitle-white {
+            text-align: right !important;
+        }
+
         /* Dark Mode & Inversion Protection (Apple Mail, Outlook, iOS Mail, Gmail) */
         u + .body .dark-header,
         u + .body .header-cell,
@@ -195,6 +221,20 @@ class EmailTemplateSeeder extends Seeder
                 padding-left: 20px !important;
                 padding-right: 20px !important;
             }
+            .header-col-left {
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                text-align: left !important;
+                padding-bottom: 16px !important;
+            }
+            .header-col-right {
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                text-align: right !important;
+                padding-left: 0 !important;
+            }
             .mobile-stack {
                 display: block !important;
                 width: 100% !important;
@@ -205,7 +245,12 @@ class EmailTemplateSeeder extends Seeder
             .mobile-stack-right {
                 padding-top: 18px !important;
                 padding-left: 0 !important;
-                text-align: left !important;
+                text-align: right !important;
+            }
+            .header-edition-text,
+            .header-title-white,
+            .header-subtitle-white {
+                text-align: right !important;
             }
             .mobile-img {
                 width: 100% !important;
@@ -274,35 +319,49 @@ class EmailTemplateSeeder extends Seeder
                         <td style="background: #0b0f19; background-color: #0b0f19; background-image: linear-gradient(#0b0f19, #0b0f19); padding: 28px 36px; border-radius: 15px 15px 0 0;" class="mobile-padding header-cell dark-header" data-header-layout="side-by-side">
                             <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
-                                    <!-- Left: Logo -->
-                                    <td class="mobile-stack" width="38%" valign="middle" align="left" style="vertical-align: middle; text-align: left; padding-right: 16px;">
-                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="left" style="margin: 0;">
-                                            <tr>
-                                                <td align="left" valign="middle">
-                                                    <a href="{{app_url}}" target="_blank" style="text-decoration: none; display: inline-block;">
-                                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="margin: 0;">
-                                                            <tr>
-                                                                <td class="header-logo-bg" style="background: #0b0f19; background-color: #0b0f19; background-image: linear-gradient(#0b0f19, #0b0f19); border-radius: 10px; padding: 4px 6px;">
-                                                                    <img src="/images/loops-logo-white.png?v=3" alt="Loops Integrated" height="64" style="height: 64px; max-height: 64px; width: auto; max-width: 240px; display: block; margin: 0; border: 0;" />
-                                                                </td>
-                                                            </tr>
-                                                        </table>
-                                                    </a>
-                                                </td>
-                                            </tr>
+                                    <td align="left" style="font-size: 0; text-align: left; padding: 0;" dir="ltr">
+                                        <!--[if mso]>
+                                        <table role="presentation" border="0" cellspacing="0" cellpadding="0" width="100%">
+                                        <tr>
+                                        <td width="240" valign="middle" align="left">
+                                        <![endif]-->
+                                        <div class="header-col-left mobile-stack" style="display: inline-block; width: 100%; max-width: 240px; vertical-align: middle; text-align: left;">
+                                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="left" style="margin: 0;">
+                                                <tr>
+                                                    <td align="left" valign="middle">
+                                                        <a href="{{app_url}}" target="_blank" style="text-decoration: none; display: inline-block;">
+                                                            <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="margin: 0;">
+                                                                <tr>
+                                                                    <td class="header-logo-bg" style="background: #0b0f19; background-color: #0b0f19; background-image: linear-gradient(#0b0f19, #0b0f19); border-radius: 10px; padding: 4px 6px;">
+                                                                        <img src="/images/loops-logo-white.png?v=3" alt="Loops Integrated" height="64" style="height: 64px; max-height: 64px; width: auto; max-width: 220px; display: block; margin: 0; border: 0;" />
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <!--[if mso]>
+                                        </td>
+                                        <td width="448" valign="middle" align="right">
+                                        <![endif]-->
+                                        <div class="header-col-right mobile-stack mobile-stack-right" style="display: inline-block; width: 100%; max-width: 448px; vertical-align: middle; text-align: right;">
+                                            <p class="header-edition-text" style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #2fd0ca; text-transform: uppercase; letter-spacing: 2px; text-align: right; white-space: nowrap;">
+                                                October Edition
+                                            </p>
+                                            <h1 class="mobile-headline header-title-white" style="margin: 6px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; color: #ffffff !important; line-height: 1.25; letter-spacing: -0.3px; text-align: right;">
+                                                What's New This Month?
+                                            </h1>
+                                            <p class="header-subtitle-white" style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #cbd5e1 !important; line-height: 1.5; text-align: right;">
+                                                Discover our latest updates, products, news and special offers.
+                                            </p>
+                                        </div>
+                                        <!--[if mso]>
+                                        </td>
+                                        </tr>
                                         </table>
-                                    </td>
-                                    <!-- Right: Edition & Heading & Subtitle -->
-                                    <td class="mobile-stack mobile-stack-right" width="62%" valign="middle" align="right" style="vertical-align: middle; text-align: right; padding-left: 16px;">
-                                        <p style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #2fd0ca; text-transform: uppercase; letter-spacing: 2px;">
-                                            October Edition
-                                        </p>
-                                        <h1 class="mobile-headline header-title-white" style="margin: 6px 0 0 0; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; color: #ffffff !important; line-height: 1.25; letter-spacing: -0.3px;">
-                                            What's New This Month?
-                                        </h1>
-                                        <p class="header-subtitle-white" style="margin: 6px 0 0 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13.5px; color: #cbd5e1 !important; line-height: 1.5;">
-                                            Discover our latest updates, products, news and special offers.
-                                        </p>
+                                        <![endif]-->
                                     </td>
                                 </tr>
                             </table>
