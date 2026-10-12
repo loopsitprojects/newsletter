@@ -580,10 +580,6 @@ class EmailTemplateSeeder extends Seeder
                                 </tr>
                             </table>
 
-                            <p class="footer-company" style="margin: 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; color: #151a29;">
-                                Loops Integrated
-                            </p>
-
                             <!-- Social Links -->
                             <div style="margin: 18px 0 16px 0;">
                                 <a href="https://facebook.com" target="_blank" class="social-icon-btn" title="Facebook" style="display: inline-block; width: 34px; height: 34px; line-height: 34px; text-align: center; vertical-align: middle; border-radius: 50%; background-color: #ffffff; border: 1px solid #e2e4ea; margin: 0 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.03);"><img src="https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/facebook.png" width="16" height="16" alt="Facebook" style="width: 16px; height: 16px; vertical-align: middle; display: inline-block; border: 0; margin-top: -2px;" /></a>

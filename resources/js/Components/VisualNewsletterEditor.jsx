@@ -91,7 +91,7 @@ const defaultFields = {
     ctaSecondaryButtonText: '',
     ctaSecondaryButtonUrl: '',
     showCeoNote: false,
-    companyName: 'Loops Integrated',
+    companyName: '',
     companyAddress: '',
     companyContact: '',
     facebookUrl: 'https://facebook.com',
@@ -958,15 +958,16 @@ const compileHtml = (f) => {
                                 <tr>
                                     <td align="center" valign="middle">
                                         <a href="{{app_url}}" target="_blank" style="text-decoration: none; display: inline-block;">
-                                            <img class="footer-logo" src="${escapeHtml(cleanUrl(footerLogoUrl))}" alt="${escapeHtml(f.companyName || f.brandName || 'Loops Integrated')}" height="32" style="height: 32px; max-height: 32px; width: auto; max-width: 160px; display: block; margin: 0 auto; border: 0;" />
+                                            <img class="footer-logo" src="${escapeHtml(cleanUrl(footerLogoUrl))}" alt="${escapeHtml(f.brandName || 'Logo')}" height="32" style="height: 32px; max-height: 32px; width: auto; max-width: 160px; display: block; margin: 0 auto; border: 0;" />
                                         </a>
                                     </td>
                                 </tr>
                             </table>
 
+                            ${f.companyName ? `
                             <p class="footer-company" style="margin: 0; font-family: ${fontStack}; font-size: 13px; font-weight: 700; color: ${footerCompanyColor};">
-                                ${escapeHtml(f.companyName || f.brandName || 'Loops Integrated')}
-                            </p>
+                                ${escapeHtml(f.companyName)}
+                            </p>` : ''}
                             ${f.companyAddress ? `<p class="footer-text" style="margin: 4px 0 0 0; font-family: ${fontStack}; font-size: 12px; color: ${footerTextColor};">${escapeHtml(f.companyAddress)}</p>` : ''}
                             ${f.companyContact ? `<p class="footer-text" style="margin: 4px 0 0 0; font-family: ${fontStack}; font-size: 12px; color: ${footerTextColor};">${escapeHtml(f.companyContact)}</p>` : ''}
 
@@ -1289,8 +1290,11 @@ const extractFieldsFromHtml = (htmlStr) => {
         const showCeoNote = !!(ceoQuote || ceoName);
 
         // Footer & Social
-        const companyNameP = doc.querySelector('td.mobile-padding > p[style*="font-weight: 700"], footer p');
-        const companyName = companyNameP ? companyNameP.textContent.trim() : '';
+        const companyNameP = doc.querySelector('td.mobile-padding > p[style*="font-weight: 700"], footer p, p.footer-company');
+        let companyName = companyNameP ? companyNameP.textContent.trim() : '';
+        if (companyName.toLowerCase() === 'loops integrated') {
+            companyName = '';
+        }
 
         const fbA = doc.querySelector('a[href*="facebook"]');
         const liA = doc.querySelector('a[href*="linkedin"]');
@@ -1366,7 +1370,7 @@ const extractFieldsFromHtml = (htmlStr) => {
             ceoLabel: ceoLabel || defaultFields.ceoLabel,
             ceoQuote: ceoQuote || defaultFields.ceoQuote,
             ceoName: ceoName || defaultFields.ceoName,
-            companyName: companyName || defaultFields.companyName,
+            companyName: companyName || '',
             companyAddress: '',
             companyContact: '',
             facebookUrl: fbA ? fbA.getAttribute('href') : defaultFields.facebookUrl,
@@ -2890,6 +2894,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                             type="text"
                                             value={fields.companyName || ''}
                                             onChange={(e) => updateField('companyName', e.target.value)}
+                                            placeholder="Optional (leave blank to hide)"
                                             className="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-semibold"
                                         />
                                     </div>

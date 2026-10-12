@@ -92,7 +92,7 @@ export default function MeridianNewsletter({
     showCtaSecondaryButton = false,
     ctaSecondaryButtonText = '',
     ctaSecondaryButtonUrl = '#',
-    companyName = 'Loops Integrated',
+    companyName = '',
     companyAddress = '',
     companyContact = '',
     unsubscribeUrl = '#',
@@ -356,7 +356,9 @@ export default function MeridianNewsletter({
                 <div className="flex justify-center mb-3">
                     <Logo logoUrl={logoUrl} logoDarkUrl={logoDarkUrl} brandName={brandName} />
                 </div>
-                <p className="font-semibold text-sm text-[#151a29]">{companyName}</p>
+                {companyName && companyName !== 'Loops Integrated' && (
+                    <p className="font-semibold text-sm text-[#151a29]">{companyName}</p>
+                )}
                 {companyAddress && <p className="mt-1">{companyAddress}</p>}
                 {companyContact && (
                     <p className={cn('mt-1', mobile && 'flex flex-col gap-1')}>
