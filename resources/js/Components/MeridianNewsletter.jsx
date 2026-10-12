@@ -130,17 +130,19 @@ export default function MeridianNewsletter({
 
             {/* Hero */}
             <section className={cn(px, mobile ? 'pt-6' : 'pt-8', 'text-center')}>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0057c5]">
-                    {edition}
-                </p>
                 <h1
                     className={cn(
-                        'mt-3 font-serif font-bold leading-tight text-[#151a29]',
+                        'font-serif font-bold leading-tight text-[#151a29]',
                         mobile ? 'text-3xl' : 'text-[40px]'
                     )}
                 >
                     {title}
                 </h1>
+                {edition && (
+                    <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#0057c5]">
+                        {edition}
+                    </p>
+                )}
                 <p className="mx-auto mt-3 max-w-md text-base leading-relaxed text-[#636978]">
                     {subtitle}
                 </p>

@@ -501,21 +501,21 @@ const compileHtml = (f) => {
                 float: none !important;
                 clear: both !important;
             }
-            .header-edition-text {
-                font-size: 10px !important;
-                letter-spacing: 1.5px !important;
-                text-align: center !important;
-                display: block !important;
-                margin: 0 auto 6px auto !important;
-            }
             h1.header-title-white,
             .header-title-white {
                 font-size: 23px !important;
                 line-height: 1.25 !important;
                 text-align: center !important;
                 display: block !important;
-                margin: 0 auto 8px auto !important;
+                margin: 0 auto 6px auto !important;
                 color: ${headerTitleColor} !important;
+            }
+            .header-edition-text {
+                font-size: 10px !important;
+                letter-spacing: 1.5px !important;
+                text-align: center !important;
+                display: block !important;
+                margin: 0 auto 8px auto !important;
             }
             .header-subtitle-white {
                 font-size: 13.5px !important;
@@ -640,14 +640,14 @@ const compileHtml = (f) => {
                                         </table>
                                     </td>
                                     <td class="header-col-right mobile-stack mobile-stack-right" valign="top" align="right" style="vertical-align: top; text-align: right; padding: 0;">
-                                        ${f.edition ? `
-                                        <p class="header-edition-text" style="margin: 0; font-family: ${fontStack}; font-size: 11px; font-weight: 700; color: ${headerEditionColor}; text-transform: uppercase; letter-spacing: 2px; text-align: right; white-space: nowrap;">
-                                            ${escapeHtml(f.edition)}
-                                        </p>` : ''}
                                         ${f.headerTitle ? `
-                                        <h1 class="header-title-white" style="margin: 6px 0 0 0; font-family: ${fontStack}; font-size: 26px; font-weight: 700; color: ${headerTitleColor} !important; line-height: 1.25; letter-spacing: -0.3px; text-align: right;">
+                                        <h1 class="header-title-white" style="margin: 0; font-family: ${fontStack}; font-size: 26px; font-weight: 700; color: ${headerTitleColor} !important; line-height: 1.25; letter-spacing: -0.3px; text-align: right;">
                                             ${escapeHtml(f.headerTitle)}
                                         </h1>` : ''}
+                                        ${f.edition ? `
+                                        <p class="header-edition-text" style="margin: 6px 0 0 0; font-family: ${fontStack}; font-size: 11px; font-weight: 700; color: ${headerEditionColor}; text-transform: uppercase; letter-spacing: 2px; text-align: right; white-space: nowrap;">
+                                            ${escapeHtml(f.edition)}
+                                        </p>` : ''}
                                         ${f.headerSubtitle ? `
                                         <p class="header-subtitle-white" style="margin: 8px 0 0 0; font-family: ${fontStack}; font-size: 13.5px; color: ${headerSubtitleColor} !important; line-height: 1.5; text-align: right; max-width: 440px; margin-left: auto;">
                                             ${escapeHtml(f.headerSubtitle)}
@@ -698,14 +698,14 @@ const compileHtml = (f) => {
                     </tr>` : '') : `
                     <tr>
                         <td align="${heroAlign}" style="padding: 36px 36px 32px 36px; text-align: ${heroAlign};" class="mobile-padding">
-                            ${f.edition ? `
-                            <p style="margin: 0; font-family: ${fontStack}; font-size: 11px; font-weight: 700; color: ${headerEditionColor}; text-transform: uppercase; letter-spacing: 2.2px; text-align: ${heroAlign};">
-                                ${escapeHtml(f.edition)}
-                            </p>` : ''}
                             ${f.headerTitle ? `
-                            <h1 class="mobile-headline" style="margin: 12px 0 0 0; font-family: ${fontStack}; font-size: 40px; font-weight: 700; color: ${headerTitleColor}; line-height: 1.2; letter-spacing: -0.5px; text-align: ${heroAlign};">
+                            <h1 class="mobile-headline" style="margin: 0; font-family: ${fontStack}; font-size: 40px; font-weight: 700; color: ${headerTitleColor}; line-height: 1.2; letter-spacing: -0.5px; text-align: ${heroAlign};">
                                 ${escapeHtml(f.headerTitle)}
                             </h1>` : ''}
+                            ${f.edition ? `
+                            <p style="margin: 10px 0 0 0; font-family: ${fontStack}; font-size: 11px; font-weight: 700; color: ${headerEditionColor}; text-transform: uppercase; letter-spacing: 2.2px; text-align: ${heroAlign};">
+                                ${escapeHtml(f.edition)}
+                            </p>` : ''}
                             ${f.headerSubtitle ? `
                             <p style="margin: ${heroAlign === 'center' ? '14px auto 0 auto' : '14px 0 0 0'}; max-width: ${heroAlign === 'center' ? '480px' : '580px'}; font-family: ${fontStack}; font-size: 15px; color: ${headerSubtitleColor}; line-height: 1.6; text-align: ${heroAlign};">
                                 ${escapeHtml(f.headerSubtitle)}
@@ -1060,7 +1060,7 @@ const extractFieldsFromHtml = (htmlStr) => {
         const logoAlign = headerLogoTd?.getAttribute('align') || (headerLogoTd?.style?.textAlign) || 'left';
 
         // Edition
-        const editionP = doc.querySelector('p[style*="letter-spacing: 2"], p[style*="letter-spacing: 2.2px"], p[style*="uppercase"]');
+        const editionP = doc.querySelector('p.header-edition-text, p[style*="letter-spacing: 2"], p[style*="letter-spacing: 2.2px"], p[style*="uppercase"]');
         const edition = editionP ? editionP.textContent.trim() : '';
 
         // Hero Title (H1)
@@ -1071,8 +1071,10 @@ const extractFieldsFromHtml = (htmlStr) => {
         let headerSubtitle = '';
         if (h1) {
             let next = h1.nextElementSibling;
-            while (next && next.tagName !== 'P') next = next.nextElementSibling;
-            if (next) headerSubtitle = next.textContent.trim();
+            while (next && (next.tagName !== 'P' || next.classList.contains('header-edition-text') || (edition && next.textContent.trim().toUpperCase() === edition.toUpperCase()))) {
+                next = next.nextElementSibling;
+            }
+            if (next && next.tagName === 'P') headerSubtitle = next.textContent.trim();
         }
 
         const heroTd = h1?.closest('td');
@@ -1726,17 +1728,17 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                     float: none !important;
                     clear: both !important;
                 }
-                .header-edition-text {
-                    font-size: 10px !important;
-                    letter-spacing: 1.5px !important;
-                    text-align: center !important;
-                    display: block !important;
-                    margin: 0 auto 6px auto !important;
-                }
                 h1.header-title-white,
                 .header-title-white {
                     font-size: 23px !important;
                     line-height: 1.25 !important;
+                    text-align: center !important;
+                    display: block !important;
+                    margin: 0 auto 6px auto !important;
+                }
+                .header-edition-text {
+                    font-size: 10px !important;
+                    letter-spacing: 1.5px !important;
                     text-align: center !important;
                     display: block !important;
                     margin: 0 auto 8px auto !important;
@@ -2191,7 +2193,7 @@ export default function VisualNewsletterEditor({ value, onChange, templates = []
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Edition Tagline (Top Pill)</label>
+                                        <label className="block text-[10px] text-slate-400 mb-1 font-semibold">Edition Tagline (Under Title)</label>
                                         <input
                                             type="text"
                                             value={fields.edition || ''}

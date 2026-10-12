@@ -298,17 +298,17 @@ class EmailTemplateSeeder extends Seeder
                 float: none !important;
                 clear: both !important;
             }
-            .header-edition-text {
-                font-size: 10px !important;
-                letter-spacing: 1.5px !important;
-                text-align: center !important;
-                display: block !important;
-                margin: 0 auto 6px auto !important;
-            }
             h1.header-title-white,
             .header-title-white {
                 font-size: 23px !important;
                 line-height: 1.25 !important;
+                text-align: center !important;
+                display: block !important;
+                margin: 0 auto 6px auto !important;
+            }
+            .header-edition-text {
+                font-size: 10px !important;
+                letter-spacing: 1.5px !important;
                 text-align: center !important;
                 display: block !important;
                 margin: 0 auto 8px auto !important;
@@ -424,12 +424,12 @@ class EmailTemplateSeeder extends Seeder
                                         </table>
                                     </td>
                                     <td class="header-col-right mobile-stack mobile-stack-right" valign="top" align="right" style="vertical-align: top; text-align: right; padding: 0;">
-                                        <p class="header-edition-text" style="margin: 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #2fd0ca; text-transform: uppercase; letter-spacing: 2px; text-align: right; white-space: nowrap;">
-                                            October Edition
-                                        </p>
-                                        <h1 class="header-title-white" style="margin: 6px 0 0 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 26px; font-weight: 700; color: #ffffff !important; line-height: 1.25; letter-spacing: -0.3px; text-align: right;">
+                                        <h1 class="header-title-white" style="margin: 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 26px; font-weight: 700; color: #ffffff !important; line-height: 1.25; letter-spacing: -0.3px; text-align: right;">
                                             What's New This Month?
                                         </h1>
+                                        <p class="header-edition-text" style="margin: 6px 0 0 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; color: #2fd0ca; text-transform: uppercase; letter-spacing: 2px; text-align: right; white-space: nowrap;">
+                                            October Edition
+                                        </p>
                                         <p class="header-subtitle-white" style="margin: 8px 0 0 0; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13.5px; color: #cbd5e1 !important; line-height: 1.5; text-align: right; max-width: 440px; margin-left: auto;">
                                             Discover our latest updates, products, news and special offers.
                                         </p>
